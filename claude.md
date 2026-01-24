@@ -120,6 +120,39 @@ Local Machine                    Server (maru)
 npm run deploy              # Build + rsync
 ```
 
+## Current Reports
+
+### Metals Commodity Prices (1975-2026)
+
+Location: `src/reports/2025-01-metals/index.jsx`
+
+**Features:**
+- 13 metals: Gold, Silver, Copper, Aluminum, Iron, Nickel, Cobalt, Zinc, Tin, Tungsten, Molybdenum, Lithium, Titanium
+- Multi-select comparison with chip-based UI
+- Dynamic Y-axis range based on selected metals
+- Linear/Log scale toggle
+- Time range filter (5/10/20/30/50 years)
+- Cycle period markers (ReferenceArea)
+- Sub-charts grouped by category:
+  - Precious Metals (Gold & Silver) - dual Y-axis
+  - Industrial Metals (Copper, Aluminum, Zinc) - normalized %
+  - Ferrous Metals (Iron, Cobalt, Nickel) - normalized %
+  - Rare Metals (Tin, Tungsten, Molybdenum) - normalized %
+  - New Energy Metals (Lithium & Titanium) - dual Y-axis
+
+**Data Structure:**
+```javascript
+// Raw price data arrays
+const goldData = [{ year: 1975, price: 161 }, ...];
+
+// Normalized data (calculated)
+const normalizedData = goldData.map((_, index) => ({
+  year: goldData[index].year,
+  gold: parseFloat(((goldData[index].price / basePrice) * 100).toFixed(1)),
+  // ... other metals
+}));
+```
+
 ## Troubleshooting
 
 ### Build fails
