@@ -223,7 +223,6 @@ const cycleAnnotations = [
 ];
 
 const MetalsDashboard = () => {
-  const [selectedMetal, setSelectedMetal] = useState('all');
   const [timeRange, setTimeRange] = useState('50');
   const [useLogScale, setUseLogScale] = useState(false);
 
@@ -239,6 +238,19 @@ const MetalsDashboard = () => {
     { id: 'lithium', name: 'Lithium', data: lithiumData, color: '#9b59b6', unit: 'USD/ton' },
     { id: 'titanium', name: 'Titanium', data: titaniumData, color: '#1abc9c', unit: 'USD/ton' },
   ];
+
+  const [selectedMetals, setSelectedMetals] = useState(metals.map(m => m.id));
+
+  const toggleMetal = (metalId) => {
+    setSelectedMetals(prev =>
+      prev.includes(metalId)
+        ? prev.filter(id => id !== metalId)
+        : [...prev, metalId]
+    );
+  };
+
+  const selectAll = () => setSelectedMetals(metals.map(m => m.id));
+  const deselectAll = () => setSelectedMetals([]);
 
   const filterByTimeRange = (data) => {
     const currentYear = 2026;
@@ -304,29 +316,70 @@ const MetalsDashboard = () => {
       <div style={{
         display: 'flex',
         justifyContent: 'center',
+        gap: '8px',
+        marginBottom: '16px',
+        flexWrap: 'wrap',
+        alignItems: 'center'
+      }}>
+        <button
+          onClick={selectAll}
+          style={{
+            background: selectedMetals.length === metals.length ? 'rgba(34, 197, 94, 0.2)' : 'rgba(30, 41, 59, 0.8)',
+            border: `1px solid ${selectedMetals.length === metals.length ? '#22c55e' : 'rgba(255,255,255,0.1)'}`,
+            borderRadius: '6px',
+            padding: '6px 12px',
+            color: selectedMetals.length === metals.length ? '#22c55e' : '#94a3b8',
+            fontSize: '12px',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease'
+          }}
+        >
+          All
+        </button>
+        <button
+          onClick={deselectAll}
+          style={{
+            background: selectedMetals.length === 0 ? 'rgba(239, 68, 68, 0.2)' : 'rgba(30, 41, 59, 0.8)',
+            border: `1px solid ${selectedMetals.length === 0 ? '#ef4444' : 'rgba(255,255,255,0.1)'}`,
+            borderRadius: '6px',
+            padding: '6px 12px',
+            color: selectedMetals.length === 0 ? '#ef4444' : '#94a3b8',
+            fontSize: '12px',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease'
+          }}
+        >
+          None
+        </button>
+        <span style={{ color: '#475569', margin: '0 4px' }}>|</span>
+        {metals.map(metal => (
+          <button
+            key={metal.id}
+            onClick={() => toggleMetal(metal.id)}
+            style={{
+              background: selectedMetals.includes(metal.id) ? `${metal.color}22` : 'rgba(30, 41, 59, 0.8)',
+              border: `1px solid ${selectedMetals.includes(metal.id) ? metal.color : 'rgba(255,255,255,0.1)'}`,
+              borderRadius: '6px',
+              padding: '6px 12px',
+              color: selectedMetals.includes(metal.id) ? metal.color : '#64748b',
+              fontSize: '12px',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              fontWeight: selectedMetals.includes(metal.id) ? '600' : '400'
+            }}
+          >
+            {metal.name}
+          </button>
+        ))}
+      </div>
+
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
         gap: '16px',
         marginBottom: '32px',
         flexWrap: 'wrap'
       }}>
-        <select
-          value={selectedMetal}
-          onChange={(e) => setSelectedMetal(e.target.value)}
-          style={{
-            background: 'rgba(30, 41, 59, 0.8)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: '8px',
-            padding: '10px 20px',
-            color: '#e2e8f0',
-            fontSize: '14px',
-            cursor: 'pointer'
-          }}
-        >
-          <option value="all">All Metals Comparison</option>
-          {metals.map(m => (
-            <option key={m.id} value={m.id}>{m.name}</option>
-          ))}
-        </select>
-
         <select
           value={timeRange}
           onChange={(e) => setTimeRange(e.target.value)}
@@ -390,7 +443,111 @@ const MetalsDashboard = () => {
         ))}
       </div>
 
-      {selectedMetal === 'all' ? (
+      {selectedMetals.length === 0 ? (
+        <div style={{
+          background: 'rgba(30, 41, 59, 0.5)',
+          borderRadius: '16px',
+          padding: '48px',
+          marginBottom: '32px',
+          border: '1px solid rgba(255,255,255,0.05)',
+          textAlign: 'center'
+        }}>
+          <p style={{ color: '#94a3b8', fontSize: '1.1rem' }}>
+            Please select at least one metal to view the chart
+          </p>
+        </div>
+      ) : selectedMetals.length === 1 ? (
+        (() => {
+          const metal = metals.find(m => m.id === selectedMetals[0]);
+          const data = filterByTimeRange(metal.data);
+          const currentPrice = data[data.length - 1].price;
+          const startPrice = data[0].price;
+          const totalReturn = ((currentPrice - startPrice) / startPrice * 100).toFixed(1);
+          const maxPrice = Math.max(...data.map(d => d.price));
+          const minPrice = Math.min(...data.map(d => d.price));
+
+          return (
+            <div style={{
+              background: 'rgba(30, 41, 59, 0.5)',
+              borderRadius: '16px',
+              padding: '24px',
+              marginBottom: '32px',
+              border: '1px solid rgba(255,255,255,0.05)'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
+                <h2 style={{ fontSize: '1.5rem', color: metal.color, margin: 0 }}>
+                  {metal.name} Price Trend
+                </h2>
+                <div style={{ display: 'flex', gap: '24px' }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Current Price</div>
+                    <div style={{ fontSize: '1.25rem', fontWeight: '700', color: metal.color }}>
+                      {currentPrice.toLocaleString()} {metal.unit}
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Total Return</div>
+                    <div style={{ fontSize: '1.25rem', fontWeight: '700', color: totalReturn > 0 ? '#22c55e' : '#ef4444' }}>
+                      {totalReturn > 0 ? '+' : ''}{totalReturn}%
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>All-Time High</div>
+                    <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#f1f5f9' }}>
+                      {maxPrice.toLocaleString()}
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>All-Time Low</div>
+                    <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#f1f5f9' }}>
+                      {minPrice.toLocaleString()}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <ResponsiveContainer width="100%" height={450}>
+                <AreaChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                  <defs>
+                    <linearGradient id={`gradient-${metal.id}`} x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={metal.color} stopOpacity={0.4}/>
+                      <stop offset="95%" stopColor={metal.color} stopOpacity={0.05}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                  <XAxis dataKey="year" stroke="#94a3b8" fontSize={12} />
+                  <YAxis stroke="#94a3b8" fontSize={12} tickFormatter={(v) => v.toLocaleString()} />
+                  {cycleAnnotations.map((cycle, index) => (
+                    <ReferenceArea
+                      key={`cycle-${index}`}
+                      x1={cycle.start}
+                      x2={cycle.end}
+                      fill={cycle.color}
+                      fillOpacity={0.15}
+                    />
+                  ))}
+                  <Tooltip
+                    contentStyle={{
+                      background: 'rgba(15, 23, 42, 0.95)',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: '8px'
+                    }}
+                    formatter={(value) => [`${value.toLocaleString()} ${metal.unit}`, metal.name]}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="price"
+                    stroke={metal.color}
+                    strokeWidth={2.5}
+                    fill={`url(#gradient-${metal.id})`}
+                    activeDot={{ r: 6, stroke: metal.color, strokeWidth: 2, fill: '#0f172a' }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          );
+        })()
+      ) : (
         <>
           <div style={{
             background: 'rgba(30, 41, 59, 0.5)',
@@ -400,7 +557,7 @@ const MetalsDashboard = () => {
             border: '1px solid rgba(255,255,255,0.05)'
           }}>
             <h2 style={{ fontSize: '1.25rem', marginBottom: '16px', color: '#f1f5f9' }}>
-              Normalized Returns (Base 1975 = 100)
+              Normalized Returns (Base 1975 = 100) - {selectedMetals.length} Metals
             </h2>
             <ResponsiveContainer width="100%" height={500}>
               <LineChart data={filterByTimeRange(normalizedData)} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
@@ -425,7 +582,7 @@ const MetalsDashboard = () => {
                     fillOpacity={0.15}
                   />
                 ))}
-                {metals.map(metal => (
+                {metals.filter(m => selectedMetals.includes(m.id)).map(metal => (
                   <Line
                     key={metal.id}
                     type="monotone"
@@ -565,89 +722,6 @@ const MetalsDashboard = () => {
             </div>
           </div>
         </>
-      ) : (
-        <div style={{
-          background: 'rgba(30, 41, 59, 0.5)',
-          borderRadius: '16px',
-          padding: '24px',
-          border: '1px solid rgba(255,255,255,0.05)'
-        }}>
-          {(() => {
-            const metal = metals.find(m => m.id === selectedMetal);
-            const data = filterByTimeRange(metal.data);
-            const currentPrice = data[data.length - 1].price;
-            const startPrice = data[0].price;
-            const totalReturn = ((currentPrice - startPrice) / startPrice * 100).toFixed(1);
-            const maxPrice = Math.max(...data.map(d => d.price));
-            const minPrice = Math.min(...data.map(d => d.price));
-
-            return (
-              <>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
-                  <h2 style={{ fontSize: '1.5rem', color: metal.color, margin: 0 }}>
-                    {metal.name} Price Trend
-                  </h2>
-                  <div style={{ display: 'flex', gap: '24px' }}>
-                    <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Current Price</div>
-                      <div style={{ fontSize: '1.25rem', fontWeight: '700', color: metal.color }}>
-                        {currentPrice.toLocaleString()} {metal.unit}
-                      </div>
-                    </div>
-                    <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Total Return</div>
-                      <div style={{ fontSize: '1.25rem', fontWeight: '700', color: totalReturn > 0 ? '#22c55e' : '#ef4444' }}>
-                        {totalReturn > 0 ? '+' : ''}{totalReturn}%
-                      </div>
-                    </div>
-                    <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>All-Time High</div>
-                      <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#f1f5f9' }}>
-                        {maxPrice.toLocaleString()}
-                      </div>
-                    </div>
-                    <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>All-Time Low</div>
-                      <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#f1f5f9' }}>
-                        {minPrice.toLocaleString()}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <ResponsiveContainer width="100%" height={450}>
-                  <AreaChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-                    <defs>
-                      <linearGradient id={`gradient-${metal.id}`} x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={metal.color} stopOpacity={0.4}/>
-                        <stop offset="95%" stopColor={metal.color} stopOpacity={0.05}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                    <XAxis dataKey="year" stroke="#94a3b8" fontSize={12} />
-                    <YAxis stroke="#94a3b8" fontSize={12} tickFormatter={(v) => v.toLocaleString()} />
-                    <Tooltip
-                      contentStyle={{
-                        background: 'rgba(15, 23, 42, 0.95)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: '8px'
-                      }}
-                      formatter={(value) => [`${value.toLocaleString()} ${metal.unit}`, metal.name]}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="price"
-                      stroke={metal.color}
-                      strokeWidth={2.5}
-                      fill={`url(#gradient-${metal.id})`}
-                      activeDot={{ r: 6, stroke: metal.color, strokeWidth: 2, fill: '#0f172a' }}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </>
-            );
-          })()}
-        </div>
       )}
 
       <div style={{
@@ -666,12 +740,12 @@ const MetalsDashboard = () => {
           return (
             <div
               key={metal.id}
-              onClick={() => setSelectedMetal(metal.id)}
+              onClick={() => toggleMetal(metal.id)}
               style={{
-                background: selectedMetal === metal.id ? 'rgba(255,255,255,0.1)' : 'rgba(30, 41, 59, 0.5)',
+                background: selectedMetals.includes(metal.id) ? 'rgba(255,255,255,0.1)' : 'rgba(30, 41, 59, 0.5)',
                 borderRadius: '12px',
                 padding: '16px',
-                border: `1px solid ${selectedMetal === metal.id ? metal.color : 'rgba(255,255,255,0.05)'}`,
+                border: `1px solid ${selectedMetals.includes(metal.id) ? metal.color : 'rgba(255,255,255,0.05)'}`,
                 cursor: 'pointer',
                 transition: 'all 0.2s ease'
               }}
