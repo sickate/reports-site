@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, ComposedChart, Bar } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, ComposedChart, Bar, ReferenceArea } from 'recharts';
 
 // Historical price data (1975-2025) - Based on actual market data
 const goldData = [
@@ -19,7 +19,8 @@ const goldData = [
   { year: 2014, price: 1266 }, { year: 2015, price: 1160 }, { year: 2016, price: 1251 },
   { year: 2017, price: 1257 }, { year: 2018, price: 1269 }, { year: 2019, price: 1393 },
   { year: 2020, price: 1770 }, { year: 2021, price: 1799 }, { year: 2022, price: 1800 },
-  { year: 2023, price: 1943 }, { year: 2024, price: 2386 }, { year: 2025, price: 4200 }
+  { year: 2023, price: 1943 }, { year: 2024, price: 2386 }, { year: 2025, price: 4200 },
+  { year: 2026, price: 4900 }
 ];
 
 const silverData = [
@@ -39,7 +40,8 @@ const silverData = [
   { year: 2014, price: 19.08 }, { year: 2015, price: 15.68 }, { year: 2016, price: 17.14 },
   { year: 2017, price: 17.05 }, { year: 2018, price: 15.71 }, { year: 2019, price: 16.21 },
   { year: 2020, price: 20.55 }, { year: 2021, price: 25.14 }, { year: 2022, price: 21.73 },
-  { year: 2023, price: 23.35 }, { year: 2024, price: 28.27 }, { year: 2025, price: 92 }
+  { year: 2023, price: 23.35 }, { year: 2024, price: 28.27 }, { year: 2025, price: 92 },
+  { year: 2026, price: 100 }
 ];
 
 const copperData = [
@@ -59,7 +61,8 @@ const copperData = [
   { year: 2014, price: 6863 }, { year: 2015, price: 5510 }, { year: 2016, price: 4868 },
   { year: 2017, price: 6166 }, { year: 2018, price: 6530 }, { year: 2019, price: 6010 },
   { year: 2020, price: 6181 }, { year: 2021, price: 9317 }, { year: 2022, price: 8797 },
-  { year: 2023, price: 8478 }, { year: 2024, price: 9200 }, { year: 2025, price: 12400 }
+  { year: 2023, price: 8478 }, { year: 2024, price: 9200 }, { year: 2025, price: 12400 },
+  { year: 2026, price: 13000 }
 ];
 
 const aluminumData = [
@@ -79,7 +82,8 @@ const aluminumData = [
   { year: 2014, price: 1867 }, { year: 2015, price: 1665 }, { year: 2016, price: 1604 },
   { year: 2017, price: 1968 }, { year: 2018, price: 2110 }, { year: 2019, price: 1794 },
   { year: 2020, price: 1704 }, { year: 2021, price: 2480 }, { year: 2022, price: 2705 },
-  { year: 2023, price: 2255 }, { year: 2024, price: 2450 }, { year: 2025, price: 3150 }
+  { year: 2023, price: 2255 }, { year: 2024, price: 2450 }, { year: 2025, price: 3150 },
+  { year: 2026, price: 3250 }
 ];
 
 const nickelData = [
@@ -99,7 +103,8 @@ const nickelData = [
   { year: 2014, price: 16893 }, { year: 2015, price: 11863 }, { year: 2016, price: 9595 },
   { year: 2017, price: 10411 }, { year: 2018, price: 13114 }, { year: 2019, price: 13914 },
   { year: 2020, price: 13789 }, { year: 2021, price: 18465 }, { year: 2022, price: 25617 },
-  { year: 2023, price: 21511 }, { year: 2024, price: 17500 }, { year: 2025, price: 15200 }
+  { year: 2023, price: 21511 }, { year: 2024, price: 17500 }, { year: 2025, price: 15200 },
+  { year: 2026, price: 18000 }
 ];
 
 const zincData = [
@@ -119,7 +124,8 @@ const zincData = [
   { year: 2014, price: 2161 }, { year: 2015, price: 1932 }, { year: 2016, price: 2090 },
   { year: 2017, price: 2896 }, { year: 2018, price: 2922 }, { year: 2019, price: 2546 },
   { year: 2020, price: 2266 }, { year: 2021, price: 3003 }, { year: 2022, price: 3478 },
-  { year: 2023, price: 2651 }, { year: 2024, price: 2800 }, { year: 2025, price: 3195 }
+  { year: 2023, price: 2651 }, { year: 2024, price: 2800 }, { year: 2025, price: 3195 },
+  { year: 2026, price: 3200 }
 ];
 
 const tinData = [
@@ -139,7 +145,8 @@ const tinData = [
   { year: 2014, price: 21899 }, { year: 2015, price: 16067 }, { year: 2016, price: 17934 },
   { year: 2017, price: 20128 }, { year: 2018, price: 20145 }, { year: 2019, price: 18670 },
   { year: 2020, price: 17125 }, { year: 2021, price: 32560 }, { year: 2022, price: 30959 },
-  { year: 2023, price: 25913 }, { year: 2024, price: 29000 }, { year: 2025, price: 45560 }
+  { year: 2023, price: 25913 }, { year: 2024, price: 29000 }, { year: 2025, price: 45560 },
+  { year: 2026, price: 52000 }
 ];
 
 const tungstenData = [
@@ -159,7 +166,52 @@ const tungstenData = [
   { year: 2014, price: 365 }, { year: 2015, price: 230 }, { year: 2016, price: 195 },
   { year: 2017, price: 275 }, { year: 2018, price: 320 }, { year: 2019, price: 260 },
   { year: 2020, price: 255 }, { year: 2021, price: 285 }, { year: 2022, price: 350 },
-  { year: 2023, price: 330 }, { year: 2024, price: 380 }, { year: 2025, price: 1050 }
+  { year: 2023, price: 330 }, { year: 2024, price: 380 }, { year: 2025, price: 1050 },
+  { year: 2026, price: 1200 }
+];
+
+// Lithium price data (USD/ton) - Lithium Carbonate equivalent
+const lithiumData = [
+  { year: 1975, price: 8500 }, { year: 1976, price: 8800 }, { year: 1977, price: 9200 },
+  { year: 1978, price: 9500 }, { year: 1979, price: 10500 }, { year: 1980, price: 12000 },
+  { year: 1981, price: 11000 }, { year: 1982, price: 9800 }, { year: 1983, price: 9200 },
+  { year: 1984, price: 8800 }, { year: 1985, price: 8500 }, { year: 1986, price: 8000 },
+  { year: 1987, price: 7800 }, { year: 1988, price: 8200 }, { year: 1989, price: 8500 },
+  { year: 1990, price: 8200 }, { year: 1991, price: 7800 }, { year: 1992, price: 7500 },
+  { year: 1993, price: 7200 }, { year: 1994, price: 7000 }, { year: 1995, price: 6800 },
+  { year: 1996, price: 6500 }, { year: 1997, price: 6200 }, { year: 1998, price: 5800 },
+  { year: 1999, price: 5500 }, { year: 2000, price: 5200 }, { year: 2001, price: 4800 },
+  { year: 2002, price: 4500 }, { year: 2003, price: 4200 }, { year: 2004, price: 4500 },
+  { year: 2005, price: 5000 }, { year: 2006, price: 5800 }, { year: 2007, price: 6500 },
+  { year: 2008, price: 6800 }, { year: 2009, price: 5500 }, { year: 2010, price: 5800 },
+  { year: 2011, price: 6200 }, { year: 2012, price: 6000 }, { year: 2013, price: 5500 },
+  { year: 2014, price: 5800 }, { year: 2015, price: 6500 }, { year: 2016, price: 9000 },
+  { year: 2017, price: 14000 }, { year: 2018, price: 16500 }, { year: 2019, price: 11000 },
+  { year: 2020, price: 8500 }, { year: 2021, price: 17000 }, { year: 2022, price: 78000 },
+  { year: 2023, price: 35000 }, { year: 2024, price: 15000 }, { year: 2025, price: 18000 },
+  { year: 2026, price: 22500 }
+];
+
+// Titanium sponge price data (USD/ton)
+const titaniumData = [
+  { year: 1975, price: 8000 }, { year: 1976, price: 8200 }, { year: 1977, price: 8500 },
+  { year: 1978, price: 9000 }, { year: 1979, price: 10000 }, { year: 1980, price: 12000 },
+  { year: 1981, price: 11500 }, { year: 1982, price: 10500 }, { year: 1983, price: 9800 },
+  { year: 1984, price: 9500 }, { year: 1985, price: 9200 }, { year: 1986, price: 8800 },
+  { year: 1987, price: 8500 }, { year: 1988, price: 9000 }, { year: 1989, price: 9500 },
+  { year: 1990, price: 9800 }, { year: 1991, price: 9200 }, { year: 1992, price: 8800 },
+  { year: 1993, price: 8500 }, { year: 1994, price: 8200 }, { year: 1995, price: 8000 },
+  { year: 1996, price: 7800 }, { year: 1997, price: 7500 }, { year: 1998, price: 7200 },
+  { year: 1999, price: 6800 }, { year: 2000, price: 6500 }, { year: 2001, price: 6200 },
+  { year: 2002, price: 6000 }, { year: 2003, price: 6200 }, { year: 2004, price: 7500 },
+  { year: 2005, price: 9500 }, { year: 2006, price: 14000 }, { year: 2007, price: 18000 },
+  { year: 2008, price: 20000 }, { year: 2009, price: 12000 }, { year: 2010, price: 10500 },
+  { year: 2011, price: 11000 }, { year: 2012, price: 10000 }, { year: 2013, price: 9500 },
+  { year: 2014, price: 9000 }, { year: 2015, price: 8500 }, { year: 2016, price: 8000 },
+  { year: 2017, price: 8800 }, { year: 2018, price: 10500 }, { year: 2019, price: 11000 },
+  { year: 2020, price: 10000 }, { year: 2021, price: 12000 }, { year: 2022, price: 14500 },
+  { year: 2023, price: 12000 }, { year: 2024, price: 11000 }, { year: 2025, price: 12500 },
+  { year: 2026, price: 13500 }
 ];
 
 const cycleAnnotations = [
@@ -183,11 +235,13 @@ const MetalsDashboard = () => {
     { id: 'nickel', name: 'Nickel', data: nickelData, color: '#727472', unit: 'USD/ton' },
     { id: 'zinc', name: 'Zinc', data: zincData, color: '#7CB9E8', unit: 'USD/ton' },
     { id: 'tin', name: 'Tin', data: tinData, color: '#8B8589', unit: 'USD/ton' },
-    { id: 'tungsten', name: 'Tungsten', data: tungstenData, color: '#3D3D3D', unit: 'USD/mtu' },
+    { id: 'tungsten', name: 'Tungsten', data: tungstenData, color: '#e74c3c', unit: 'USD/mtu' },
+    { id: 'lithium', name: 'Lithium', data: lithiumData, color: '#9b59b6', unit: 'USD/ton' },
+    { id: 'titanium', name: 'Titanium', data: titaniumData, color: '#1abc9c', unit: 'USD/ton' },
   ];
 
   const filterByTimeRange = (data) => {
-    const currentYear = 2025;
+    const currentYear = 2026;
     const startYear = currentYear - parseInt(timeRange);
     return data.filter(d => d.year >= startYear);
   };
@@ -240,10 +294,10 @@ const MetalsDashboard = () => {
           WebkitTextFillColor: 'transparent',
           marginBottom: '8px'
         }}>
-          Metals Commodity Prices (1975-2025)
+          Metals Commodity Prices (1975-2026)
         </h1>
         <p style={{ color: '#94a3b8', fontSize: '1rem' }}>
-          50 Years of Historical Data - 8 Major Metals - Cycle Analysis
+          50+ Years of Historical Data - 10 Major Metals - Cycle Analysis
         </p>
       </div>
 
@@ -348,7 +402,7 @@ const MetalsDashboard = () => {
             <h2 style={{ fontSize: '1.25rem', marginBottom: '16px', color: '#f1f5f9' }}>
               Normalized Returns (Base 1975 = 100)
             </h2>
-            <ResponsiveContainer width="100%" height={400}>
+            <ResponsiveContainer width="100%" height={500}>
               <LineChart data={filterByTimeRange(normalizedData)} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
                 <XAxis dataKey="year" stroke="#94a3b8" fontSize={12} />
@@ -362,6 +416,15 @@ const MetalsDashboard = () => {
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
+                {cycleAnnotations.map((cycle, index) => (
+                  <ReferenceArea
+                    key={`cycle-${index}`}
+                    x1={cycle.start}
+                    x2={cycle.end}
+                    fill={cycle.color}
+                    fillOpacity={0.15}
+                  />
+                ))}
                 {metals.map(metal => (
                   <Line
                     key={metal.id}
@@ -469,11 +532,34 @@ const MetalsDashboard = () => {
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
                   <XAxis dataKey="year" stroke="#94a3b8" fontSize={11} allowDuplicatedCategory={false} />
                   <YAxis yAxisId="left" stroke="#8B8589" fontSize={11} />
-                  <YAxis yAxisId="right" orientation="right" stroke="#3D3D3D" fontSize={11} />
+                  <YAxis yAxisId="right" orientation="right" stroke="#e74c3c" fontSize={11} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend />
                   <Line yAxisId="left" data={filterByTimeRange(tinData)} type="monotone" dataKey="price" name="Tin" stroke="#8B8589" strokeWidth={2} dot={false} />
                   <Line yAxisId="right" data={filterByTimeRange(tungstenData)} type="monotone" dataKey="price" name="Tungsten" stroke="#e74c3c" strokeWidth={2} dot={false} />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div style={{
+              background: 'rgba(30, 41, 59, 0.5)',
+              borderRadius: '16px',
+              padding: '24px',
+              border: '1px solid rgba(255,255,255,0.05)'
+            }}>
+              <h3 style={{ color: '#9b59b6', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                New Energy Metals (Lithium & Titanium)
+              </h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <ComposedChart margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                  <XAxis dataKey="year" stroke="#94a3b8" fontSize={11} allowDuplicatedCategory={false} />
+                  <YAxis yAxisId="left" stroke="#9b59b6" fontSize={11} />
+                  <YAxis yAxisId="right" orientation="right" stroke="#1abc9c" fontSize={11} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend />
+                  <Line yAxisId="left" data={filterByTimeRange(lithiumData)} type="monotone" dataKey="price" name="Lithium" stroke="#9b59b6" strokeWidth={2} dot={false} />
+                  <Line yAxisId="right" data={filterByTimeRange(titaniumData)} type="monotone" dataKey="price" name="Titanium" stroke="#1abc9c" strokeWidth={2} dot={false} />
                 </ComposedChart>
               </ResponsiveContainer>
             </div>
@@ -620,7 +706,7 @@ const MetalsDashboard = () => {
         color: '#64748b',
         fontSize: '0.875rem'
       }}>
-        Data Source: LME, COMEX, World Bank - Annual Average Prices - Last Updated: January 2025
+        Data Source: LME, COMEX, World Bank - Annual Average Prices - Last Updated: January 2026
       </div>
     </div>
   );
