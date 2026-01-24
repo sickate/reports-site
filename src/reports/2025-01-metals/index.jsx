@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, ComposedChart, Bar, ReferenceArea } from 'recharts';
 
 // Historical price data (1975-2025) - Based on actual market data
@@ -327,14 +327,43 @@ const MetalsDashboard = () => {
     return data.filter(d => d.year >= startYear);
   };
 
+  // Calculate normalized data first (needs to be before yAxisDomain)
   const normalizedData = goldData.map((_, index) => {
     const entry = { year: goldData[index].year };
     metals.forEach(metal => {
       const basePrice = metal.data[0].price;
-      entry[metal.id] = ((metal.data[index].price / basePrice) * 100).toFixed(1);
+      entry[metal.id] = parseFloat(((metal.data[index].price / basePrice) * 100).toFixed(1));
     });
     return entry;
   });
+
+  // Dynamic Y-axis domain based on selected metals and time range
+  const yAxisDomain = useMemo(() => {
+    if (selectedMetals.length === 0) return [0, 100];
+
+    const currentYear = 2026;
+    const startYear = currentYear - parseInt(timeRange);
+    const filteredData = normalizedData.filter(d => d.year >= startYear);
+
+    let min = Infinity;
+    let max = -Infinity;
+
+    filteredData.forEach(entry => {
+      selectedMetals.forEach(metalId => {
+        const value = entry[metalId];
+        if (value !== undefined && !isNaN(value)) {
+          min = Math.min(min, value);
+          max = Math.max(max, value);
+        }
+      });
+    });
+
+    if (min === Infinity || max === -Infinity) return [0, 100];
+
+    // Add 10% padding for better visualization
+    const padding = (max - min) * 0.1;
+    return [Math.max(0, Math.floor(min - padding)), Math.ceil(max + padding)];
+  }, [selectedMetals, timeRange, normalizedData]);
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -636,7 +665,10 @@ const MetalsDashboard = () => {
                   stroke="#94a3b8"
                   fontSize={12}
                   scale={useLogScale ? 'log' : 'auto'}
-                  domain={useLogScale ? [50, 'auto'] : ['auto', 'auto']}
+                  domain={useLogScale
+                    ? [Math.max(50, yAxisDomain[0]), yAxisDomain[1]]
+                    : yAxisDomain
+                  }
                   tickFormatter={(v) => `${Math.round(v)}%`}
                   allowDataOverflow={false}
                 />
