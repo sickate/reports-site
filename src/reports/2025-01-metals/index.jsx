@@ -742,15 +742,15 @@ const MetalsDashboard = () => {
                 Industrial Metals (Copper, Aluminum & Zinc)
               </h3>
               <ResponsiveContainer width="100%" height={300}>
-                <LineChart margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                <LineChart data={filterByTimeRange(normalizedData)} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                  <XAxis dataKey="year" stroke="#94a3b8" fontSize={11} allowDuplicatedCategory={false} />
-                  <YAxis stroke="#94a3b8" fontSize={11} />
+                  <XAxis dataKey="year" stroke="#94a3b8" fontSize={11} />
+                  <YAxis stroke="#94a3b8" fontSize={11} tickFormatter={(v) => `${Math.round(v)}%`} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend />
-                  <Line data={filterByTimeRange(copperData)} type="monotone" dataKey="price" name="Copper" stroke="#B87333" strokeWidth={2} dot={false} />
-                  <Line data={filterByTimeRange(aluminumData)} type="monotone" dataKey="price" name="Aluminum" stroke="#848789" strokeWidth={2} dot={false} />
-                  <Line data={filterByTimeRange(zincData)} type="monotone" dataKey="price" name="Zinc" stroke="#7CB9E8" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="copper" name="Copper" stroke="#B87333" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="aluminum" name="Aluminum" stroke="#848789" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="zinc" name="Zinc" stroke="#7CB9E8" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -765,15 +765,15 @@ const MetalsDashboard = () => {
                 Ferrous Metals (Iron, Cobalt & Nickel)
               </h3>
               <ResponsiveContainer width="100%" height={300}>
-                <LineChart margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                <LineChart data={filterByTimeRange(normalizedData)} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                  <XAxis dataKey="year" stroke="#94a3b8" fontSize={11} allowDuplicatedCategory={false} />
-                  <YAxis stroke="#94a3b8" fontSize={11} />
+                  <XAxis dataKey="year" stroke="#94a3b8" fontSize={11} />
+                  <YAxis stroke="#94a3b8" fontSize={11} tickFormatter={(v) => `${Math.round(v)}%`} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend />
-                  <Line data={filterByTimeRange(ironData)} type="monotone" dataKey="price" name="Iron" stroke="#8B4513" strokeWidth={2} dot={false} />
-                  <Line data={filterByTimeRange(cobaltData)} type="monotone" dataKey="price" name="Cobalt" stroke="#0047AB" strokeWidth={2} dot={false} />
-                  <Line data={filterByTimeRange(nickelData)} type="monotone" dataKey="price" name="Nickel" stroke="#727472" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="iron" name="Iron" stroke="#8B4513" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="cobalt" name="Cobalt" stroke="#0047AB" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="nickel" name="Nickel" stroke="#727472" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -788,15 +788,15 @@ const MetalsDashboard = () => {
                 Rare Metals (Tin, Tungsten & Molybdenum)
               </h3>
               <ResponsiveContainer width="100%" height={300}>
-                <LineChart margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                <LineChart data={filterByTimeRange(normalizedData)} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                  <XAxis dataKey="year" stroke="#94a3b8" fontSize={11} allowDuplicatedCategory={false} />
-                  <YAxis stroke="#94a3b8" fontSize={11} />
+                  <XAxis dataKey="year" stroke="#94a3b8" fontSize={11} />
+                  <YAxis stroke="#94a3b8" fontSize={11} tickFormatter={(v) => `${Math.round(v)}%`} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend />
-                  <Line data={filterByTimeRange(tinData)} type="monotone" dataKey="price" name="Tin" stroke="#8B8589" strokeWidth={2} dot={false} />
-                  <Line data={filterByTimeRange(tungstenData)} type="monotone" dataKey="price" name="Tungsten" stroke="#e74c3c" strokeWidth={2} dot={false} />
-                  <Line data={filterByTimeRange(molybdenumData)} type="monotone" dataKey="price" name="Molybdenum" stroke="#4A4A4A" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="tin" name="Tin" stroke="#8B8589" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="tungsten" name="Tungsten" stroke="#e74c3c" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="molybdenum" name="Molybdenum" stroke="#4A4A4A" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
