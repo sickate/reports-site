@@ -214,6 +214,72 @@ const titaniumData = [
   { year: 2026, price: 13500 }
 ];
 
+// Molybdenum price data (USD/lb)
+const molybdenumData = [
+  { year: 1975, price: 3.50 }, { year: 1976, price: 3.80 }, { year: 1977, price: 4.20 },
+  { year: 1978, price: 5.50 }, { year: 1979, price: 9.00 }, { year: 1980, price: 9.50 },
+  { year: 1981, price: 8.00 }, { year: 1982, price: 4.50 }, { year: 1983, price: 3.80 },
+  { year: 1984, price: 3.50 }, { year: 1985, price: 3.20 }, { year: 1986, price: 2.80 },
+  { year: 1987, price: 2.90 }, { year: 1988, price: 3.50 }, { year: 1989, price: 3.80 },
+  { year: 1990, price: 3.20 }, { year: 1991, price: 2.90 }, { year: 1992, price: 2.70 },
+  { year: 1993, price: 2.50 }, { year: 1994, price: 4.50 }, { year: 1995, price: 7.00 },
+  { year: 1996, price: 4.50 }, { year: 1997, price: 4.20 }, { year: 1998, price: 3.50 },
+  { year: 1999, price: 2.60 }, { year: 2000, price: 2.50 }, { year: 2001, price: 2.30 },
+  { year: 2002, price: 3.80 }, { year: 2003, price: 5.20 }, { year: 2004, price: 16.50 },
+  { year: 2005, price: 31.00 }, { year: 2006, price: 24.50 }, { year: 2007, price: 30.00 },
+  { year: 2008, price: 28.00 }, { year: 2009, price: 11.00 }, { year: 2010, price: 15.50 },
+  { year: 2011, price: 15.80 }, { year: 2012, price: 12.50 }, { year: 2013, price: 10.20 },
+  { year: 2014, price: 11.50 }, { year: 2015, price: 6.00 }, { year: 2016, price: 6.50 },
+  { year: 2017, price: 8.20 }, { year: 2018, price: 12.00 }, { year: 2019, price: 11.50 },
+  { year: 2020, price: 8.50 }, { year: 2021, price: 18.00 }, { year: 2022, price: 19.50 },
+  { year: 2023, price: 22.00 }, { year: 2024, price: 20.00 }, { year: 2025, price: 24.00 },
+  { year: 2026, price: 26.00 }
+];
+
+// Iron ore price data (USD/ton) - 62% Fe CFR China
+const ironData = [
+  { year: 1975, price: 18 }, { year: 1976, price: 19 }, { year: 1977, price: 20 },
+  { year: 1978, price: 21 }, { year: 1979, price: 24 }, { year: 1980, price: 28 },
+  { year: 1981, price: 26 }, { year: 1982, price: 25 }, { year: 1983, price: 23 },
+  { year: 1984, price: 22 }, { year: 1985, price: 24 }, { year: 1986, price: 25 },
+  { year: 1987, price: 24 }, { year: 1988, price: 26 }, { year: 1989, price: 28 },
+  { year: 1990, price: 31 }, { year: 1991, price: 33 }, { year: 1992, price: 32 },
+  { year: 1993, price: 29 }, { year: 1994, price: 27 }, { year: 1995, price: 28 },
+  { year: 1996, price: 29 }, { year: 1997, price: 30 }, { year: 1998, price: 28 },
+  { year: 1999, price: 25 }, { year: 2000, price: 28 }, { year: 2001, price: 30 },
+  { year: 2002, price: 29 }, { year: 2003, price: 32 }, { year: 2004, price: 38 },
+  { year: 2005, price: 65 }, { year: 2006, price: 77 }, { year: 2007, price: 85 },
+  { year: 2008, price: 140 }, { year: 2009, price: 80 }, { year: 2010, price: 146 },
+  { year: 2011, price: 168 }, { year: 2012, price: 128 }, { year: 2013, price: 135 },
+  { year: 2014, price: 97 }, { year: 2015, price: 56 }, { year: 2016, price: 58 },
+  { year: 2017, price: 71 }, { year: 2018, price: 70 }, { year: 2019, price: 94 },
+  { year: 2020, price: 109 }, { year: 2021, price: 160 }, { year: 2022, price: 120 },
+  { year: 2023, price: 115 }, { year: 2024, price: 105 }, { year: 2025, price: 110 },
+  { year: 2026, price: 108 }
+];
+
+// Cobalt price data (USD/lb)
+const cobaltData = [
+  { year: 1975, price: 4.50 }, { year: 1976, price: 4.80 }, { year: 1977, price: 5.20 },
+  { year: 1978, price: 12.00 }, { year: 1979, price: 25.00 }, { year: 1980, price: 25.00 },
+  { year: 1981, price: 14.00 }, { year: 1982, price: 8.00 }, { year: 1983, price: 6.50 },
+  { year: 1984, price: 11.00 }, { year: 1985, price: 11.50 }, { year: 1986, price: 6.50 },
+  { year: 1987, price: 7.50 }, { year: 1988, price: 11.00 }, { year: 1989, price: 10.00 },
+  { year: 1990, price: 14.00 }, { year: 1991, price: 18.00 }, { year: 1992, price: 20.00 },
+  { year: 1993, price: 12.00 }, { year: 1994, price: 22.00 }, { year: 1995, price: 27.00 },
+  { year: 1996, price: 24.00 }, { year: 1997, price: 23.00 }, { year: 1998, price: 20.00 },
+  { year: 1999, price: 16.00 }, { year: 2000, price: 15.00 }, { year: 2001, price: 9.50 },
+  { year: 2002, price: 7.00 }, { year: 2003, price: 10.50 }, { year: 2004, price: 23.00 },
+  { year: 2005, price: 16.00 }, { year: 2006, price: 17.00 }, { year: 2007, price: 29.00 },
+  { year: 2008, price: 39.00 }, { year: 2009, price: 18.00 }, { year: 2010, price: 21.00 },
+  { year: 2011, price: 17.50 }, { year: 2012, price: 14.00 }, { year: 2013, price: 13.00 },
+  { year: 2014, price: 14.00 }, { year: 2015, price: 13.00 }, { year: 2016, price: 12.00 },
+  { year: 2017, price: 27.00 }, { year: 2018, price: 37.00 }, { year: 2019, price: 16.00 },
+  { year: 2020, price: 15.00 }, { year: 2021, price: 24.00 }, { year: 2022, price: 32.00 },
+  { year: 2023, price: 15.00 }, { year: 2024, price: 12.50 }, { year: 2025, price: 14.00 },
+  { year: 2026, price: 15.50 }
+];
+
 const cycleAnnotations = [
   { start: 1979, end: 1980, label: 'Post Oil Crisis Inflation Peak', color: '#ff6b6b' },
   { start: 1987, end: 1989, label: 'East Asia Industrialization', color: '#4ecdc4' },
@@ -231,10 +297,13 @@ const MetalsDashboard = () => {
     { id: 'silver', name: 'Silver', data: silverData, color: '#C0C0C0', unit: 'USD/oz' },
     { id: 'copper', name: 'Copper', data: copperData, color: '#B87333', unit: 'USD/ton' },
     { id: 'aluminum', name: 'Aluminum', data: aluminumData, color: '#848789', unit: 'USD/ton' },
+    { id: 'iron', name: 'Iron', data: ironData, color: '#8B4513', unit: 'USD/ton' },
     { id: 'nickel', name: 'Nickel', data: nickelData, color: '#727472', unit: 'USD/ton' },
+    { id: 'cobalt', name: 'Cobalt', data: cobaltData, color: '#0047AB', unit: 'USD/lb' },
     { id: 'zinc', name: 'Zinc', data: zincData, color: '#7CB9E8', unit: 'USD/ton' },
     { id: 'tin', name: 'Tin', data: tinData, color: '#8B8589', unit: 'USD/ton' },
     { id: 'tungsten', name: 'Tungsten', data: tungstenData, color: '#e74c3c', unit: 'USD/mtu' },
+    { id: 'molybdenum', name: 'Molybdenum', data: molybdenumData, color: '#4A4A4A', unit: 'USD/lb' },
     { id: 'lithium', name: 'Lithium', data: lithiumData, color: '#9b59b6', unit: 'USD/ton' },
     { id: 'titanium', name: 'Titanium', data: titaniumData, color: '#1abc9c', unit: 'USD/ton' },
   ];
@@ -309,7 +378,7 @@ const MetalsDashboard = () => {
           Metals Commodity Prices (1975-2026)
         </h1>
         <p style={{ color: '#94a3b8', fontSize: '1rem' }}>
-          50+ Years of Historical Data - 10 Major Metals - Cycle Analysis
+          50+ Years of Historical Data - 13 Major Metals - Cycle Analysis
         </p>
       </div>
 
@@ -638,7 +707,7 @@ const MetalsDashboard = () => {
               border: '1px solid rgba(255,255,255,0.05)'
             }}>
               <h3 style={{ color: '#B87333', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                Industrial Metals (Copper & Aluminum)
+                Industrial Metals (Copper, Aluminum & Zinc)
               </h3>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
@@ -649,27 +718,6 @@ const MetalsDashboard = () => {
                   <Legend />
                   <Line data={filterByTimeRange(copperData)} type="monotone" dataKey="price" name="Copper" stroke="#B87333" strokeWidth={2} dot={false} />
                   <Line data={filterByTimeRange(aluminumData)} type="monotone" dataKey="price" name="Aluminum" stroke="#848789" strokeWidth={2} dot={false} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-
-            <div style={{
-              background: 'rgba(30, 41, 59, 0.5)',
-              borderRadius: '16px',
-              padding: '24px',
-              border: '1px solid rgba(255,255,255,0.05)'
-            }}>
-              <h3 style={{ color: '#727472', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                Battery Metals (Nickel & Zinc)
-              </h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                  <XAxis dataKey="year" stroke="#94a3b8" fontSize={11} allowDuplicatedCategory={false} />
-                  <YAxis stroke="#94a3b8" fontSize={11} />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend />
-                  <Line data={filterByTimeRange(nickelData)} type="monotone" dataKey="price" name="Nickel" stroke="#727472" strokeWidth={2} dot={false} />
                   <Line data={filterByTimeRange(zincData)} type="monotone" dataKey="price" name="Zinc" stroke="#7CB9E8" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
@@ -681,20 +729,43 @@ const MetalsDashboard = () => {
               padding: '24px',
               border: '1px solid rgba(255,255,255,0.05)'
             }}>
-              <h3 style={{ color: '#8B8589', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                Rare Metals (Tin & Tungsten)
+              <h3 style={{ color: '#8B4513', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                Ferrous Metals (Iron, Cobalt & Nickel)
               </h3>
               <ResponsiveContainer width="100%" height={300}>
-                <ComposedChart margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                <LineChart margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
                   <XAxis dataKey="year" stroke="#94a3b8" fontSize={11} allowDuplicatedCategory={false} />
-                  <YAxis yAxisId="left" stroke="#8B8589" fontSize={11} />
-                  <YAxis yAxisId="right" orientation="right" stroke="#e74c3c" fontSize={11} />
+                  <YAxis stroke="#94a3b8" fontSize={11} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend />
-                  <Line yAxisId="left" data={filterByTimeRange(tinData)} type="monotone" dataKey="price" name="Tin" stroke="#8B8589" strokeWidth={2} dot={false} />
-                  <Line yAxisId="right" data={filterByTimeRange(tungstenData)} type="monotone" dataKey="price" name="Tungsten" stroke="#e74c3c" strokeWidth={2} dot={false} />
-                </ComposedChart>
+                  <Line data={filterByTimeRange(ironData)} type="monotone" dataKey="price" name="Iron" stroke="#8B4513" strokeWidth={2} dot={false} />
+                  <Line data={filterByTimeRange(cobaltData)} type="monotone" dataKey="price" name="Cobalt" stroke="#0047AB" strokeWidth={2} dot={false} />
+                  <Line data={filterByTimeRange(nickelData)} type="monotone" dataKey="price" name="Nickel" stroke="#727472" strokeWidth={2} dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div style={{
+              background: 'rgba(30, 41, 59, 0.5)',
+              borderRadius: '16px',
+              padding: '24px',
+              border: '1px solid rgba(255,255,255,0.05)'
+            }}>
+              <h3 style={{ color: '#8B8589', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                Rare Metals (Tin, Tungsten & Molybdenum)
+              </h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                  <XAxis dataKey="year" stroke="#94a3b8" fontSize={11} allowDuplicatedCategory={false} />
+                  <YAxis stroke="#94a3b8" fontSize={11} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend />
+                  <Line data={filterByTimeRange(tinData)} type="monotone" dataKey="price" name="Tin" stroke="#8B8589" strokeWidth={2} dot={false} />
+                  <Line data={filterByTimeRange(tungstenData)} type="monotone" dataKey="price" name="Tungsten" stroke="#e74c3c" strokeWidth={2} dot={false} />
+                  <Line data={filterByTimeRange(molybdenumData)} type="monotone" dataKey="price" name="Molybdenum" stroke="#4A4A4A" strokeWidth={2} dot={false} />
+                </LineChart>
               </ResponsiveContainer>
             </div>
 
