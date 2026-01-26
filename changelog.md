@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2026-01-26
+
+### Added
+
+- Automatic price update system: CLI script to fetch latest metal prices
+- External JSON data file: `public/data/metals-prices.json` for separating data from code
+- "Last Updated" timestamp display on page footer
+- Server-side cron job runs every 2 hours to update current year prices
+
+### Changed
+
+- React component now fetches price data from JSON file instead of hardcoded arrays
+- Data source description: "Year-End Prices (Historical) / Latest Price (Current Year)"
+- Deploy script now preserves server-side scripts folder
+
+### Infrastructure
+
+- Added Node.js on server for running update scripts
+- Cron job: `0 */2 * * *` for price updates
+- Log file: `/var/log/metals-update.log`
+
+### Known Issues
+
+- Web scraping requires improvement: current regex patterns may not match website HTML structure
+- Alternative: Consider using an API service with proper data feeds
+
 ## [1.2.0] - 2025-01-24
 
 ### Added

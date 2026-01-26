@@ -20,6 +20,7 @@ rsync -avz --delete --chmod=D755,F644 \
   --exclude '.git' \
   --exclude '.DS_Store' \
   --exclude 'node_modules' \
+  --exclude 'scripts' \
   "$BUILD_DIR/" "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/"
 
 echo -e "${GREEN}=== Deployment complete ===${NC}"

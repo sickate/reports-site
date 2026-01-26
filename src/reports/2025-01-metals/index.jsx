@@ -1,284 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, ComposedChart, Bar, ReferenceArea } from 'recharts';
-
-// Historical price data (1975-2025) - Based on actual market data
-const goldData = [
-  { year: 1975, price: 161 }, { year: 1976, price: 125 }, { year: 1977, price: 148 },
-  { year: 1978, price: 194 }, { year: 1979, price: 307 }, { year: 1980, price: 615 },
-  { year: 1981, price: 460 }, { year: 1982, price: 376 }, { year: 1983, price: 424 },
-  { year: 1984, price: 361 }, { year: 1985, price: 317 }, { year: 1986, price: 368 },
-  { year: 1987, price: 448 }, { year: 1988, price: 437 }, { year: 1989, price: 381 },
-  { year: 1990, price: 384 }, { year: 1991, price: 362 }, { year: 1992, price: 344 },
-  { year: 1993, price: 360 }, { year: 1994, price: 384 }, { year: 1995, price: 384 },
-  { year: 1996, price: 388 }, { year: 1997, price: 331 }, { year: 1998, price: 294 },
-  { year: 1999, price: 279 }, { year: 2000, price: 279 }, { year: 2001, price: 271 },
-  { year: 2002, price: 310 }, { year: 2003, price: 363 }, { year: 2004, price: 409 },
-  { year: 2005, price: 445 }, { year: 2006, price: 603 }, { year: 2007, price: 695 },
-  { year: 2008, price: 872 }, { year: 2009, price: 972 }, { year: 2010, price: 1225 },
-  { year: 2011, price: 1572 }, { year: 2012, price: 1669 }, { year: 2013, price: 1411 },
-  { year: 2014, price: 1266 }, { year: 2015, price: 1160 }, { year: 2016, price: 1251 },
-  { year: 2017, price: 1257 }, { year: 2018, price: 1269 }, { year: 2019, price: 1393 },
-  { year: 2020, price: 1770 }, { year: 2021, price: 1799 }, { year: 2022, price: 1800 },
-  { year: 2023, price: 1943 }, { year: 2024, price: 2386 }, { year: 2025, price: 4200 },
-  { year: 2026, price: 4900 }
-];
-
-const silverData = [
-  { year: 1975, price: 4.42 }, { year: 1976, price: 4.35 }, { year: 1977, price: 4.62 },
-  { year: 1978, price: 5.40 }, { year: 1979, price: 11.09 }, { year: 1980, price: 20.63 },
-  { year: 1981, price: 10.52 }, { year: 1982, price: 7.95 }, { year: 1983, price: 11.44 },
-  { year: 1984, price: 8.14 }, { year: 1985, price: 6.14 }, { year: 1986, price: 5.47 },
-  { year: 1987, price: 7.01 }, { year: 1988, price: 6.53 }, { year: 1989, price: 5.50 },
-  { year: 1990, price: 4.83 }, { year: 1991, price: 4.04 }, { year: 1992, price: 3.94 },
-  { year: 1993, price: 4.30 }, { year: 1994, price: 5.29 }, { year: 1995, price: 5.20 },
-  { year: 1996, price: 5.19 }, { year: 1997, price: 4.89 }, { year: 1998, price: 5.54 },
-  { year: 1999, price: 5.22 }, { year: 2000, price: 4.95 }, { year: 2001, price: 4.37 },
-  { year: 2002, price: 4.60 }, { year: 2003, price: 4.88 }, { year: 2004, price: 6.67 },
-  { year: 2005, price: 7.31 }, { year: 2006, price: 11.55 }, { year: 2007, price: 13.38 },
-  { year: 2008, price: 14.99 }, { year: 2009, price: 14.67 }, { year: 2010, price: 20.19 },
-  { year: 2011, price: 35.12 }, { year: 2012, price: 31.15 }, { year: 2013, price: 23.79 },
-  { year: 2014, price: 19.08 }, { year: 2015, price: 15.68 }, { year: 2016, price: 17.14 },
-  { year: 2017, price: 17.05 }, { year: 2018, price: 15.71 }, { year: 2019, price: 16.21 },
-  { year: 2020, price: 20.55 }, { year: 2021, price: 25.14 }, { year: 2022, price: 21.73 },
-  { year: 2023, price: 23.35 }, { year: 2024, price: 28.27 }, { year: 2025, price: 92 },
-  { year: 2026, price: 100 }
-];
-
-const copperData = [
-  { year: 1975, price: 1237 }, { year: 1976, price: 1402 }, { year: 1977, price: 1310 },
-  { year: 1978, price: 1367 }, { year: 1979, price: 2009 }, { year: 1980, price: 2182 },
-  { year: 1981, price: 1742 }, { year: 1982, price: 1480 }, { year: 1983, price: 1592 },
-  { year: 1984, price: 1377 }, { year: 1985, price: 1417 }, { year: 1986, price: 1374 },
-  { year: 1987, price: 1785 }, { year: 1988, price: 2608 }, { year: 1989, price: 2848 },
-  { year: 1990, price: 2662 }, { year: 1991, price: 2339 }, { year: 1992, price: 2281 },
-  { year: 1993, price: 1913 }, { year: 1994, price: 2307 }, { year: 1995, price: 2936 },
-  { year: 1996, price: 2295 }, { year: 1997, price: 2277 }, { year: 1998, price: 1654 },
-  { year: 1999, price: 1573 }, { year: 2000, price: 1813 }, { year: 2001, price: 1578 },
-  { year: 2002, price: 1559 }, { year: 2003, price: 1779 }, { year: 2004, price: 2866 },
-  { year: 2005, price: 3679 }, { year: 2006, price: 6722 }, { year: 2007, price: 7118 },
-  { year: 2008, price: 6956 }, { year: 2009, price: 5150 }, { year: 2010, price: 7534 },
-  { year: 2011, price: 8828 }, { year: 2012, price: 7962 }, { year: 2013, price: 7332 },
-  { year: 2014, price: 6863 }, { year: 2015, price: 5510 }, { year: 2016, price: 4868 },
-  { year: 2017, price: 6166 }, { year: 2018, price: 6530 }, { year: 2019, price: 6010 },
-  { year: 2020, price: 6181 }, { year: 2021, price: 9317 }, { year: 2022, price: 8797 },
-  { year: 2023, price: 8478 }, { year: 2024, price: 9200 }, { year: 2025, price: 12400 },
-  { year: 2026, price: 13000 }
-];
-
-const aluminumData = [
-  { year: 1975, price: 850 }, { year: 1976, price: 920 }, { year: 1977, price: 1100 },
-  { year: 1978, price: 1150 }, { year: 1979, price: 1450 }, { year: 1980, price: 1780 },
-  { year: 1981, price: 1260 }, { year: 1982, price: 1020 }, { year: 1983, price: 1430 },
-  { year: 1984, price: 1250 }, { year: 1985, price: 1050 }, { year: 1986, price: 1150 },
-  { year: 1987, price: 1565 }, { year: 1988, price: 2551 }, { year: 1989, price: 1951 },
-  { year: 1990, price: 1639 }, { year: 1991, price: 1302 }, { year: 1992, price: 1254 },
-  { year: 1993, price: 1139 }, { year: 1994, price: 1477 }, { year: 1995, price: 1805 },
-  { year: 1996, price: 1506 }, { year: 1997, price: 1599 }, { year: 1998, price: 1357 },
-  { year: 1999, price: 1361 }, { year: 2000, price: 1549 }, { year: 2001, price: 1444 },
-  { year: 2002, price: 1350 }, { year: 2003, price: 1431 }, { year: 2004, price: 1716 },
-  { year: 2005, price: 1898 }, { year: 2006, price: 2570 }, { year: 2007, price: 2638 },
-  { year: 2008, price: 2573 }, { year: 2009, price: 1665 }, { year: 2010, price: 2173 },
-  { year: 2011, price: 2401 }, { year: 2012, price: 2023 }, { year: 2013, price: 1847 },
-  { year: 2014, price: 1867 }, { year: 2015, price: 1665 }, { year: 2016, price: 1604 },
-  { year: 2017, price: 1968 }, { year: 2018, price: 2110 }, { year: 2019, price: 1794 },
-  { year: 2020, price: 1704 }, { year: 2021, price: 2480 }, { year: 2022, price: 2705 },
-  { year: 2023, price: 2255 }, { year: 2024, price: 2450 }, { year: 2025, price: 3150 },
-  { year: 2026, price: 3250 }
-];
-
-const nickelData = [
-  { year: 1975, price: 4550 }, { year: 1976, price: 4850 }, { year: 1977, price: 5100 },
-  { year: 1978, price: 4650 }, { year: 1979, price: 5950 }, { year: 1980, price: 6519 },
-  { year: 1981, price: 5950 }, { year: 1982, price: 4750 }, { year: 1983, price: 4750 },
-  { year: 1984, price: 4752 }, { year: 1985, price: 4899 }, { year: 1986, price: 3855 },
-  { year: 1987, price: 4872 }, { year: 1988, price: 13778 }, { year: 1989, price: 13300 },
-  { year: 1990, price: 8864 }, { year: 1991, price: 8156 }, { year: 1992, price: 7001 },
-  { year: 1993, price: 5293 }, { year: 1994, price: 6340 }, { year: 1995, price: 8228 },
-  { year: 1996, price: 7501 }, { year: 1997, price: 6927 }, { year: 1998, price: 4630 },
-  { year: 1999, price: 6011 }, { year: 2000, price: 8638 }, { year: 2001, price: 5945 },
-  { year: 2002, price: 6772 }, { year: 2003, price: 9640 }, { year: 2004, price: 13823 },
-  { year: 2005, price: 14744 }, { year: 2006, price: 24254 }, { year: 2007, price: 37230 },
-  { year: 2008, price: 21111 }, { year: 2009, price: 14655 }, { year: 2010, price: 21809 },
-  { year: 2011, price: 22910 }, { year: 2012, price: 17548 }, { year: 2013, price: 15032 },
-  { year: 2014, price: 16893 }, { year: 2015, price: 11863 }, { year: 2016, price: 9595 },
-  { year: 2017, price: 10411 }, { year: 2018, price: 13114 }, { year: 2019, price: 13914 },
-  { year: 2020, price: 13789 }, { year: 2021, price: 18465 }, { year: 2022, price: 25617 },
-  { year: 2023, price: 21511 }, { year: 2024, price: 17500 }, { year: 2025, price: 15200 },
-  { year: 2026, price: 18000 }
-];
-
-const zincData = [
-  { year: 1975, price: 650 }, { year: 1976, price: 720 }, { year: 1977, price: 580 },
-  { year: 1978, price: 620 }, { year: 1979, price: 740 }, { year: 1980, price: 760 },
-  { year: 1981, price: 850 }, { year: 1982, price: 770 }, { year: 1983, price: 820 },
-  { year: 1984, price: 950 }, { year: 1985, price: 800 }, { year: 1986, price: 760 },
-  { year: 1987, price: 820 }, { year: 1988, price: 1410 }, { year: 1989, price: 1510 },
-  { year: 1990, price: 1513 }, { year: 1991, price: 1088 }, { year: 1992, price: 1240 },
-  { year: 1993, price: 958 }, { year: 1994, price: 998 }, { year: 1995, price: 1030 },
-  { year: 1996, price: 1025 }, { year: 1997, price: 1313 }, { year: 1998, price: 1023 },
-  { year: 1999, price: 1077 }, { year: 2000, price: 1128 }, { year: 2001, price: 886 },
-  { year: 2002, price: 779 }, { year: 2003, price: 828 }, { year: 2004, price: 1048 },
-  { year: 2005, price: 1381 }, { year: 2006, price: 3273 }, { year: 2007, price: 3242 },
-  { year: 2008, price: 1871 }, { year: 2009, price: 1658 }, { year: 2010, price: 2161 },
-  { year: 2011, price: 2194 }, { year: 2012, price: 1950 }, { year: 2013, price: 1910 },
-  { year: 2014, price: 2161 }, { year: 2015, price: 1932 }, { year: 2016, price: 2090 },
-  { year: 2017, price: 2896 }, { year: 2018, price: 2922 }, { year: 2019, price: 2546 },
-  { year: 2020, price: 2266 }, { year: 2021, price: 3003 }, { year: 2022, price: 3478 },
-  { year: 2023, price: 2651 }, { year: 2024, price: 2800 }, { year: 2025, price: 3195 },
-  { year: 2026, price: 3200 }
-];
-
-const tinData = [
-  { year: 1975, price: 6800 }, { year: 1976, price: 7500 }, { year: 1977, price: 10500 },
-  { year: 1978, price: 12800 }, { year: 1979, price: 15500 }, { year: 1980, price: 16750 },
-  { year: 1981, price: 14200 }, { year: 1982, price: 12800 }, { year: 1983, price: 12500 },
-  { year: 1984, price: 11800 }, { year: 1985, price: 11500 }, { year: 1986, price: 5500 },
-  { year: 1987, price: 6100 }, { year: 1988, price: 7400 }, { year: 1989, price: 8600 },
-  { year: 1990, price: 6100 }, { year: 1991, price: 5580 }, { year: 1992, price: 6100 },
-  { year: 1993, price: 5150 }, { year: 1994, price: 5460 }, { year: 1995, price: 6180 },
-  { year: 1996, price: 6120 }, { year: 1997, price: 5620 }, { year: 1998, price: 5515 },
-  { year: 1999, price: 5420 }, { year: 2000, price: 5435 }, { year: 2001, price: 4480 },
-  { year: 2002, price: 4061 }, { year: 2003, price: 4890 }, { year: 2004, price: 8510 },
-  { year: 2005, price: 7380 }, { year: 2006, price: 8760 }, { year: 2007, price: 14530 },
-  { year: 2008, price: 18510 }, { year: 2009, price: 13570 }, { year: 2010, price: 20406 },
-  { year: 2011, price: 26054 }, { year: 2012, price: 21125 }, { year: 2013, price: 22282 },
-  { year: 2014, price: 21899 }, { year: 2015, price: 16067 }, { year: 2016, price: 17934 },
-  { year: 2017, price: 20128 }, { year: 2018, price: 20145 }, { year: 2019, price: 18670 },
-  { year: 2020, price: 17125 }, { year: 2021, price: 32560 }, { year: 2022, price: 30959 },
-  { year: 2023, price: 25913 }, { year: 2024, price: 29000 }, { year: 2025, price: 45560 },
-  { year: 2026, price: 52000 }
-];
-
-const tungstenData = [
-  { year: 1975, price: 85 }, { year: 1976, price: 90 }, { year: 1977, price: 95 },
-  { year: 1978, price: 100 }, { year: 1979, price: 140 }, { year: 1980, price: 180 },
-  { year: 1981, price: 145 }, { year: 1982, price: 110 }, { year: 1983, price: 85 },
-  { year: 1984, price: 78 }, { year: 1985, price: 65 }, { year: 1986, price: 48 },
-  { year: 1987, price: 52 }, { year: 1988, price: 58 }, { year: 1989, price: 62 },
-  { year: 1990, price: 55 }, { year: 1991, price: 50 }, { year: 1992, price: 45 },
-  { year: 1993, price: 42 }, { year: 1994, price: 48 }, { year: 1995, price: 75 },
-  { year: 1996, price: 65 }, { year: 1997, price: 58 }, { year: 1998, price: 52 },
-  { year: 1999, price: 48 }, { year: 2000, price: 52 }, { year: 2001, price: 55 },
-  { year: 2002, price: 52 }, { year: 2003, price: 58 }, { year: 2004, price: 95 },
-  { year: 2005, price: 210 }, { year: 2006, price: 245 }, { year: 2007, price: 265 },
-  { year: 2008, price: 280 }, { year: 2009, price: 195 }, { year: 2010, price: 245 },
-  { year: 2011, price: 450 }, { year: 2012, price: 380 }, { year: 2013, price: 350 },
-  { year: 2014, price: 365 }, { year: 2015, price: 230 }, { year: 2016, price: 195 },
-  { year: 2017, price: 275 }, { year: 2018, price: 320 }, { year: 2019, price: 260 },
-  { year: 2020, price: 255 }, { year: 2021, price: 285 }, { year: 2022, price: 350 },
-  { year: 2023, price: 330 }, { year: 2024, price: 380 }, { year: 2025, price: 1050 },
-  { year: 2026, price: 1200 }
-];
-
-// Lithium price data (USD/ton) - Lithium Carbonate equivalent
-const lithiumData = [
-  { year: 1975, price: 8500 }, { year: 1976, price: 8800 }, { year: 1977, price: 9200 },
-  { year: 1978, price: 9500 }, { year: 1979, price: 10500 }, { year: 1980, price: 12000 },
-  { year: 1981, price: 11000 }, { year: 1982, price: 9800 }, { year: 1983, price: 9200 },
-  { year: 1984, price: 8800 }, { year: 1985, price: 8500 }, { year: 1986, price: 8000 },
-  { year: 1987, price: 7800 }, { year: 1988, price: 8200 }, { year: 1989, price: 8500 },
-  { year: 1990, price: 8200 }, { year: 1991, price: 7800 }, { year: 1992, price: 7500 },
-  { year: 1993, price: 7200 }, { year: 1994, price: 7000 }, { year: 1995, price: 6800 },
-  { year: 1996, price: 6500 }, { year: 1997, price: 6200 }, { year: 1998, price: 5800 },
-  { year: 1999, price: 5500 }, { year: 2000, price: 5200 }, { year: 2001, price: 4800 },
-  { year: 2002, price: 4500 }, { year: 2003, price: 4200 }, { year: 2004, price: 4500 },
-  { year: 2005, price: 5000 }, { year: 2006, price: 5800 }, { year: 2007, price: 6500 },
-  { year: 2008, price: 6800 }, { year: 2009, price: 5500 }, { year: 2010, price: 5800 },
-  { year: 2011, price: 6200 }, { year: 2012, price: 6000 }, { year: 2013, price: 5500 },
-  { year: 2014, price: 5800 }, { year: 2015, price: 6500 }, { year: 2016, price: 9000 },
-  { year: 2017, price: 14000 }, { year: 2018, price: 16500 }, { year: 2019, price: 11000 },
-  { year: 2020, price: 8500 }, { year: 2021, price: 17000 }, { year: 2022, price: 78000 },
-  { year: 2023, price: 35000 }, { year: 2024, price: 15000 }, { year: 2025, price: 18000 },
-  { year: 2026, price: 22500 }
-];
-
-// Titanium sponge price data (USD/ton)
-const titaniumData = [
-  { year: 1975, price: 8000 }, { year: 1976, price: 8200 }, { year: 1977, price: 8500 },
-  { year: 1978, price: 9000 }, { year: 1979, price: 10000 }, { year: 1980, price: 12000 },
-  { year: 1981, price: 11500 }, { year: 1982, price: 10500 }, { year: 1983, price: 9800 },
-  { year: 1984, price: 9500 }, { year: 1985, price: 9200 }, { year: 1986, price: 8800 },
-  { year: 1987, price: 8500 }, { year: 1988, price: 9000 }, { year: 1989, price: 9500 },
-  { year: 1990, price: 9800 }, { year: 1991, price: 9200 }, { year: 1992, price: 8800 },
-  { year: 1993, price: 8500 }, { year: 1994, price: 8200 }, { year: 1995, price: 8000 },
-  { year: 1996, price: 7800 }, { year: 1997, price: 7500 }, { year: 1998, price: 7200 },
-  { year: 1999, price: 6800 }, { year: 2000, price: 6500 }, { year: 2001, price: 6200 },
-  { year: 2002, price: 6000 }, { year: 2003, price: 6200 }, { year: 2004, price: 7500 },
-  { year: 2005, price: 9500 }, { year: 2006, price: 14000 }, { year: 2007, price: 18000 },
-  { year: 2008, price: 20000 }, { year: 2009, price: 12000 }, { year: 2010, price: 10500 },
-  { year: 2011, price: 11000 }, { year: 2012, price: 10000 }, { year: 2013, price: 9500 },
-  { year: 2014, price: 9000 }, { year: 2015, price: 8500 }, { year: 2016, price: 8000 },
-  { year: 2017, price: 8800 }, { year: 2018, price: 10500 }, { year: 2019, price: 11000 },
-  { year: 2020, price: 10000 }, { year: 2021, price: 12000 }, { year: 2022, price: 14500 },
-  { year: 2023, price: 12000 }, { year: 2024, price: 11000 }, { year: 2025, price: 12500 },
-  { year: 2026, price: 13500 }
-];
-
-// Molybdenum price data (USD/lb)
-const molybdenumData = [
-  { year: 1975, price: 3.50 }, { year: 1976, price: 3.80 }, { year: 1977, price: 4.20 },
-  { year: 1978, price: 5.50 }, { year: 1979, price: 9.00 }, { year: 1980, price: 9.50 },
-  { year: 1981, price: 8.00 }, { year: 1982, price: 4.50 }, { year: 1983, price: 3.80 },
-  { year: 1984, price: 3.50 }, { year: 1985, price: 3.20 }, { year: 1986, price: 2.80 },
-  { year: 1987, price: 2.90 }, { year: 1988, price: 3.50 }, { year: 1989, price: 3.80 },
-  { year: 1990, price: 3.20 }, { year: 1991, price: 2.90 }, { year: 1992, price: 2.70 },
-  { year: 1993, price: 2.50 }, { year: 1994, price: 4.50 }, { year: 1995, price: 7.00 },
-  { year: 1996, price: 4.50 }, { year: 1997, price: 4.20 }, { year: 1998, price: 3.50 },
-  { year: 1999, price: 2.60 }, { year: 2000, price: 2.50 }, { year: 2001, price: 2.30 },
-  { year: 2002, price: 3.80 }, { year: 2003, price: 5.20 }, { year: 2004, price: 16.50 },
-  { year: 2005, price: 31.00 }, { year: 2006, price: 24.50 }, { year: 2007, price: 30.00 },
-  { year: 2008, price: 28.00 }, { year: 2009, price: 11.00 }, { year: 2010, price: 15.50 },
-  { year: 2011, price: 15.80 }, { year: 2012, price: 12.50 }, { year: 2013, price: 10.20 },
-  { year: 2014, price: 11.50 }, { year: 2015, price: 6.00 }, { year: 2016, price: 6.50 },
-  { year: 2017, price: 8.20 }, { year: 2018, price: 12.00 }, { year: 2019, price: 11.50 },
-  { year: 2020, price: 8.50 }, { year: 2021, price: 18.00 }, { year: 2022, price: 19.50 },
-  { year: 2023, price: 22.00 }, { year: 2024, price: 20.00 }, { year: 2025, price: 24.00 },
-  { year: 2026, price: 26.00 }
-];
-
-// Iron ore price data (USD/ton) - 62% Fe CFR China
-const ironData = [
-  { year: 1975, price: 18 }, { year: 1976, price: 19 }, { year: 1977, price: 20 },
-  { year: 1978, price: 21 }, { year: 1979, price: 24 }, { year: 1980, price: 28 },
-  { year: 1981, price: 26 }, { year: 1982, price: 25 }, { year: 1983, price: 23 },
-  { year: 1984, price: 22 }, { year: 1985, price: 24 }, { year: 1986, price: 25 },
-  { year: 1987, price: 24 }, { year: 1988, price: 26 }, { year: 1989, price: 28 },
-  { year: 1990, price: 31 }, { year: 1991, price: 33 }, { year: 1992, price: 32 },
-  { year: 1993, price: 29 }, { year: 1994, price: 27 }, { year: 1995, price: 28 },
-  { year: 1996, price: 29 }, { year: 1997, price: 30 }, { year: 1998, price: 28 },
-  { year: 1999, price: 25 }, { year: 2000, price: 28 }, { year: 2001, price: 30 },
-  { year: 2002, price: 29 }, { year: 2003, price: 32 }, { year: 2004, price: 38 },
-  { year: 2005, price: 65 }, { year: 2006, price: 77 }, { year: 2007, price: 85 },
-  { year: 2008, price: 140 }, { year: 2009, price: 80 }, { year: 2010, price: 146 },
-  { year: 2011, price: 168 }, { year: 2012, price: 128 }, { year: 2013, price: 135 },
-  { year: 2014, price: 97 }, { year: 2015, price: 56 }, { year: 2016, price: 58 },
-  { year: 2017, price: 71 }, { year: 2018, price: 70 }, { year: 2019, price: 94 },
-  { year: 2020, price: 109 }, { year: 2021, price: 160 }, { year: 2022, price: 120 },
-  { year: 2023, price: 115 }, { year: 2024, price: 105 }, { year: 2025, price: 110 },
-  { year: 2026, price: 108 }
-];
-
-// Cobalt price data (USD/lb)
-const cobaltData = [
-  { year: 1975, price: 4.50 }, { year: 1976, price: 4.80 }, { year: 1977, price: 5.20 },
-  { year: 1978, price: 12.00 }, { year: 1979, price: 25.00 }, { year: 1980, price: 25.00 },
-  { year: 1981, price: 14.00 }, { year: 1982, price: 8.00 }, { year: 1983, price: 6.50 },
-  { year: 1984, price: 11.00 }, { year: 1985, price: 11.50 }, { year: 1986, price: 6.50 },
-  { year: 1987, price: 7.50 }, { year: 1988, price: 11.00 }, { year: 1989, price: 10.00 },
-  { year: 1990, price: 14.00 }, { year: 1991, price: 18.00 }, { year: 1992, price: 20.00 },
-  { year: 1993, price: 12.00 }, { year: 1994, price: 22.00 }, { year: 1995, price: 27.00 },
-  { year: 1996, price: 24.00 }, { year: 1997, price: 23.00 }, { year: 1998, price: 20.00 },
-  { year: 1999, price: 16.00 }, { year: 2000, price: 15.00 }, { year: 2001, price: 9.50 },
-  { year: 2002, price: 7.00 }, { year: 2003, price: 10.50 }, { year: 2004, price: 23.00 },
-  { year: 2005, price: 16.00 }, { year: 2006, price: 17.00 }, { year: 2007, price: 29.00 },
-  { year: 2008, price: 39.00 }, { year: 2009, price: 18.00 }, { year: 2010, price: 21.00 },
-  { year: 2011, price: 17.50 }, { year: 2012, price: 14.00 }, { year: 2013, price: 13.00 },
-  { year: 2014, price: 14.00 }, { year: 2015, price: 13.00 }, { year: 2016, price: 12.00 },
-  { year: 2017, price: 27.00 }, { year: 2018, price: 37.00 }, { year: 2019, price: 16.00 },
-  { year: 2020, price: 15.00 }, { year: 2021, price: 24.00 }, { year: 2022, price: 32.00 },
-  { year: 2023, price: 15.00 }, { year: 2024, price: 12.50 }, { year: 2025, price: 14.00 },
-  { year: 2026, price: 15.50 }
-];
 
 const cycleAnnotations = [
   { start: 1979, end: 1980, label: 'Post Oil Crisis Inflation Peak', color: '#ff6b6b' },
@@ -288,27 +9,71 @@ const cycleAnnotations = [
   { start: 2020, end: 2025, label: 'New Energy + De-dollarization', color: '#dda15e' },
 ];
 
+// Metal display order and colors
+const METAL_CONFIG = {
+  gold: { name: 'Gold', color: '#FFD700' },
+  silver: { name: 'Silver', color: '#C0C0C0' },
+  copper: { name: 'Copper', color: '#B87333' },
+  aluminum: { name: 'Aluminum', color: '#848789' },
+  iron: { name: 'Iron', color: '#8B4513' },
+  nickel: { name: 'Nickel', color: '#727472' },
+  cobalt: { name: 'Cobalt', color: '#0047AB' },
+  zinc: { name: 'Zinc', color: '#7CB9E8' },
+  tin: { name: 'Tin', color: '#8B8589' },
+  tungsten: { name: 'Tungsten', color: '#e74c3c' },
+  molybdenum: { name: 'Molybdenum', color: '#4A4A4A' },
+  lithium: { name: 'Lithium', color: '#9b59b6' },
+  titanium: { name: 'Titanium', color: '#1abc9c' },
+};
+
+const METAL_ORDER = ['gold', 'silver', 'copper', 'aluminum', 'iron', 'nickel', 'cobalt', 'zinc', 'tin', 'tungsten', 'molybdenum', 'lithium', 'titanium'];
+
 const MetalsDashboard = () => {
   const [timeRange, setTimeRange] = useState('50');
   const [useLogScale, setUseLogScale] = useState(false);
+  const [priceData, setPriceData] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const metals = [
-    { id: 'gold', name: 'Gold', data: goldData, color: '#FFD700', unit: 'USD/oz' },
-    { id: 'silver', name: 'Silver', data: silverData, color: '#C0C0C0', unit: 'USD/oz' },
-    { id: 'copper', name: 'Copper', data: copperData, color: '#B87333', unit: 'USD/ton' },
-    { id: 'aluminum', name: 'Aluminum', data: aluminumData, color: '#848789', unit: 'USD/ton' },
-    { id: 'iron', name: 'Iron', data: ironData, color: '#8B4513', unit: 'USD/ton' },
-    { id: 'nickel', name: 'Nickel', data: nickelData, color: '#727472', unit: 'USD/ton' },
-    { id: 'cobalt', name: 'Cobalt', data: cobaltData, color: '#0047AB', unit: 'USD/lb' },
-    { id: 'zinc', name: 'Zinc', data: zincData, color: '#7CB9E8', unit: 'USD/ton' },
-    { id: 'tin', name: 'Tin', data: tinData, color: '#8B8589', unit: 'USD/ton' },
-    { id: 'tungsten', name: 'Tungsten', data: tungstenData, color: '#e74c3c', unit: 'USD/mtu' },
-    { id: 'molybdenum', name: 'Molybdenum', data: molybdenumData, color: '#4A4A4A', unit: 'USD/lb' },
-    { id: 'lithium', name: 'Lithium', data: lithiumData, color: '#9b59b6', unit: 'USD/ton' },
-    { id: 'titanium', name: 'Titanium', data: titaniumData, color: '#1abc9c', unit: 'USD/ton' },
-  ];
+  // Fetch price data on mount
+  useEffect(() => {
+    fetch('/data/metals-prices.json')
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to load price data');
+        return res.json();
+      })
+      .then(data => {
+        setPriceData(data.metals);
+        setLastUpdated(data.lastUpdated);
+        setLoading(false);
+      })
+      .catch(err => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, []);
 
-  const [selectedMetals, setSelectedMetals] = useState(metals.map(m => m.id));
+  // Build metals array from fetched data
+  const metals = useMemo(() => {
+    if (!priceData) return [];
+    return METAL_ORDER.filter(id => priceData[id]).map(id => ({
+      id,
+      name: METAL_CONFIG[id]?.name || priceData[id].name,
+      data: priceData[id].data,
+      color: METAL_CONFIG[id]?.color || priceData[id].color,
+      unit: priceData[id].unit,
+    }));
+  }, [priceData]);
+
+  const [selectedMetals, setSelectedMetals] = useState(METAL_ORDER);
+
+  // Update selectedMetals when metals data loads
+  useEffect(() => {
+    if (metals.length > 0) {
+      setSelectedMetals(metals.map(m => m.id));
+    }
+  }, [metals]);
 
   const toggleMetal = (metalId) => {
     setSelectedMetals(prev =>
@@ -328,14 +93,20 @@ const MetalsDashboard = () => {
   };
 
   // Calculate normalized data first (needs to be before yAxisDomain)
-  const normalizedData = goldData.map((_, index) => {
-    const entry = { year: goldData[index].year };
-    metals.forEach(metal => {
-      const basePrice = metal.data[0].price;
-      entry[metal.id] = parseFloat(((metal.data[index].price / basePrice) * 100).toFixed(1));
+  const normalizedData = useMemo(() => {
+    if (metals.length === 0) return [];
+    const goldMetal = metals.find(m => m.id === 'gold');
+    if (!goldMetal) return [];
+
+    return goldMetal.data.map((_, index) => {
+      const entry = { year: goldMetal.data[index].year };
+      metals.forEach(metal => {
+        const basePrice = metal.data[0].price;
+        entry[metal.id] = parseFloat(((metal.data[index].price / basePrice) * 100).toFixed(1));
+      });
+      return entry;
     });
-    return entry;
-  });
+  }, [metals]);
 
   // Dynamic Y-axis domain based on selected metals and time range
   const yAxisDomain = useMemo(() => {
@@ -386,6 +157,48 @@ const MetalsDashboard = () => {
     }
     return null;
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)',
+        color: '#e2e8f0',
+        fontFamily: "'IBM Plex Sans', -apple-system, sans-serif",
+        padding: '24px',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '1.5rem', marginBottom: '16px' }}>Loading price data...</div>
+          <div style={{ color: '#94a3b8' }}>Fetching historical metal prices</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)',
+        color: '#e2e8f0',
+        fontFamily: "'IBM Plex Sans', -apple-system, sans-serif",
+        padding: '24px',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '1.5rem', color: '#ef4444', marginBottom: '16px' }}>Error loading data</div>
+          <div style={{ color: '#94a3b8' }}>{error}</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{
@@ -704,33 +517,40 @@ const MetalsDashboard = () => {
             gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))',
             gap: '24px'
           }}>
-            <div style={{
-              background: 'rgba(30, 41, 59, 0.5)',
-              borderRadius: '16px',
-              padding: '24px',
-              border: '1px solid rgba(255,255,255,0.05)'
-            }}>
-              <h3 style={{ color: '#FFD700', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                Precious Metals (Gold & Silver)
-              </h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <ComposedChart data={filterByTimeRange(goldData)} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                  <XAxis dataKey="year" stroke="#94a3b8" fontSize={11} />
-                  <YAxis yAxisId="left" stroke="#FFD700" fontSize={11} />
-                  <YAxis yAxisId="right" orientation="right" stroke="#C0C0C0" fontSize={11} />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend />
-                  <Area yAxisId="left" type="monotone" dataKey="price" name="Gold" fill="rgba(255,215,0,0.2)" stroke="#FFD700" strokeWidth={2} />
-                  {filterByTimeRange(silverData).map((item, idx) => {
-                    const goldItem = filterByTimeRange(goldData)[idx];
-                    if (goldItem) goldItem.silver = item.price;
-                    return null;
-                  })}
-                  <Line yAxisId="right" type="monotone" dataKey="silver" data={filterByTimeRange(silverData).map((s, i) => ({ ...filterByTimeRange(goldData)[i], silver: s.price }))} name="Silver" stroke="#C0C0C0" strokeWidth={2} dot={false} />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </div>
+            {(() => {
+              const goldMetal = metals.find(m => m.id === 'gold');
+              const silverMetal = metals.find(m => m.id === 'silver');
+              if (!goldMetal || !silverMetal) return null;
+              const preciousData = filterByTimeRange(goldMetal.data).map((g, i) => ({
+                year: g.year,
+                gold: g.price,
+                silver: filterByTimeRange(silverMetal.data)[i]?.price
+              }));
+              return (
+                <div style={{
+                  background: 'rgba(30, 41, 59, 0.5)',
+                  borderRadius: '16px',
+                  padding: '24px',
+                  border: '1px solid rgba(255,255,255,0.05)'
+                }}>
+                  <h3 style={{ color: '#FFD700', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    Precious Metals (Gold & Silver)
+                  </h3>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <ComposedChart data={preciousData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                      <XAxis dataKey="year" stroke="#94a3b8" fontSize={11} />
+                      <YAxis yAxisId="left" stroke="#FFD700" fontSize={11} />
+                      <YAxis yAxisId="right" orientation="right" stroke="#C0C0C0" fontSize={11} />
+                      <Tooltip content={<CustomTooltip />} />
+                      <Legend />
+                      <Area yAxisId="left" type="monotone" dataKey="gold" name="Gold" fill="rgba(255,215,0,0.2)" stroke="#FFD700" strokeWidth={2} />
+                      <Line yAxisId="right" type="monotone" dataKey="silver" name="Silver" stroke="#C0C0C0" strokeWidth={2} dot={false} />
+                    </ComposedChart>
+                  </ResponsiveContainer>
+                </div>
+              );
+            })()}
 
             <div style={{
               background: 'rgba(30, 41, 59, 0.5)',
@@ -801,28 +621,40 @@ const MetalsDashboard = () => {
               </ResponsiveContainer>
             </div>
 
-            <div style={{
-              background: 'rgba(30, 41, 59, 0.5)',
-              borderRadius: '16px',
-              padding: '24px',
-              border: '1px solid rgba(255,255,255,0.05)'
-            }}>
-              <h3 style={{ color: '#9b59b6', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                New Energy Metals (Lithium & Titanium)
-              </h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <ComposedChart margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                  <XAxis dataKey="year" stroke="#94a3b8" fontSize={11} allowDuplicatedCategory={false} />
-                  <YAxis yAxisId="left" stroke="#9b59b6" fontSize={11} />
-                  <YAxis yAxisId="right" orientation="right" stroke="#1abc9c" fontSize={11} />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend />
-                  <Line yAxisId="left" data={filterByTimeRange(lithiumData)} type="monotone" dataKey="price" name="Lithium" stroke="#9b59b6" strokeWidth={2} dot={false} />
-                  <Line yAxisId="right" data={filterByTimeRange(titaniumData)} type="monotone" dataKey="price" name="Titanium" stroke="#1abc9c" strokeWidth={2} dot={false} />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </div>
+            {(() => {
+              const lithiumMetal = metals.find(m => m.id === 'lithium');
+              const titaniumMetal = metals.find(m => m.id === 'titanium');
+              if (!lithiumMetal || !titaniumMetal) return null;
+              const energyData = filterByTimeRange(lithiumMetal.data).map((l, i) => ({
+                year: l.year,
+                lithium: l.price,
+                titanium: filterByTimeRange(titaniumMetal.data)[i]?.price
+              }));
+              return (
+                <div style={{
+                  background: 'rgba(30, 41, 59, 0.5)',
+                  borderRadius: '16px',
+                  padding: '24px',
+                  border: '1px solid rgba(255,255,255,0.05)'
+                }}>
+                  <h3 style={{ color: '#9b59b6', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    New Energy Metals (Lithium & Titanium)
+                  </h3>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <ComposedChart data={energyData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                      <XAxis dataKey="year" stroke="#94a3b8" fontSize={11} />
+                      <YAxis yAxisId="left" stroke="#9b59b6" fontSize={11} />
+                      <YAxis yAxisId="right" orientation="right" stroke="#1abc9c" fontSize={11} />
+                      <Tooltip content={<CustomTooltip />} />
+                      <Legend />
+                      <Line yAxisId="left" type="monotone" dataKey="lithium" name="Lithium" stroke="#9b59b6" strokeWidth={2} dot={false} />
+                      <Line yAxisId="right" type="monotone" dataKey="titanium" name="Titanium" stroke="#1abc9c" strokeWidth={2} dot={false} />
+                    </ComposedChart>
+                  </ResponsiveContainer>
+                </div>
+              );
+            })()}
           </div>
         </>
       )}
@@ -883,7 +715,16 @@ const MetalsDashboard = () => {
         color: '#64748b',
         fontSize: '0.875rem'
       }}>
-        Data Source: LME, COMEX, World Bank - Annual Average Prices - Last Updated: January 2026
+        <div>Data Source: LME, COMEX, Trading Economics - Year-End Prices (Historical) / Latest Price (Current Year)</div>
+        <div style={{ marginTop: '4px' }}>
+          Last Updated: {lastUpdated ? new Date(lastUpdated).toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          }) : 'Unknown'}
+        </div>
       </div>
     </div>
   );

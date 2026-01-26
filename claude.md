@@ -24,7 +24,9 @@ This is a static website for hosting research reports and data visualizations, d
 | `src/reports/index.js` | Report registry - add new reports here |
 | `src/App.jsx` | React Router configuration |
 | `src/styles/global.css` | Global styles (dark theme) |
+| `public/data/metals-prices.json` | Metal price data (fetched by React, updated by cron) |
 | `scripts/deploy.sh` | Build and deploy to server |
+| `scripts/update-prices.js` | CLI script for fetching latest prices |
 | `nginx/reports.instap.net.conf` | nginx server configuration |
 
 ## Common Commands
@@ -140,18 +142,37 @@ Location: `src/reports/2025-01-metals/index.jsx`
   - Rare Metals (Tin, Tungsten, Molybdenum) - normalized %
   - New Energy Metals (Lithium & Titanium) - dual Y-axis
 
-**Data Structure:**
-```javascript
-// Raw price data arrays
-const goldData = [{ year: 1975, price: 161 }, ...];
+**Data Architecture:**
 
-// Normalized data (calculated)
-const normalizedData = goldData.map((_, index) => ({
-  year: goldData[index].year,
-  gold: parseFloat(((goldData[index].price / basePrice) * 100).toFixed(1)),
-  // ... other metals
-}));
+Data is stored in `public/data/metals-prices.json` and fetched by the React component:
+
+```json
+{
+  "lastUpdated": "2026-01-26T12:00:00Z",
+  "metals": {
+    "gold": {
+      "name": "Gold",
+      "unit": "USD/oz",
+      "color": "#FFD700",
+      "data": [{"year": 1975, "price": 161}, ...]
+    }
+  }
+}
 ```
+
+Price types:
+- Historical years: Dec 31 closing price
+- Current year: Latest available price
+
+**Auto-Update System:**
+
+Server-side cron job runs every 2 hours:
+```bash
+# Cron: 0 */2 * * *
+DATA_FILE=/var/www/reports/data/metals-prices.json node /var/www/reports/scripts/update-prices.js
+```
+
+Log file: `/var/log/metals-update.log`
 
 ## Troubleshooting
 
