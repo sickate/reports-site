@@ -3,18 +3,20 @@
 /**
  * Metal Prices Update Script
  *
- * Fetches current metal prices from web sources and updates the JSON data file.
+ * Fetches current metal prices and updates the JSON data file.
  * Run with: node scripts/update-prices.js
  *
  * Data sources:
- * - Trading Economics (most metals)
- * - Kitco (gold, silver fallback)
+ * - gold-api.com (free, no API key): Gold, Silver, Copper, Platinum, Palladium
+ * - freegoldapi.com (free, no API key): Gold backup
+ *
+ * Metals without free API sources require manual update:
+ * - Aluminum, Nickel, Zinc, Tin, Tungsten, Molybdenum, Iron, Cobalt, Lithium, Titanium
  */
 
 import fs from 'fs';
 import path from 'path';
 import https from 'https';
-import http from 'http';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -24,103 +26,153 @@ const __dirname = path.dirname(__filename);
 // On local: /path/to/project/public/data/metals-prices.json
 const DATA_FILE = process.env.DATA_FILE || path.join(__dirname, '../public/data/metals-prices.json');
 
-// Metal configurations with scraping sources
+// Metal configurations with data source info
+// gold-api.com uses USD/oz for gold/silver, USD/lb for copper
+// westmetall.com provides LME data (USD/ton)
 const METAL_SOURCES = {
   gold: {
-    url: 'https://www.kitco.com/charts/livegold.html',
-    selector: 'bid price',
-    parser: 'kitco',
-    unit: 'USD/oz'
+    api: 'gold-api',
+    symbol: 'XAU',
+    unit: 'USD/oz',
+    multiplier: 1,
   },
   silver: {
-    url: 'https://www.kitco.com/charts/livesilver.html',
-    selector: 'bid price',
-    parser: 'kitco',
-    unit: 'USD/oz'
+    api: 'gold-api',
+    symbol: 'XAG',
+    unit: 'USD/oz',
+    multiplier: 1,
   },
   copper: {
-    url: 'https://tradingeconomics.com/commodity/copper',
-    parser: 'tradingeconomics',
-    unit: 'USD/lb'
+    api: 'westmetall',
+    name: 'Copper',
+    unit: 'USD/ton',
   },
   aluminum: {
-    url: 'https://tradingeconomics.com/commodity/aluminum',
-    parser: 'tradingeconomics',
-    unit: 'USD/ton'
+    api: 'westmetall',
+    name: 'Aluminium',
+    unit: 'USD/ton',
   },
   nickel: {
-    url: 'https://tradingeconomics.com/commodity/nickel',
-    parser: 'tradingeconomics',
-    unit: 'USD/ton'
+    api: 'westmetall',
+    name: 'Nickel',
+    unit: 'USD/ton',
   },
   zinc: {
-    url: 'https://tradingeconomics.com/commodity/zinc',
-    parser: 'tradingeconomics',
-    unit: 'USD/ton'
+    api: 'westmetall',
+    name: 'Zinc',
+    unit: 'USD/ton',
   },
   tin: {
-    url: 'https://tradingeconomics.com/commodity/tin',
-    parser: 'tradingeconomics',
-    unit: 'USD/ton'
+    api: 'westmetall',
+    name: 'Tin',
+    unit: 'USD/ton',
   },
+  // Metals with manual price lookup (no free API)
+  // Prices from web search: Trading Economics, Fastmarkets, SMM, etc.
+  // Updated: 2026-01-27
   tungsten: {
-    url: 'https://tradingeconomics.com/commodity/tungsten',
-    parser: 'tradingeconomics',
-    unit: 'USD/kg'
+    api: 'manual',
+    price: 1200,  // USD/mtu - APT FOB China ~$1,080-1,325/mtu
+    unit: 'USD/mtu',
+    source: 'Fastmarkets APT',
   },
   molybdenum: {
-    url: 'https://tradingeconomics.com/commodity/molybdenum',
-    parser: 'tradingeconomics',
-    unit: 'USD/lb'
+    api: 'manual',
+    price: 23.5,  // USD/lb - LME/SMM ~$23.47-23.55/lb
+    unit: 'USD/lb',
+    source: 'LME/SMM',
   },
   iron: {
-    url: 'https://tradingeconomics.com/commodity/iron-ore',
-    parser: 'tradingeconomics',
-    unit: 'USD/ton'
+    api: 'manual',
+    price: 106,   // USD/ton - CFR China 62% Fe ~$106.36/ton
+    unit: 'USD/ton',
+    source: 'Trading Economics CFR China',
   },
   cobalt: {
-    url: 'https://tradingeconomics.com/commodity/cobalt',
-    parser: 'tradingeconomics',
-    unit: 'USD/ton'
+    api: 'manual',
+    price: 25.5,  // USD/lb - LME ~$56,290/ton = $25.53/lb
+    unit: 'USD/lb',
+    source: 'LME/Trading Economics',
   },
   lithium: {
-    url: 'https://tradingeconomics.com/commodity/lithium',
-    parser: 'tradingeconomics',
-    unit: 'CNY/ton'
+    api: 'manual',
+    price: 22000, // USD/ton - Battery-grade carbonate ~CNY 156,000/ton ≈ $22,000
+    unit: 'USD/ton',
+    source: 'SMM China',
   },
   titanium: {
-    url: 'https://tradingeconomics.com/commodity/titanium',
-    parser: 'tradingeconomics',
-    unit: 'USD/kg'
-  }
+    api: 'manual',
+    price: 10000, // USD/ton - Titanium sponge ~$9,000-11,000/ton
+    unit: 'USD/ton',
+    source: 'SMM/Argus',
+  },
 };
 
-const USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+const USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36';
 
 /**
- * Fetch URL content with proper headers
+ * Fetch JSON from URL
  */
-function fetchUrl(url) {
+function fetchJSON(url) {
   return new Promise((resolve, reject) => {
-    const protocol = url.startsWith('https') ? https : http;
     const options = {
       headers: {
         'User-Agent': USER_AGENT,
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.5',
-        'Connection': 'keep-alive',
+        'Accept': 'application/json',
       }
     };
 
-    protocol.get(url, options, (res) => {
-      // Handle redirects
-      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-        fetchUrl(res.headers.location).then(resolve).catch(reject);
+    https.get(url, options, (res) => {
+      if (res.statusCode !== 200) {
+        reject(new Error(`HTTP ${res.statusCode}`));
         return;
       }
 
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          resolve(JSON.parse(data));
+        } catch (e) {
+          reject(e);
+        }
+      });
+      res.on('error', reject);
+    }).on('error', reject);
+  });
+}
+
+/**
+ * Fetch price from gold-api.com
+ */
+async function fetchFromGoldAPI(symbol) {
+  const url = `https://api.gold-api.com/price/${symbol}`;
+  const data = await fetchJSON(url);
+
+  if (data.price && data.price > 0) {
+    return data.price;
+  }
+  throw new Error('Invalid price from gold-api.com');
+}
+
+// Cache for westmetall data (fetched once per run)
+let westmetallCache = null;
+
+/**
+ * Fetch HTML content
+ */
+function fetchHTML(url) {
+  return new Promise((resolve, reject) => {
+    const options = {
+      headers: {
+        'User-Agent': USER_AGENT,
+        'Accept': 'text/html',
+      }
+    };
+
+    https.get(url, options, (res) => {
       if (res.statusCode !== 200) {
-        reject(new Error(`HTTP ${res.statusCode} for ${url}`));
+        reject(new Error(`HTTP ${res.statusCode}`));
         return;
       }
 
@@ -133,75 +185,83 @@ function fetchUrl(url) {
 }
 
 /**
- * Parse price from Trading Economics HTML
- * Looking for patterns like: id="p" or class containing price value
+ * Fetch LME prices from westmetall.com
  */
-function parseTradingEconomics(html) {
-  // Try multiple patterns used by Trading Economics
-  const patterns = [
-    /<span[^>]*id="p"[^>]*>([0-9,]+\.?[0-9]*)<\/span>/i,
-    /<div[^>]*class="[^"]*te-commodity-header[^"]*"[^>]*>[\s\S]*?([0-9,]+\.?[0-9]*)/i,
-    /data-actual="([0-9,]+\.?[0-9]*)"/i,
-    /<td[^>]*id="p"[^>]*>([0-9,]+\.?[0-9]*)<\/td>/i,
-  ];
+async function fetchWestmetallPrices() {
+  if (westmetallCache) return westmetallCache;
 
-  for (const pattern of patterns) {
-    const match = html.match(pattern);
-    if (match && match[1]) {
+  const url = 'https://www.westmetall.com/en/markdaten.php';
+  const html = await fetchHTML(url);
+
+  // Parse prices from HTML
+  // Pattern: "Copper </a> </td> <td> <a...> 13,195.00 </a>"
+  const prices = {};
+
+  const metals = ['Copper', 'Tin', 'Zinc', 'Aluminium', 'Nickel', 'Lead'];
+
+  for (const metal of metals) {
+    // Match pattern: metal name followed by </a></td><td><a...>price
+    // The price has format like 13,195.00 or 55,005.00
+    const regex = new RegExp(
+      metal + '\\s*</a>\\s*</td>\\s*<td>\\s*<a[^>]*>\\s*([\\d,]+\\.\\d{2})\\s*</a>',
+      'i'
+    );
+    const match = html.match(regex);
+    if (match) {
       const price = parseFloat(match[1].replace(/,/g, ''));
-      if (!isNaN(price) && price > 0) {
-        return price;
+      if (price > 0) {
+        prices[metal] = price;
       }
     }
   }
-  return null;
+
+  westmetallCache = prices;
+  return prices;
 }
 
 /**
- * Parse price from Kitco HTML
+ * Fetch price from westmetall.com
  */
-function parseKitco(html) {
-  // Kitco uses various formats for bid price
-  const patterns = [
-    /Bid[\s\S]*?<td[^>]*>[\s$]*([0-9,]+\.?[0-9]*)/i,
-    /class="[^"]*bid[^"]*"[^>]*>[\s$]*([0-9,]+\.?[0-9]*)/i,
-    /<span[^>]*class="[^"]*price[^"]*"[^>]*>[\s$]*([0-9,]+\.?[0-9]*)/i,
-  ];
+async function fetchFromWestmetall(metalName) {
+  const prices = await fetchWestmetallPrices();
+  const price = prices[metalName];
 
-  for (const pattern of patterns) {
-    const match = html.match(pattern);
-    if (match && match[1]) {
-      const price = parseFloat(match[1].replace(/,/g, ''));
-      if (!isNaN(price) && price > 0) {
-        return price;
-      }
-    }
+  if (price && price > 0) {
+    return price;
   }
-  return null;
+  throw new Error(`Price not found for ${metalName}`);
 }
 
 /**
  * Fetch price for a single metal
  */
 async function fetchMetalPrice(metalId, config) {
+  if (!config.api) {
+    return { metalId, price: null, success: false, error: config.note || 'No API configured' };
+  }
+
   try {
-    console.log(`  Fetching ${metalId} from ${config.url}...`);
-    const html = await fetchUrl(config.url);
-
-    let price = null;
-    if (config.parser === 'tradingeconomics') {
-      price = parseTradingEconomics(html);
-    } else if (config.parser === 'kitco') {
-      price = parseKitco(html);
-    }
-
-    if (price !== null) {
-      console.log(`  ✓ ${metalId}: ${price} ${config.unit}`);
-      return { metalId, price, success: true };
+    let price;
+    if (config.api === 'manual') {
+      // Use hardcoded price from config
+      console.log(`  Using manual price for ${metalId} (${config.source})...`);
+      price = config.price;
+    } else if (config.api === 'gold-api') {
+      console.log(`  Fetching ${metalId} (${config.symbol}) from gold-api...`);
+      price = await fetchFromGoldAPI(config.symbol);
+    } else if (config.api === 'westmetall') {
+      console.log(`  Fetching ${metalId} (${config.name}) from westmetall...`);
+      price = await fetchFromWestmetall(config.name);
     } else {
-      console.log(`  ✗ ${metalId}: Could not parse price`);
-      return { metalId, price: null, success: false, error: 'Parse failed' };
+      throw new Error(`Unknown API: ${config.api}`);
     }
+
+    // Apply multiplier for unit conversion
+    const multiplier = config.multiplier || 1;
+    const finalPrice = Math.round(price * multiplier * 100) / 100;
+    console.log(`  ✓ ${metalId}: ${finalPrice} ${config.targetUnit || config.unit}`);
+
+    return { metalId, price: finalPrice, success: true };
   } catch (error) {
     console.log(`  ✗ ${metalId}: ${error.message}`);
     return { metalId, price: null, success: false, error: error.message };
@@ -209,7 +269,7 @@ async function fetchMetalPrice(metalId, config) {
 }
 
 /**
- * Add delay between requests to be respectful
+ * Add delay between requests
  */
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -237,37 +297,46 @@ async function updatePrices() {
   const currentYear = new Date().getFullYear();
   console.log(`\nUpdating prices for year: ${currentYear}\n`);
 
-  const results = [];
   let successCount = 0;
   let failCount = 0;
+  let skipCount = 0;
+  const updates = [];
 
-  // Fetch prices sequentially with delays
+  // Fetch prices
   for (const [metalId, config] of Object.entries(METAL_SOURCES)) {
+    if (!config.api) {
+      console.log(`  ⊘ ${metalId}: Skipped (${config.note})`);
+      skipCount++;
+      continue;
+    }
+
     const result = await fetchMetalPrice(metalId, config);
-    results.push(result);
 
-    if (result.success) {
-      successCount++;
+    if (result.success && data.metals[metalId]) {
+      const metalData = data.metals[metalId].data;
+      const yearEntry = metalData.find(d => d.year === currentYear);
+      const oldPrice = yearEntry ? yearEntry.price : null;
 
-      // Update the price in data
-      if (data.metals[metalId]) {
-        const metalData = data.metals[metalId].data;
-        const yearEntry = metalData.find(d => d.year === currentYear);
-
-        if (yearEntry) {
-          yearEntry.price = result.price;
-        } else {
-          metalData.push({ year: currentYear, price: result.price });
-          // Keep sorted by year
-          metalData.sort((a, b) => a.year - b.year);
-        }
+      if (yearEntry) {
+        yearEntry.price = result.price;
+      } else {
+        metalData.push({ year: currentYear, price: result.price });
+        metalData.sort((a, b) => a.year - b.year);
       }
+
+      updates.push({
+        metal: metalId,
+        oldPrice,
+        newPrice: result.price,
+        unit: data.metals[metalId].unit,
+      });
+      successCount++;
     } else {
       failCount++;
     }
 
-    // Delay between requests (1 second)
-    await delay(1000);
+    // Delay between requests (300ms)
+    await delay(300);
   }
 
   // Update timestamp
@@ -286,18 +355,22 @@ async function updatePrices() {
   console.log('\n' + '='.repeat(50));
   console.log('Summary');
   console.log('='.repeat(50));
-  console.log(`Success: ${successCount}/${Object.keys(METAL_SOURCES).length}`);
-  console.log(`Failed:  ${failCount}/${Object.keys(METAL_SOURCES).length}`);
+  console.log(`Success: ${successCount}`);
+  console.log(`Failed:  ${failCount}`);
+  console.log(`Skipped: ${skipCount} (no free API available)`);
   console.log(`Last Updated: ${data.lastUpdated}`);
 
-  if (failCount > 0) {
-    console.log('\nFailed metals:');
-    results.filter(r => !r.success).forEach(r => {
-      console.log(`  - ${r.metalId}: ${r.error}`);
+  if (updates.length > 0) {
+    console.log('\n📊 Price Updates:');
+    updates.forEach(u => {
+      console.log(`  ${u.metal}: ${u.oldPrice} → ${u.newPrice} ${u.unit}`);
     });
   }
 
-  console.log('\nDone!');
+  console.log('\n✅ Done!');
+  console.log('\n💡 Note: 6 metals use manual prices (no free API available):');
+  console.log('   Tungsten, Molybdenum, Iron, Cobalt, Lithium, Titanium');
+  console.log('   To update them, edit METAL_SOURCES in scripts/update-prices.js');
 }
 
 // Run the update

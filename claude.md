@@ -166,13 +166,59 @@ Price types:
 
 **Auto-Update System:**
 
-Server-side cron job runs every 2 hours:
+Server-side cron job runs every hour:
 ```bash
-# Cron: 0 */2 * * *
+# Cron: 0 * * * *
 DATA_FILE=/var/www/reports/data/metals-prices.json node /var/www/reports/scripts/update-prices.js
 ```
 
 Log file: `/var/log/metals-update.log`
+
+**Data Sources & Units:**
+
+| Metal | Unit | Source | Auto-Update |
+|-------|------|--------|-------------|
+| Gold | USD/oz | gold-api.com (COMEX spot) | Yes |
+| Silver | USD/oz | gold-api.com (COMEX spot) | Yes |
+| Copper | USD/ton | westmetall.com (LME) | Yes |
+| Aluminum | USD/ton | westmetall.com (LME) | Yes |
+| Nickel | USD/ton | westmetall.com (LME) | Yes |
+| Zinc | USD/ton | westmetall.com (LME) | Yes |
+| Tin | USD/ton | westmetall.com (LME) | Yes |
+| Iron | USD/ton | Manual (CFR China 62% Fe) | No |
+| Cobalt | USD/lb | Manual (LME) | No |
+| Tungsten | USD/mtu | Manual (APT 88.5% WO3) | No |
+| Molybdenum | USD/lb | Manual (Oxide) | No |
+| Lithium | USD/ton | Manual (Battery-grade carbonate) | No |
+| Titanium | USD/ton | Manual (Sponge) | No |
+
+**Manual Price Update Notes:**
+
+6 metals require manual price updates in `scripts/update-prices.js`:
+
+1. **Unit Consistency**: Always use USD. If source is CNY, convert to USD.
+2. **Product Consistency**: Use the same product type as historical data:
+   - Lithium: Battery-grade carbonate (not hydroxide)
+   - Titanium: Sponge (not ingot)
+   - Iron: 62% Fe fines CFR China
+3. **Verify YoY**: After updating, check Year-over-Year change is reasonable (typically <50%)
+4. **Data Sources**:
+   - Trading Economics: https://tradingeconomics.com/commodities
+   - SMM (Shanghai Metals Market): https://www.metal.com
+   - Fastmarkets: https://www.fastmarkets.com
+
+To update manual prices:
+```javascript
+// In scripts/update-prices.js, edit METAL_SOURCES:
+lithium: {
+  api: 'manual',
+  price: 22000,  // Update this value
+  unit: 'USD/ton',
+  source: 'SMM China',
+},
+```
+
+Then run: `node scripts/update-prices.js` and `npm run deploy`
 
 ## Troubleshooting
 

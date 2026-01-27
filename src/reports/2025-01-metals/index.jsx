@@ -38,7 +38,9 @@ const MetalsDashboard = () => {
 
   // Fetch price data on mount
   useEffect(() => {
-    fetch('/data/metals-prices.json')
+    // Cache bust: new URL every hour to get fresh data
+    const cacheBuster = Math.floor(Date.now() / 3600000);
+    fetch(`/data/metals-prices.json?v=${cacheBuster}`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to load price data');
         return res.json();
@@ -709,21 +711,43 @@ const MetalsDashboard = () => {
       </div>
 
       <div style={{
-        textAlign: 'center',
         marginTop: '32px',
         padding: '16px',
         color: '#64748b',
-        fontSize: '0.875rem'
+        fontSize: '0.75rem',
+        lineHeight: '1.6'
       }}>
-        <div>Data Source: LME, COMEX, Trading Economics - Year-End Prices (Historical) / Latest Price (Current Year)</div>
-        <div style={{ marginTop: '4px' }}>
+        <div style={{ textAlign: 'center', fontSize: '0.875rem', marginBottom: '12px' }}>
           Last Updated: {lastUpdated ? new Date(lastUpdated).toLocaleString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
             hour: '2-digit',
-            minute: '2-digit'
+            minute: '2-digit',
+            timeZoneName: 'short'
           }) : 'Unknown'}
+        </div>
+        <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'left' }}>
+          <div style={{ fontWeight: 'bold', marginBottom: '8px', color: '#94a3b8' }}>Data Sources & Units:</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '4px 16px' }}>
+            <div><strong>Gold</strong> (USD/oz) - COMEX spot price, troy ounce</div>
+            <div><strong>Silver</strong> (USD/oz) - COMEX spot price, troy ounce</div>
+            <div><strong>Copper</strong> (USD/ton) - LME settlement, metric ton</div>
+            <div><strong>Aluminum</strong> (USD/ton) - LME settlement, metric ton</div>
+            <div><strong>Nickel</strong> (USD/ton) - LME settlement, metric ton</div>
+            <div><strong>Zinc</strong> (USD/ton) - LME settlement, metric ton</div>
+            <div><strong>Tin</strong> (USD/ton) - LME settlement, metric ton</div>
+            <div><strong>Iron</strong> (USD/ton) - CFR China 62% Fe fines</div>
+            <div><strong>Cobalt</strong> (USD/lb) - LME settlement, per pound</div>
+            <div><strong>Tungsten</strong> (USD/mtu) - APT 88.5% WO3, metric ton unit</div>
+            <div><strong>Molybdenum</strong> (USD/lb) - Oxide, per pound</div>
+            <div><strong>Lithium</strong> (USD/ton) - Battery-grade carbonate, China spot</div>
+            <div><strong>Titanium</strong> (USD/ton) - Sponge, metric ton</div>
+          </div>
+          <div style={{ marginTop: '12px', fontSize: '0.7rem', color: '#475569' }}>
+            Historical: Year-end closing price | Current year: Latest available price |
+            Sources: LME, COMEX, Trading Economics, Fastmarkets, SMM
+          </div>
         </div>
       </div>
     </div>
