@@ -745,8 +745,9 @@ const MetalsDashboard = () => {
             <div><strong>Titanium</strong> (USD/ton) - Sponge, metric ton</div>
           </div>
           <div style={{ marginTop: '12px', fontSize: '0.7rem', color: '#475569' }}>
-            Historical: Year-end closing price | Current year: Latest available price |
-            Sources: LME, COMEX, Trading Economics, Fastmarkets, SMM
+            Historical (2025 and earlier): Dec 31 closing price; earlier years may use annual average. Current year: Latest available price.
+            Gold & Silver: LBMA/COMEX; Copper, Aluminum, Nickel, Zinc, Tin: LME Cash Settlement (Westmetall).
+            Other sources: Trading Economics, Fastmarkets, SMM.
           </div>
         </div>
       </div>
