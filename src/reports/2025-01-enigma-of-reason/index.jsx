@@ -280,7 +280,7 @@ export default function EnigmaOfReasonComplete() {
       </header>
 
       {/* ==================== 导航栏 ==================== */}
-      <nav className="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-700/50 py-3 px-6">
+      <nav className="sticky top-16 z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-700/50 py-3 px-6">
         <div className="max-w-5xl mx-auto flex gap-2 overflow-x-auto pb-1">
           {sections.map((section, idx) => (
             <button
@@ -303,7 +303,7 @@ export default function EnigmaOfReasonComplete() {
         <div className="max-w-4xl mx-auto">
 
           {/* ==================== 第一部分：导言 ==================== */}
-          <section id="intro" className="scroll-mt-24 mb-20">
+          <section id="intro" className="scroll-mt-32 mb-20">
             <h2 className="text-3xl font-bold text-slate-100 mb-6 flex items-center gap-3">
               <span className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white text-lg">1</span>
               导言：为什么这本书重要
@@ -335,7 +335,7 @@ export default function EnigmaOfReasonComplete() {
           </section>
 
           {/* ==================== 第二部分：理性悖论 ==================== */}
-          <section id="paradox" className="scroll-mt-24 mb-20">
+          <section id="paradox" className="scroll-mt-32 mb-20">
             <h2 className="text-3xl font-bold text-slate-100 mb-6 flex items-center gap-3">
               <span className="w-10 h-10 rounded-lg bg-gradient-to-br from-red-500 to-rose-600 flex items-center justify-center text-white text-lg">2</span>
               理性的双重之谜
@@ -423,7 +423,7 @@ export default function EnigmaOfReasonComplete() {
           </section>
 
           {/* ==================== 第三部分：论证理论框架 ==================== */}
-          <section id="theory" className="scroll-mt-24 mb-20">
+          <section id="theory" className="scroll-mt-32 mb-20">
             <h2 className="text-3xl font-bold text-slate-100 mb-6 flex items-center gap-3">
               <span className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-lg">3</span>
               论证理论的核心框架
@@ -575,7 +575,7 @@ export default function EnigmaOfReasonComplete() {
           </section>
 
           {/* ==================== 第四部分：Wason选择任务 ==================== */}
-          <section id="wason" className="scroll-mt-24 mb-20">
+          <section id="wason" className="scroll-mt-32 mb-20">
             <h2 className="text-3xl font-bold text-slate-100 mb-6 flex items-center gap-3">
               <span className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-lg">4</span>
               Wason选择任务：关键实验证据
@@ -774,7 +774,7 @@ export default function EnigmaOfReasonComplete() {
           </section>
 
           {/* ==================== 第五部分：确认偏误与我方偏误 ==================== */}
-          <section id="bias" className="scroll-mt-24 mb-20">
+          <section id="bias" className="scroll-mt-32 mb-20">
             <h2 className="text-3xl font-bold text-slate-100 mb-6 flex items-center gap-3">
               <span className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center text-white text-lg">5</span>
               确认偏误与我方偏误：设计特征而非缺陷
@@ -974,7 +974,7 @@ export default function EnigmaOfReasonComplete() {
           </section>
 
           {/* ==================== 第六部分：道德伪善实验 ==================== */}
-          <section id="hypocrisy" className="scroll-mt-24 mb-20">
+          <section id="hypocrisy" className="scroll-mt-32 mb-20">
             <h2 className="text-3xl font-bold text-slate-100 mb-6 flex items-center gap-3">
               <span className="w-10 h-10 rounded-lg bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center text-white text-lg">6</span>
               道德伪善实验：推理如何为自利辩护
@@ -1258,7 +1258,7 @@ export default function EnigmaOfReasonComplete() {
           </section>
 
           {/* ==================== 第七部分：进化起源 ==================== */}
-          <section id="evolution" className="scroll-mt-24 mb-20">
+          <section id="evolution" className="scroll-mt-32 mb-20">
             <h2 className="text-3xl font-bold text-slate-100 mb-6 flex items-center gap-3">
               <span className="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center text-white text-lg">7</span>
               进化起源：超社会性与认知警觉
@@ -1396,7 +1396,7 @@ export default function EnigmaOfReasonComplete() {
           </section>
 
           {/* ==================== 第八部分：实践应用 ==================== */}
-          <section id="practice" className="scroll-mt-24 mb-20">
+          <section id="practice" className="scroll-mt-32 mb-20">
             <h2 className="text-3xl font-bold text-slate-100 mb-6 flex items-center gap-3">
               <span className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-yellow-600 flex items-center justify-center text-white text-lg">8</span>
               实践应用：如何利用论证理论改善推理
