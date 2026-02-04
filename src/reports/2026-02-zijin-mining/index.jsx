@@ -107,7 +107,7 @@ const Accordion = ({ title, children, defaultOpen = false, highlight = false, ic
       >
         <div className="flex items-center gap-3">
           {icon && <span className="text-xl">{icon}</span>}
-          <span className={`font-medium ${highlight ? 'text-amber-200' : 'text-slate-200'}`}>
+          <span className={`font-medium ${highlight ? 'text-amber-200' : 'text-slate-100'}`}>
             {title}
           </span>
         </div>
@@ -508,18 +508,10 @@ export default function ZijinMiningReport() {
               <div className="text-emerald-400/70 text-sm">置信度 92%</div>
             </div>
 
-            <div className="flex gap-8">
-              <div>
-                <div className="text-slate-400 text-sm">H股目标价</div>
-                <div className="text-2xl font-bold" style={{ color: metalColors.gold }}>
-                  HK$ 52
-                </div>
-              </div>
-              <div>
-                <div className="text-slate-400 text-sm">A股目标价</div>
-                <div className="text-2xl font-bold" style={{ color: metalColors.gold }}>
-                  ¥ 25
-                </div>
+            <div>
+              <div className="text-slate-400 text-sm">H股目标价</div>
+              <div className="text-2xl font-bold" style={{ color: metalColors.gold }}>
+                HK$ 52
               </div>
             </div>
           </div>
@@ -1100,7 +1092,7 @@ export default function ZijinMiningReport() {
           <SectionTitle subtitle="建仓策略与止损红线">📈 交易指引</SectionTitle>
 
           {/* Target Prices */}
-          <div className="grid md:grid-cols-2 gap-6 mb-8">
+          <div className="max-w-md mb-8">
             <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-6">
               <h4 className="text-lg font-semibold text-slate-200 mb-4">H股目标价</h4>
               <div className="flex items-baseline gap-3 mb-2">
@@ -1115,23 +1107,6 @@ export default function ZijinMiningReport() {
               </div>
               <div className="bg-emerald-500/20 text-emerald-400 rounded-lg px-4 py-2 text-center">
                 潜在上涨空间 +{tradeGuidance.targetPrices.hShare.upside}%
-              </div>
-            </div>
-
-            <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-6">
-              <h4 className="text-lg font-semibold text-slate-200 mb-4">A股目标价</h4>
-              <div className="flex items-baseline gap-3 mb-2">
-                <span className="text-slate-400">当前</span>
-                <span className="text-2xl text-slate-300">¥ {tradeGuidance.targetPrices.aShare.current}</span>
-              </div>
-              <div className="flex items-baseline gap-3 mb-4">
-                <span className="text-slate-400">目标</span>
-                <span className="text-4xl font-bold" style={{ color: metalColors.gold }}>
-                  ¥ {tradeGuidance.targetPrices.aShare.target}
-                </span>
-              </div>
-              <div className="bg-emerald-500/20 text-emerald-400 rounded-lg px-4 py-2 text-center">
-                潜在上涨空间 +{tradeGuidance.targetPrices.aShare.upside}%
               </div>
             </div>
           </div>

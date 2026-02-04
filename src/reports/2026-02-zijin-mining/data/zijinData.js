@@ -416,8 +416,7 @@ export const projectTimeline = [
 // 交易指引
 export const tradeGuidance = {
   targetPrices: {
-    hShare: { current: 18.5, target: 52, upside: 181 },
-    aShare: { current: 17.2, target: 25, upside: 45 }
+    hShare: { current: 18.5, target: 52, upside: 181 }
   },
   entryStrategy: [
     { price: '港股 17-19 HKD', action: '首次建仓', position: '30%' },
