@@ -13,6 +13,24 @@
     padding: 0;
   }
 
+  /* Reset form elements (no Tailwind Preflight) */
+  button, input, select, textarea {
+    font: inherit;
+    color: inherit;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+  }
+
+  img, svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  ul, ol {
+    list-style: none;
+  }
+
   :root {
     --color-bg-primary: #0f172a;
     --color-bg-secondary: #1e293b;

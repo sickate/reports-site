@@ -45,9 +45,9 @@ const AnimatedNumber = ({ value, suffix = '%' }) => {
 const Accordion = ({ title, children, defaultOpen = false, highlight = false }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   return (
-    <div className={`border rounded-xl overflow-hidden mb-4 ${highlight ? 'border-amber-500/50 bg-amber-500/5' : 'border-slate-700/50 bg-slate-800/30'}`}>
-      <button onClick={() => setIsOpen(!isOpen)} className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-slate-700/20 transition-all">
-        <span className={`font-semibold text-lg ${highlight ? 'text-amber-300' : 'text-slate-100'}`}>{title}</span>
+    <div className={`border rounded-xl overflow-hidden mb-4 ${highlight ? 'border-amber-500/50 bg-amber-900/40' : 'border-slate-700/50 bg-slate-800/60'}`}>
+      <button onClick={() => setIsOpen(!isOpen)} className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-slate-700/30 transition-all">
+        <span className={`font-semibold text-lg ${highlight ? 'text-amber-200' : 'text-slate-100'}`}>{title}</span>
         <div className="flex items-center gap-2">
           {!isOpen && <span className="text-xs text-slate-500">点击展开</span>}
           <svg className={`w-5 h-5 text-slate-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
