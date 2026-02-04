@@ -101,13 +101,13 @@ const Accordion = ({ title, children, defaultOpen = false, highlight = false, ic
     }`}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full px-6 py-4 flex items-center justify-between text-left transition-colors ${
+        className={`w-full px-6 py-4 flex items-center justify-between text-left transition-colors bg-transparent ${
           highlight ? 'hover:bg-amber-500/10' : 'hover:bg-slate-700/30'
         }`}
       >
         <div className="flex items-center gap-3">
           {icon && <span className="text-xl">{icon}</span>}
-          <span className={`font-medium ${highlight ? 'text-amber-200' : 'text-slate-100'}`}>
+          <span className={`font-medium ${highlight ? 'text-amber-200' : 'text-white'}`}>
             {title}
           </span>
         </div>
