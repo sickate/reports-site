@@ -2,7 +2,7 @@
 set -e
 
 # Configuration
-REMOTE_USER="root"
+REMOTE_USER="tzhu"
 REMOTE_HOST="maru"
 REMOTE_PATH="/var/www/reports"
 BUILD_DIR="dist"
