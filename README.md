@@ -9,6 +9,7 @@ Static website for research reports and data visualizations.
 - **Build**: Vite 6
 - **Frontend**: React 18
 - **Charts**: Recharts
+- **3D Graphics**: Three.js + React Three Fiber (for interactive visualizations)
 - **Deployment**: nginx + Let's Encrypt (Aliyun VM)
 
 ## Local Development
@@ -106,8 +107,14 @@ reports-instap/
 │   ├── deploy.sh       # Deployment script
 │   └── server-setup.sh # Server initialization
 ├── nginx/              # nginx configuration
-└── public/             # Static assets
+└── public/
+    └── textures/       # Texture assets for 3D visualizations
+        └── planets/    # Planet textures (CC BY 4.0 from Solar System Scope)
 ```
+
+## Texture Credits
+
+Planet textures are from [Solar System Scope](https://www.solarsystemscope.com/textures/) under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) license. These textures are based on NASA elevation and imagery data.
 
 ## Server Information
 

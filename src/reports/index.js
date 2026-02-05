@@ -1,5 +1,14 @@
 export const reports = [
   {
+    slug: '2026-02-solar-system',
+    title: '3D Solar System Simulator',
+    description: '交互式3D太阳系模拟器，支持手势控制',
+    date: '2026-02-04',
+    type: 'visualization',
+    tags: ['3D', 'WebGL', 'Interactive', 'Space'],
+    component: () => import('./2026-02-solar-system/index.jsx'),
+  },
+  {
     slug: '2026-02-zijin-mining',
     title: '紫金矿业深度分析',
     description: '紫金矿业 (2899.HK / 601899.SS) 投研分析：全球铜金龙头，AI时代的"新石油"供应商，央行购金浪潮的核心受益者。',
