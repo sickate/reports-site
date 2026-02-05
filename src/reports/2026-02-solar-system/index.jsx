@@ -1,4 +1,4 @@
-import { Suspense, useState, useEffect } from 'react';
+import { Suspense, useState, useEffect, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { SolarSystemScene } from './components/SolarSystemScene';
 import { GestureController } from './components/Controls/GestureController';
@@ -52,15 +52,87 @@ function WebGLNotSupported() {
   );
 }
 
+// Fullscreen button component
+function FullscreenButton({ isFullscreen, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`
+        z-[10000] p-2 rounded-lg transition-all duration-300
+        ${isFullscreen
+          ? 'fixed bottom-4 left-4 bg-white/10 hover:bg-white/20'
+          : 'absolute top-16 left-4 bg-black/50 hover:bg-black/70 backdrop-blur-sm'
+        }
+        text-white/80 hover:text-white border border-white/20
+      `}
+      title={isFullscreen ? 'Exit fullscreen (ESC)' : 'Enter fullscreen'}
+    >
+      {isFullscreen ? (
+        // Exit fullscreen icon
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="4 14 10 14 10 20" />
+          <polyline points="20 10 14 10 14 4" />
+          <line x1="14" y1="10" x2="21" y2="3" />
+          <line x1="3" y1="21" x2="10" y2="14" />
+        </svg>
+      ) : (
+        // Enter fullscreen icon
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="15 3 21 3 21 9" />
+          <polyline points="9 21 3 21 3 15" />
+          <line x1="21" y1="3" x2="14" y2="10" />
+          <line x1="3" y1="21" x2="10" y2="14" />
+        </svg>
+      )}
+    </button>
+  );
+}
+
 export default function SolarSystemSimulator() {
   const [webGLSupported, setWebGLSupported] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const device = useDeviceDetection();
   const settings = getPerformanceSettings(device);
 
+  const toggleFullscreen = useCallback(() => {
+    setIsFullscreen((prev) => !prev);
+  }, []);
+
+  // Handle ESC key to exit fullscreen
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isFullscreen) {
+        setIsFullscreen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFullscreen]);
+
+  // Add class to body when component mounts (for full-width styling)
+  useEffect(() => {
+    document.body.classList.add('solar-system-active');
+    return () => {
+      document.body.classList.remove('solar-system-active');
+    };
+  }, []);
+
+  // Toggle body class for hiding external layout elements
+  useEffect(() => {
+    if (isFullscreen) {
+      document.body.classList.add('solar-system-fullscreen');
+    } else {
+      document.body.classList.remove('solar-system-fullscreen');
+    }
+    return () => {
+      document.body.classList.remove('solar-system-fullscreen');
+    };
+  }, [isFullscreen]);
+
   useEffect(() => {
     setWebGLSupported(checkWebGLSupport());
-    // Simulate minimum loading time for smooth transition
     const timer = setTimeout(() => setIsLoading(false), 500);
     return () => clearTimeout(timer);
   }, []);
@@ -70,7 +142,15 @@ export default function SolarSystemSimulator() {
   }
 
   return (
-    <div className="w-full h-screen bg-black relative overflow-hidden">
+    <div
+      className={`
+        solar-system-wrapper bg-black relative overflow-hidden
+        ${isFullscreen
+          ? 'fixed inset-0 z-[9999] w-screen h-screen'
+          : 'w-full h-screen'
+        }
+      `}
+    >
       {/* Loading overlay */}
       {isLoading && <Loader />}
 
@@ -92,18 +172,48 @@ export default function SolarSystemSimulator() {
         </Suspense>
       </Canvas>
 
-      {/* UI Overlays */}
-      <InfoPanel />
-      <ControlsHint isMobile={device.isMobile} />
+      {/* Fullscreen button - always visible */}
+      <FullscreenButton isFullscreen={isFullscreen} onClick={toggleFullscreen} />
 
-      {/* Gesture controller - only on desktop */}
-      {!device.isMobile && <GestureController enabled={!device.isMobile} />}
+      {/* UI Overlays - hidden in fullscreen mode */}
+      <div
+        className={`transition-opacity duration-300 ${
+          isFullscreen ? 'opacity-0 pointer-events-none' : 'opacity-100'
+        }`}
+      >
+        <InfoPanel />
+        <ControlsHint isMobile={device.isMobile} />
 
-      {/* Title */}
-      <div className="absolute top-4 right-4 text-right z-30">
-        <h1 className="text-white/90 text-lg font-light tracking-wide">Solar System</h1>
-        <p className="text-white/50 text-xs">Interactive 3D Simulation</p>
+        {/* Gesture controller - only on desktop */}
+        {!device.isMobile && <GestureController enabled={!device.isMobile} />}
+
+        {/* Title */}
+        <div className="absolute top-4 right-4 text-right z-30">
+          <h1 className="text-white/90 text-lg font-light tracking-wide">Solar System</h1>
+          <p className="text-white/50 text-xs">Interactive 3D Simulation</p>
+        </div>
       </div>
+
+      {/* Fullscreen hint - shows briefly when entering fullscreen */}
+      {isFullscreen && (
+        <div
+          className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 text-white/50 text-xs
+                     animate-pulse pointer-events-none"
+          style={{
+            animation: 'fadeOut 3s forwards',
+          }}
+        >
+          Press ESC to exit fullscreen
+        </div>
+      )}
+
+      <style>{`
+        @keyframes fadeOut {
+          0% { opacity: 1; }
+          70% { opacity: 1; }
+          100% { opacity: 0; }
+        }
+      `}</style>
     </div>
   );
 }

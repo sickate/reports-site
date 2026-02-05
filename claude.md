@@ -220,6 +220,69 @@ lithium: {
 
 Then run: `node scripts/update-prices.js` and `npm run deploy`
 
+### 3D Solar System Simulator (2026-02)
+
+Location: `src/reports/2026-02-solar-system/`
+
+**Features:**
+- Interactive 3D solar system with all 8 planets + Pluto
+- Realistic orbital mechanics and planet sizes (logarithmic scale)
+- Hand gesture control via MediaPipe
+- Mouse/touch controls (OrbitControls)
+- Fullscreen mode (hides all UI)
+- Planet info panel on click
+
+**Tech Stack:**
+- Three.js + React Three Fiber
+- MediaPipe Tasks Vision (hand tracking)
+- Zustand (state management)
+- Custom GLSL shaders (sun, atmosphere)
+
+**Hand Gesture Controls:**
+
+| Gesture | Detection | Action |
+|---------|-----------|--------|
+| ✋ Open hand | All fingers extended | Rotate view (turn hand left/right) |
+| 🤏 Single pinch | Thumb + index close | Pan view (move pinched hand) |
+| 🤲 Two-hand pinch | Both hands pinching | Zoom (pull hands apart/together) |
+
+**Key Components:**
+
+| File | Purpose |
+|------|---------|
+| `index.jsx` | Main component, fullscreen toggle |
+| `components/SolarSystemScene.jsx` | 3D scene setup |
+| `components/Controls/GestureController.jsx` | MediaPipe hand tracking |
+| `components/Controls/CameraRig.jsx` | Camera control (mouse + gesture) |
+| `hooks/useGestureStore.js` | Zustand store for gesture state |
+| `data/planetData.js` | Planet orbital parameters |
+
+**Fullscreen Mode:**
+- Click fullscreen button (top-left) to enter
+- Hides navbar, footer, and all UI overlays
+- Press ESC or click exit button to exit
+- Uses `body.solar-system-fullscreen` CSS class
+
+**Adding New Gestures:**
+
+1. Add detection logic in `GestureController.jsx`:
+```javascript
+const isNewGesture = (landmarks) => {
+  // Check landmark positions
+  return condition;
+};
+```
+
+2. Add state/action in `useGestureStore.js`:
+```javascript
+newGestureActive: false,
+newGestureDelta: 0,
+updateNewGesture: (value) => set({ ... }),
+endNewGesture: () => set({ ... }),
+```
+
+3. Handle in `CameraRig.jsx` useFrame loop
+
 ## Troubleshooting
 
 ### Build fails

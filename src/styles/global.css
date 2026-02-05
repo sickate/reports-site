@@ -359,4 +359,39 @@
       padding: 0 16px;
     }
   }
+
+  /* Solar System Report - needs full width */
+  body.solar-system-active .main-content {
+    max-width: none;
+    padding: 0;
+  }
+
+  body.solar-system-active .report-page {
+    padding: 0;
+  }
+
+  body.solar-system-active .report-nav {
+    position: absolute;
+    top: 80px;
+    left: 16px;
+    z-index: 40;
+  }
+
+  /* Solar System Fullscreen Mode */
+  body.solar-system-fullscreen {
+    overflow: hidden;
+  }
+
+  body.solar-system-fullscreen .navbar,
+  body.solar-system-fullscreen .footer,
+  body.solar-system-fullscreen .report-nav {
+    display: none !important;
+  }
+
+  body.solar-system-fullscreen .main-content,
+  body.solar-system-fullscreen .report-page {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: none !important;
+  }
 }

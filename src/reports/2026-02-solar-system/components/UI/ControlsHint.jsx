@@ -40,8 +40,14 @@ export function ControlsHint({ isMobile = false }) {
           <li>Right drag: Pan</li>
           <li>Scroll: Zoom in/out</li>
           <li>Click planet: Show info</li>
-          <li className="text-blue-300/80 pt-1 border-t border-white/10 mt-1">
-            Hand gesture: Pinch with both hands to zoom
+          <li className="text-cyan-300/80 pt-1 border-t border-white/10 mt-1">
+            ✋ Open hand: Rotate view
+          </li>
+          <li className="text-green-300/80">
+            🤏 Single pinch: Pan view
+          </li>
+          <li className="text-pink-300/80">
+            🤲 Both pinch: Zoom in/out
           </li>
         </ul>
       )}
