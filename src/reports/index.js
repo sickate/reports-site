@@ -1,5 +1,14 @@
 export const reports = [
   {
+    slug: '2026-02-optical-communications',
+    title: '光通信：AI数据中心的物理边界',
+    description: 'Morgan Stanley研报摘要：光通信从升级周期到架构迁移，五条增量赛道TAM估算，OCS/CPO技术解读，个股估值与关键争论。',
+    date: '2026-02-24',
+    type: 'visualization',
+    tags: ['投资分析', 'Optical', 'AI Infrastructure', '光通信', 'CPO', 'OCS'],
+    component: () => import('./2026-02-optical-communications/index.jsx'),
+  },
+  {
     slug: '2026-02-solar-system',
     title: '3D Solar System Simulator',
     description: '交互式3D太阳系模拟器，支持手势控制',
