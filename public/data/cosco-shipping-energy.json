@@ -1,0 +1,149 @@
+{
+  "lastUpdated": "2026-04-12T07:00:00Z",
+  "metrics": {
+    "vlccOrders": {
+      "type": "auto",
+      "name": "月度新增 VLCC 订单",
+      "unit": "艘",
+      "baseline": "历史低位 1.5%; 当前 orderbook/fleet ~15%",
+      "threshold": {
+        "alert": 15,
+        "window": "monthly"
+      },
+      "source": "Splash247 / iMarine / Eworldship",
+      "latest": {
+        "value": 13,
+        "asOf": "2026-04-11",
+        "rolling7d": 13,
+        "details": [
+          {
+            "source": "Splash247 / Seatrade Maritime",
+            "title": "China Merchants Energy Shipping orders 10 VLCCs at DSIC (RMB 8.57bn, $124m/vessel)",
+            "count": 10,
+            "url": "https://splash247.com/china-merchants-energy-stacks-orderbook-with-10-ship-vlcc-series/"
+          },
+          {
+            "source": "NYK official",
+            "title": "NYK Line orders 1 methanol dual-fuel VLCC at Nippon Shipyard (for Idemitsu Tanker)",
+            "count": 1,
+            "url": "https://www.nyk.com/english/news/2025/20250407.html"
+          },
+          {
+            "source": "Riviera Maritime",
+            "title": "Carlova Maritime (Inglessis) orders 2 VLCCs at Hanwha Ocean, delivery Q4 2027 + Q3 2029",
+            "count": 2,
+            "url": "https://www.rivieramm.com/news-content-hub/anthony-inglessis-carlova-maritime-doubles-vlcc-orderbook-at-hanwha-adds-aframax-at-hengli-88378"
+          }
+        ],
+        "alert": false
+      },
+      "history": [
+        {
+          "date": "2026-04-11",
+          "value": 13,
+          "window": "rolling-7d"
+        }
+      ]
+    },
+    "vlccPriceRatio": {
+      "type": "auto",
+      "name": "10 年船龄 / 新造 VLCC 价格比",
+      "unit": "ratio",
+      "baseline": "健康 <0.60; 警戒 ≥0.70; 极度亢奋 ≥0.80",
+      "threshold": {
+        "alert": 0.7,
+        "extreme": 0.8
+      },
+      "source": "Hellenic Shipping News (Clarksons weekly)",
+      "latest": {
+        "value": 0.856,
+        "asOf": "2026-03-02",
+        "newbuildUsdM": 128.5,
+        "secondhand10yrUsdM": 110.0,
+        "sourceUrl": "https://splash247.com/vlcc-resales-outprice-newbuilds-by-record-39-5m/",
+        "alert": true,
+        "extreme": true
+      },
+      "history": [
+        {
+          "date": "2026-03-02",
+          "value": 0.856,
+          "newbuildUsdM": 128.5,
+          "secondhand10yrUsdM": 110.0
+        }
+      ]
+    },
+    "td3cTce": {
+      "type": "manual",
+      "name": "VLCC TD3C TCE (中东→中国)",
+      "unit": "USD/天",
+      "baseline": "10 年均值 $25-35k/天",
+      "source": "Baltic Exchange",
+      "latest": {
+        "value": 451000,
+        "asOf": "2026-04-09",
+        "note": "战时溢价"
+      }
+    },
+    "bdti": {
+      "type": "manual",
+      "name": "BDTI 波罗的海脏油轮指数",
+      "unit": "点",
+      "baseline": "2025 同期 ~1,200 点",
+      "source": "Baltic Exchange",
+      "latest": {
+        "value": 3658,
+        "asOf": "2026-04-09",
+        "note": "历史峰值附近"
+      }
+    },
+    "vlccEffectiveFleet": {
+      "type": "manual",
+      "name": "全球合规 VLCC 有效运力",
+      "unit": "艘",
+      "baseline": "总船队 880 艘, 影子船队 ~230 艘",
+      "source": "S&P Global / Signal Group",
+      "latest": {
+        "value": 650,
+        "asOf": "2026-02-01",
+        "note": "35% 船龄 >15 年"
+      }
+    },
+    "coscoNetIncome": {
+      "type": "manual",
+      "name": "中远海能 2025 归母净利润",
+      "unit": "亿元",
+      "baseline": "Q4 单季 13.1 亿 (+125% YoY)",
+      "source": "公司年报",
+      "latest": {
+        "value": 40.37,
+        "asOf": "2026-03-27",
+        "note": "ROE 10.42%"
+      }
+    },
+    "brentOil": {
+      "type": "manual",
+      "name": "Brent 原油",
+      "unit": "USD/桶",
+      "baseline": "停火前 $118+; 年初 $61",
+      "source": "CNBC",
+      "latest": {
+        "value": 95.71,
+        "asOf": "2026-04-09",
+        "note": "停火当日 −15%"
+      }
+    },
+    "hormuzStatus": {
+      "type": "manual",
+      "name": "霍尔木兹海峡状态",
+      "unit": "",
+      "baseline": "正常日均 ~50 艘油轮通行",
+      "source": "Kpler",
+      "latest": {
+        "value": "近乎封锁, 仅 ~5% 通行",
+        "asOf": "2026-04-09",
+        "note": "伊朗逐船审批"
+      }
+    }
+  }
+}

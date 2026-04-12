@@ -1,5 +1,14 @@
 export const reports = [
   {
+    slug: '2026-04-cosco-shipping-energy',
+    title: '中远海能 H 股 (1138.HK) 深度投研 v3.1',
+    description: '霍尔木兹危机下的 VLCC 结构性牛市分析: 可比估值、红队测试、交易指引, 含 VLCC 订单与船价比值的实时监控仪表盘。',
+    date: '2026-04-11',
+    type: 'visualization',
+    tags: ['投资分析', '航运', 'VLCC', 'LNG', '地缘政治'],
+    component: () => import('./2026-04-cosco-shipping-energy/index.jsx'),
+  },
+  {
     slug: '2026-02-optical-communications',
     title: '光通信：AI数据中心的物理边界',
     description: 'Morgan Stanley研报摘要：光通信从升级周期到架构迁移，五条增量赛道TAM估算，OCS/CPO技术解读，个股估值与关键争论。',
