@@ -4,6 +4,13 @@ function Navbar() {
   const location = useLocation();
   const isHome = location.pathname === '/';
 
+  const handleBooksClick = (e) => {
+    if (isHome) {
+      e.preventDefault();
+      document.getElementById('books')?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <nav className="navbar">
       <div className="navbar-content">
@@ -14,6 +21,12 @@ function Navbar() {
         <div className="navbar-links">
           <Link to="/" className={isHome ? 'active' : ''}>
             Home
+          </Link>
+          <Link
+            to="/#books"
+            onClick={handleBooksClick}
+          >
+            Books
           </Link>
         </div>
       </div>
