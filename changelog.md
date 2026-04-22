@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.0] - 2026-04-22
+
+### Added
+
+- New April 2026 research topics:
+  - `2026-04-optical-value-chain`
+  - `2026-04-semiconductor-upstream`
+  - `2026-04-high-voltage-platform`
+  - `2026-04-global-lithium`
+  - `2026-04-commercial-space`
+  - `2026-04-elon-musk-factories`
+- Shared company finance card renderer in `src/lib/`
+- Generated finance dataset: `public/data/company-financials.jsonl`
+- Generated semiconductor upstream datasets:
+  - `public/data/semiconductor-upstream-subsegments.jsonl`
+  - `public/data/semiconductor-upstream-company-exposures.jsonl`
+- Research topic assets and supporting notes under `public/research-topics/`, `researches/`, and `skills/`
+
+### Changed
+
+- `npm run build` now runs a `prebuild` step that generates shared JSONL research datasets
+- Deploy script now validates `dist/data/company-financials.jsonl` before syncing to production
+- Report registry updated to include the new April 2026 topic pages
+- Global styles and shared report infrastructure expanded to support richer topic pages, layered finance sections, and reusable research components
+
+### Data
+
+- Optical communications page now uses shared per-company finance records instead of page-local hardcoded tables
+- Semiconductor upstream topic now reads generated subsegment and company exposure datasets
+- Added new public data files for lithium and global manufacturing map research
+
+### Infrastructure
+
+- Established a reusable research-data pipeline for report pages that need shared company / subsegment / exposure datasets
+- Added repository-level documentation for generated datasets and recent topic pages
+
 ## [1.3.0] - 2026-01-26
 
 ### Added

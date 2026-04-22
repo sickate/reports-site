@@ -1,0 +1,805 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Elon Musk 全球制造基地分布图</title>
+    <style>
+      :root {
+        --bg: #07111f;
+        --bg-soft: rgba(15, 23, 42, 0.84);
+        --panel: rgba(11, 21, 38, 0.82);
+        --panel-strong: rgba(8, 16, 31, 0.95);
+        --border: rgba(148, 163, 184, 0.16);
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --muted-2: #64748b;
+        --tesla: #ff5a5f;
+        --spacex: #3dd9ff;
+        --accent: #f8fafc;
+        --shadow: 0 24px 64px rgba(2, 6, 23, 0.34);
+        --radius: 24px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        min-height: 100%;
+        background:
+          radial-gradient(circle at top left, rgba(255, 90, 95, 0.12), transparent 28%),
+          radial-gradient(circle at top right, rgba(61, 217, 255, 0.14), transparent 24%),
+          linear-gradient(180deg, #08111f 0%, #07111f 100%);
+        color: var(--text);
+        font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+      }
+
+      body {
+        padding: 28px;
+      }
+
+      #app {
+        width: min(1520px, 100%);
+        margin: 0 auto;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+
+      .hero-card,
+      .side-card,
+      .map-shell,
+      .detail-card {
+        background: var(--bg-soft);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(12px);
+      }
+
+      .hero-card {
+        padding: 28px 30px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 14px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(61, 217, 255, 0.22);
+        background: rgba(61, 217, 255, 0.08);
+        color: #9be7ff;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0 0 14px;
+        font-size: clamp(32px, 5vw, 54px);
+        line-height: 1.02;
+        letter-spacing: -0.03em;
+      }
+
+      .hero-copy {
+        margin: 0;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.72;
+        max-width: 72ch;
+      }
+
+      .meta-line {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .meta-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.08);
+        border: 1px solid rgba(148, 163, 184, 0.12);
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .side-card {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding: 24px;
+      }
+
+      .side-card h2 {
+        margin: 0;
+        font-size: 15px;
+        color: var(--accent);
+      }
+
+      .side-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      .legend-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .legend-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.08);
+        border: 1px solid rgba(148, 163, 184, 0.12);
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .legend-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-bottom: 20px;
+      }
+
+      .metric {
+        padding: 18px;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+      }
+
+      .metric-label {
+        font-size: 12px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .metric-value {
+        margin-top: 8px;
+        font-size: clamp(26px, 4vw, 36px);
+        line-height: 1;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+      }
+
+      .metric-note {
+        margin-top: 8px;
+        font-size: 12px;
+        color: var(--muted-2);
+      }
+
+      .map-shell {
+        padding: 18px 18px 10px;
+        margin-bottom: 20px;
+      }
+
+      .map-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 16px;
+        margin: 0 8px 14px;
+      }
+
+      .map-header h2 {
+        margin: 0;
+        font-size: 20px;
+      }
+
+      .map-header p {
+        margin: 6px 0 0;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      #map {
+        min-height: 760px;
+      }
+
+      .footnote {
+        margin: 12px 8px 8px;
+        font-size: 12px;
+        color: var(--muted-2);
+      }
+
+      .details {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .detail-card {
+        padding: 22px;
+      }
+
+      .detail-card h3 {
+        margin: 0 0 12px;
+        font-size: 18px;
+      }
+
+      .detail-card p {
+        margin: 0 0 12px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      .facility-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .facility {
+        padding: 16px;
+        border-radius: 16px;
+        background: var(--panel);
+        border: 1px solid rgba(148, 163, 184, 0.12);
+      }
+
+      .facility-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+
+      .facility-name {
+        font-size: 15px;
+        font-weight: 700;
+        line-height: 1.35;
+      }
+
+      .company-badge {
+        flex-shrink: 0;
+        padding: 5px 9px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .company-badge[data-company="Tesla"] {
+        background: rgba(255, 90, 95, 0.14);
+        color: #ff9da1;
+        border: 1px solid rgba(255, 90, 95, 0.22);
+      }
+
+      .company-badge[data-company="SpaceX"] {
+        background: rgba(61, 217, 255, 0.14);
+        color: #9be7ff;
+        border: 1px solid rgba(61, 217, 255, 0.22);
+      }
+
+      .facility-meta {
+        display: grid;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .facility-meta strong {
+        color: var(--text);
+        font-weight: 600;
+      }
+
+      .status-planned {
+        color: #fbbf24;
+      }
+
+      .status-build {
+        color: #7dd3fc;
+      }
+
+      .status-live {
+        color: #86efac;
+      }
+
+      .loading,
+      .error {
+        padding: 80px 24px;
+        text-align: center;
+        color: var(--muted);
+      }
+
+      .error {
+        color: #fecaca;
+      }
+
+      @media (max-width: 1100px) {
+        .hero,
+        .details,
+        .facility-list {
+          grid-template-columns: 1fr;
+        }
+
+        .summary-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 720px) {
+        body {
+          padding: 16px;
+        }
+
+        .hero-card,
+        .side-card,
+        .detail-card,
+        .map-shell {
+          padding-left: 18px;
+          padding-right: 18px;
+        }
+
+        .summary-grid {
+          grid-template-columns: 1fr;
+        }
+
+        #map {
+          min-height: 560px;
+        }
+
+        .map-header {
+          margin-left: 0;
+          margin-right: 0;
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      }
+    </style>
+    <script src="https://cdn.plot.ly/plotly-3.3.1.min.js"></script>
+  </head>
+  <body>
+    <main id="app">
+      <div class="loading">正在加载地图数据…</div>
+    </main>
+
+    <script>
+      const HEIGHT_MESSAGE_TYPE = 'instap-research-topic-height';
+      const DATA_URL = '/data/elon-musk-global-factories.csv';
+      const COMPANY_COLORS = {
+        Tesla: '#ff5a5f',
+        SpaceX: '#3dd9ff',
+      };
+
+      function parseCsv(text) {
+        const rows = [];
+        let row = [];
+        let current = '';
+        let inQuotes = false;
+
+        for (let i = 0; i < text.length; i += 1) {
+          const char = text[i];
+          const next = text[i + 1];
+
+          if (char === '"') {
+            if (inQuotes && next === '"') {
+              current += '"';
+              i += 1;
+            } else {
+              inQuotes = !inQuotes;
+            }
+          } else if (char === ',' && !inQuotes) {
+            row.push(current);
+            current = '';
+          } else if ((char === '\n' || char === '\r') && !inQuotes) {
+            if (char === '\r' && next === '\n') {
+              i += 1;
+            }
+            row.push(current);
+            if (row.some((value) => value !== '')) {
+              rows.push(row);
+            }
+            row = [];
+            current = '';
+          } else {
+            current += char;
+          }
+        }
+
+        if (current || row.length) {
+          row.push(current);
+          rows.push(row);
+        }
+
+        return rows;
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? '')
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;');
+      }
+
+      function sendHeight() {
+        const app = document.getElementById('app');
+        if (!app) {
+          return;
+        }
+
+        window.parent?.postMessage(
+          {
+            type: HEIGHT_MESSAGE_TYPE,
+            height: Math.max(app.scrollHeight, app.offsetHeight),
+          },
+          '*'
+        );
+      }
+
+      function toRecords(text) {
+        const normalized = text.replace(/^\uFEFF/, '');
+        const rows = parseCsv(normalized);
+        const headers = rows[0] || [];
+
+        return rows.slice(1).map((cols) => {
+          const record = {};
+          headers.forEach((header, index) => {
+            record[header] = cols[index] ?? '';
+          });
+          const status = record['状态'] || '';
+          record.lat = Number(record['纬度']);
+          record.lon = Number(record['经度']);
+          record.country = (record['城市/地区'].split(',').pop() || '').trim();
+          record.displayCompany = record['所属公司展示'] || record['公司'];
+          record.assetOwner = record['厂房/资产所有权'] || '';
+          record.contractValue = record['Tesla 对应合同金额'] || '';
+          record.siteStart = record['厂房建设起点'] || '';
+          record.isPlanned = status.includes('规划') || status.includes('暂停');
+          record.isUnderConstruction =
+            !record.isPlanned &&
+            (status.includes('在建') || status.includes('待量产')) &&
+            !status.includes('已完成') &&
+            !status.includes('已运营');
+          record.isLive = !record.isPlanned && !record.isUnderConstruction;
+          return record;
+        });
+      }
+
+      function buildSummary(records) {
+        const countries = new Set(records.map((record) => record.country));
+        const operating = records.filter((record) => record.isLive).length;
+        const underConstruction = records.filter((record) => record.isUnderConstruction).length;
+        const tesla = records.filter((record) => record['公司'] === 'Tesla');
+        const spacex = records.filter((record) => record['公司'] === 'SpaceX');
+        const teslaOperating = tesla.filter((record) => record.isLive).length;
+        const teslaUnderConstruction = tesla.filter((record) => record.isUnderConstruction).length;
+        const teslaPlanned = tesla.filter((record) => record.isPlanned).length;
+
+        return [
+          {
+            label: '基地总数',
+            value: records.length,
+            note: '覆盖整车、电池、储能、火箭、卫星终端与 AI SoC 制造/代工',
+          },
+          {
+            label: 'Tesla',
+            value: tesla.length,
+            note: `${teslaOperating} 个已运营，${teslaUnderConstruction} 个在建/待量产，${teslaPlanned} 个规划/暂停`,
+          },
+          {
+            label: 'SpaceX',
+            value: spacex.length,
+            note: '3 个核心制造园区，均位于美国本土',
+          },
+          {
+            label: '国家/地区',
+            value: countries.size,
+            note: `${operating} 个已运营，${underConstruction} 个在建/待量产`,
+          },
+        ];
+      }
+
+      function buildMetaRow(label, value, extraClass = '') {
+        if (!value) {
+          return '';
+        }
+
+        const renderedValue = extraClass
+          ? `<span class="${extraClass}">${escapeHtml(value)}</span>`
+          : escapeHtml(value);
+
+        return `<div><strong>${escapeHtml(label)}</strong> ${renderedValue}</div>`;
+      }
+
+      function buildHoverHtml(record) {
+        const locationBlock = [
+          `<b>${escapeHtml(record['工厂/基地'])}</b>`,
+          escapeHtml(record['城市/地区']),
+        ].join('<br>');
+
+        const detailBlock = [
+          record.displayCompany && record.displayCompany !== record['公司']
+            ? `展示归属: ${escapeHtml(record.displayCompany)}`
+            : '',
+          record.assetOwner ? `资产所有权: ${escapeHtml(record.assetOwner)}` : '',
+          `状态: ${escapeHtml(record['状态'])}`,
+          `类型: ${escapeHtml(record['类型'])}`,
+          `开始: ${escapeHtml(record['开始日期'])}`,
+          record.siteStart ? `厂房建设起点: ${escapeHtml(record.siteStart)}` : '',
+          `投产: ${escapeHtml(record['完成/投产日期'])}`,
+          `投资额: ${escapeHtml(record['投资额'])}`,
+          record.contractValue ? `Tesla合同金额: ${escapeHtml(record.contractValue)}` : '',
+          `产能: ${escapeHtml(record['产能'])}`,
+          `工人数量: ${escapeHtml(record['工人数量'])}`,
+          `备注: ${escapeHtml(record['备注'])}`,
+        ]
+          .filter(Boolean)
+          .join('<br>');
+
+        return `${locationBlock}<br><br>${detailBlock}`;
+      }
+
+      function buildFacilityCards(records) {
+        return records
+          .map((record) => {
+            const statusClass = record.isPlanned
+              ? 'status-planned'
+              : record.isUnderConstruction
+                ? 'status-build'
+                : 'status-live';
+
+            return `
+              <article class="facility">
+                <div class="facility-top">
+                  <div class="facility-name">${escapeHtml(record['工厂/基地'])}</div>
+                  <span class="company-badge" data-company="${escapeHtml(record['公司'])}">
+                    ${escapeHtml(record['公司'])}
+                  </span>
+                </div>
+                <div class="facility-meta">
+                  ${buildMetaRow('位置', record['城市/地区'])}
+                  ${buildMetaRow('状态', record['状态'], statusClass)}
+                  ${buildMetaRow('类型', record['类型'])}
+                  ${record.displayCompany && record.displayCompany !== record['公司']
+                    ? buildMetaRow('展示归属', record.displayCompany)
+                    : ''}
+                  ${record.assetOwner ? buildMetaRow('资产所有权', record.assetOwner) : ''}
+                  ${buildMetaRow('开始', record['开始日期'])}
+                  ${record.siteStart ? buildMetaRow('厂房建设起点', record.siteStart) : ''}
+                  ${buildMetaRow('投产', record['完成/投产日期'])}
+                  ${buildMetaRow('投资额', record['投资额'])}
+                  ${record.contractValue ? buildMetaRow('Tesla合同金额', record.contractValue) : ''}
+                  ${buildMetaRow('产能', record['产能'])}
+                  ${buildMetaRow('工人数量', record['工人数量'])}
+                  ${buildMetaRow('备注', record['备注'])}
+                </div>
+              </article>
+            `;
+          })
+          .join('');
+      }
+
+      function render(records) {
+        const app = document.getElementById('app');
+        const summary = buildSummary(records);
+        const sortedFacilities = [...records].sort((a, b) => {
+          if (a.isPlanned !== b.isPlanned) {
+            return Number(a.isPlanned) - Number(b.isPlanned);
+          }
+          return a['公司'].localeCompare(b['公司']) || a['工厂/基地'].localeCompare(b['工厂/基地']);
+        });
+
+        app.innerHTML = `
+          <section class="hero">
+            <div class="hero-card">
+              <div class="eyebrow">Manufacturing Footprint</div>
+              <h1>Elon Musk 全球制造基地分布图</h1>
+              <p class="hero-copy">
+                把附件里的 Tesla / SpaceX 工厂分布图接成了站内可视化专题页，并保留原始经纬度与基地说明。
+                当前数据基于截至 2026-04-17 的公开披露口径，覆盖整车、电池、储能、火箭、飞船、卫星终端与半导体相关制造节点。
+              </p>
+              <div class="meta-line">
+                <span class="meta-pill">数据来源: 用户附件 CSV + 现成地图口径</span>
+                <span class="meta-pill">可独立打开 / 可嵌入报告流</span>
+                <span class="meta-pill">Taylor 芯片项目按“在建/待量产”，Mexico 按“规划/暂停”标注</span>
+              </div>
+            </div>
+            <aside class="side-card">
+              <h2>阅读框架</h2>
+              <p>
+                Tesla 的产能布局已经从加州单点扩展为“美国本土主制造 + 上海外向出口 + 柏林欧洲本地化 + 储能双基地 + Taylor AI 芯片代工项目”的多极网络；
+                SpaceX 则明显更集中，制造与迭代链条仍压在加州与德州。
+              </p>
+              <div class="legend-row">
+                <span class="legend-chip">
+                  <span class="legend-dot" style="background:${COMPANY_COLORS.Tesla}"></span>
+                  Tesla
+                </span>
+                <span class="legend-chip">
+                  <span class="legend-dot" style="background:${COMPANY_COLORS.SpaceX}"></span>
+                  SpaceX
+                </span>
+              </div>
+              <p>
+                地图适合看“制造重心在哪里”，下方卡片适合看“每个基地具体做什么、何时投产、产能口径是否清晰”。
+              </p>
+            </aside>
+          </section>
+
+          <section class="summary-grid">
+            ${summary
+              .map(
+                (item) => `
+                  <div class="metric">
+                    <div class="metric-label">${escapeHtml(item.label)}</div>
+                    <div class="metric-value">${escapeHtml(item.value)}</div>
+                    <div class="metric-note">${escapeHtml(item.note)}</div>
+                  </div>
+                `
+              )
+              .join('')}
+          </section>
+
+          <section class="map-shell">
+            <div class="map-header">
+              <div>
+                <h2>全球分布地图</h2>
+                <p>颜色按公司区分，hover 可查看基地类型、状态、投资口径、归属结构与备注。</p>
+              </div>
+            </div>
+            <div id="map"></div>
+            <div class="footnote">
+              说明: 坐标与基地属性来自附件 CSV；部分投资额、工人数量与统一产能口径在公开资料中未披露，因此仍按“未公开/口径不统一”保留。Taylor 芯片项目当前使用 Taylor, Texas 城市级坐标作为地图点位。
+            </div>
+          </section>
+
+          <section class="details">
+            <article class="detail-card">
+              <h3>结构性观察</h3>
+              <p>
+                Tesla 的 10 个基地/项目横跨 4 个国家，制造链条从整车延伸到电池、电驱、公用事业级储能，再延伸到 Taylor 的 AI SoC 代工项目，说明它的全球化不是单纯为了出海，而是围绕成本、关税、供应链和交付半径来重构产能。
+              </p>
+              <p>
+                SpaceX 的 3 个基地则更像一个高度集中、快速迭代的国防工业网络: Hawthorne 负责传统主制造和总装，Starbase 承接 Starship 高速试错与放量，Bastrop 逐渐成为 Starlink 硬件与先进封装的第二支点。
+              </p>
+              <p>
+                从资本配置看，Mexico 是当前唯一显著“挂起”的整车扩张项目，而 Taylor 代表的是另一种路径: 不是 Tesla 自建并完全拥有晶圆厂，而是把关键 AI 芯片产能深度绑定到 Samsung 的美国本土 foundry 资产上。
+              </p>
+            </article>
+
+            <article class="detail-card">
+              <h3>基地卡片</h3>
+              <p>
+                下面这组卡片保留了附件表格里的关键信息，方便在地图之外快速浏览每个基地的类型、投产节奏和公开披露口径。
+              </p>
+              <div class="facility-list">${buildFacilityCards(sortedFacilities)}</div>
+            </article>
+          </section>
+        `;
+
+        const companyOrder = ['Tesla', 'SpaceX'];
+        const traces = companyOrder.map((company) => {
+          const companyRecords = records.filter((record) => record['公司'] === company);
+
+          return {
+            type: 'scattergeo',
+            mode: 'markers',
+            name: company,
+            lat: companyRecords.map((record) => record.lat),
+            lon: companyRecords.map((record) => record.lon),
+            text: companyRecords.map((record) => record['工厂/基地']),
+            hovertext: companyRecords.map((record) => buildHoverHtml(record)),
+            marker: {
+              size: companyRecords.map((record) => (record.isPlanned ? 11 : record.isUnderConstruction ? 13 : 14)),
+              color: companyRecords.map(() => COMPANY_COLORS[company]),
+              opacity: 0.9,
+              line: {
+                width: 0.8,
+                color: '#ffffff',
+              },
+            },
+            hovertemplate: '%{hovertext}<extra></extra>',
+          };
+        });
+
+        const layout = {
+          height: 760,
+          margin: { l: 8, r: 8, t: 8, b: 8 },
+          paper_bgcolor: 'rgba(0,0,0,0)',
+          plot_bgcolor: 'rgba(0,0,0,0)',
+          font: {
+            family: 'IBM Plex Sans, Segoe UI, sans-serif',
+            color: '#e2e8f0',
+          },
+          legend: {
+            orientation: 'h',
+            y: 1.04,
+            x: 0,
+            bgcolor: 'rgba(0,0,0,0)',
+          },
+          geo: {
+            scope: 'world',
+            projection: { type: 'natural earth', scale: 1.05 },
+            showland: true,
+            landcolor: '#12243a',
+            showcountries: true,
+            countrycolor: 'rgba(148, 163, 184, 0.28)',
+            countrywidth: 0.7,
+            showocean: true,
+            oceancolor: '#07111f',
+            showlakes: true,
+            lakecolor: '#07111f',
+            showcoastlines: true,
+            coastlinecolor: 'rgba(148, 163, 184, 0.18)',
+            coastlinewidth: 0.8,
+            bgcolor: 'rgba(0,0,0,0)',
+            lataxis: { showgrid: false },
+            lonaxis: { showgrid: false },
+          },
+          annotations: [
+            {
+              x: 0.02,
+              y: 0.06,
+              xref: 'paper',
+              yref: 'paper',
+              showarrow: false,
+              align: 'left',
+              font: { size: 11, color: '#94a3b8' },
+              text: 'Mexico 项目仍处于规划/暂停状态，因此点位尺寸略小。',
+            },
+          ],
+        };
+
+        Plotly.newPlot('map', traces, layout, {
+          responsive: true,
+          displayModeBar: false,
+        }).then(sendHeight);
+
+        window.requestAnimationFrame(sendHeight);
+        window.setTimeout(sendHeight, 160);
+        window.setTimeout(sendHeight, 520);
+      }
+
+      fetch(DATA_URL)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Failed to fetch CSV');
+          }
+          return response.text();
+        })
+        .then(toRecords)
+        .then(render)
+        .catch((error) => {
+          const app = document.getElementById('app');
+          app.innerHTML = `<div class="error">地图加载失败: ${escapeHtml(error.message)}</div>`;
+          sendHeight();
+        });
+
+      window.addEventListener('resize', sendHeight);
+    </script>
+  </body>
+</html>

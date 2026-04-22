@@ -15,6 +15,11 @@ NC='\033[0m'
 echo -e "${YELLOW}=== Building project ===${NC}"
 npm run build
 
+if [ ! -f "$BUILD_DIR/data/company-financials.jsonl" ]; then
+  echo "Missing $BUILD_DIR/data/company-financials.jsonl after build"
+  exit 1
+fi
+
 echo -e "${YELLOW}=== Syncing to server ===${NC}"
 rsync -avz --delete --chmod=D755,F644 \
   --exclude '.git' \

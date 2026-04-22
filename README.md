@@ -21,6 +21,10 @@ npm install
 # Start dev server
 npm run dev
 
+# Generate shared research datasets
+# (also runs automatically before npm run build)
+node scripts/generate-company-financials-jsonl.mjs
+
 # Build for production
 npm run build
 
@@ -98,6 +102,7 @@ tags: [Tag1, Tag2]
 reports-instap/
 ├── src/
 │   ├── components/     # Shared React components
+│   ├── lib/            # Shared data/report rendering utilities
 │   ├── pages/          # Page components
 │   ├── reports/        # Report content
 │   │   ├── index.js    # Report registry
@@ -105,12 +110,30 @@ reports-instap/
 │   └── styles/         # Global styles
 ├── scripts/
 │   ├── deploy.sh       # Deployment script
+│   ├── generate-company-financials-jsonl.mjs  # Shared finance dataset generator
 │   └── server-setup.sh # Server initialization
 ├── nginx/              # nginx configuration
 └── public/
+    ├── data/           # JSON / JSONL datasets consumed by reports
+    ├── research-topics/# Topic landing pages and generated research assets
     └── textures/       # Texture assets for 3D visualizations
         └── planets/    # Planet textures (CC BY 4.0 from Solar System Scope)
 ```
+
+## Data Pipeline
+
+- `npm run build` now runs `prebuild`, which generates shared research datasets such as `public/data/company-financials.jsonl`
+- Report pages can reuse shared company finance cards and generated JSONL instead of hardcoding tables into each page
+- Deployment now validates that `dist/data/company-financials.jsonl` exists before syncing to the server
+
+## Recent Research Topics
+
+- `2026-04-optical-value-chain`: 光通信产业链价值捕获点、架构图示与分层财务卡片
+- `2026-04-semiconductor-upstream`: 半导体上游产业链关系图与细分赛道数据
+- `2026-04-high-voltage-platform`: 800V 高压平台升级与产业链映射
+- `2026-04-global-lithium`: 全球锂资源项目地图与数据库
+- `2026-04-commercial-space`: 商业航天催化时间轴与火箭爆炸图
+- `2026-04-elon-musk-factories`: Tesla / SpaceX 全球制造基地地图
 
 ## Texture Credits
 
