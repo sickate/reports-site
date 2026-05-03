@@ -55,12 +55,48 @@ export const reports = [
     title: 'New Report Title',
     description: 'Brief description',
     date: 'YYYY-MM-DD',
-    type: 'visualization',  // or 'markdown'
+    type: 'visualization',  // 'visualization' | 'html' | 'markdown'
+    category: 'company',    // 'company' | 'industry' | 'viz' | 'reading'
     tags: ['Tag1', 'Tag2'],
     component: () => import('./YYYY-MM-new-report/index.jsx'),
   },
 ];
 ```
+
+### Report Categories
+
+The `category` field drives homepage grouping (defined in `src/reports/index.js` as `REPORT_CATEGORIES`):
+
+| Category | Label | Use for |
+|----------|-------|---------|
+| `company` | 公司报告 | Single-ticker deep dive / quarterly tracking |
+| `industry` | 行业分析 | Sector / value chain / multi-company horizontal comparison |
+| `viz` | 可视化研究 | Interactive map / dashboard / 3D simulation |
+| `reading` | 读书笔记 | Book reports — collapsed by default on the homepage |
+
+The first three categories render as full-weight sections at the top of the homepage. The `reading` category lives in a collapsed `<details>` block below them, alongside the existing Books series (Rifters reader).
+
+### Tech Company Quarterly Report Template
+
+For company-category quarterly tracking reports, use the reusable template at `docs/templates/tech-company-research/`:
+
+| File | Purpose |
+|------|---------|
+| `meta.template.js` | reportMeta, narrativePivots, kpiCards |
+| `series.template.js` | quarterlySeries + business line / geography / TAC / cost / SBC tables |
+| `segments.template.js` | segmentDeepDive, capexGuidance, balance sheet, ops/AI KPIs |
+| `valuation.template.js` | SOTP, valuationSnapshot, analystTargets, forwardGuidance |
+| `notes.template.js` | earningsCallNotes, riskEvents, watchlist, sanityChecks, sources |
+| `PROMPT.md` | Self-contained AI prompt with `{COMPANY_NAME}` / `{TICKER}` / `{FISCAL_QUARTER}` placeholders |
+| `README.md` | 3-step workflow + per-export reference + customization notes (Meta=ARPU/DAU, NVDA=Datacenter $bn, etc.) |
+
+Reference implementation: `src/reports/2026-05-google-alphabet/` (the canonical Alphabet Q1 2026 report, also the template's first concrete instance).
+
+To create a new tech company report:
+1. Paste `docs/templates/tech-company-research/PROMPT.md` into an AI session, fill in placeholders, and have it return 5 filled JS files
+2. Save them to `src/reports/YYYY-MM-{company-slug}/content/`
+3. Copy `src/reports/2026-05-google-alphabet/index.jsx` and `components/` into the new directory (or import from a shared location once one exists)
+4. Register in `src/reports/index.js` with `category: 'company'`
 
 ## Server Information
 

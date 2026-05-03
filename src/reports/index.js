@@ -1,10 +1,50 @@
+// category 字段用于主页分组：'company' | 'industry' | 'viz' | 'reading'
+// company:  单标的深度（季度跟踪、公司深度投研）
+// industry: 行业 / 板块 / 产业链分析
+// viz:      可视化 / 交互工具（地图、数据仪表盘、3D）
+// reading:  读书笔记（默认在主页底部收起，权重低于前三类）
+
 export const reports = [
+  {
+    slug: '2026-05-google-alphabet',
+    title: 'Alphabet Q1 2026 财报跟踪：CapEx 周期顶部、Cloud Backlog 5x 跃迁与回购暂停',
+    description:
+      '按 11 模块跟踪模板落地的 Alphabet (GOOG) Q1 2026 投研页：8 张 KPI 卡 + 6 组季度趋势图，含 CapEx 指引演变、Cloud RPO $467.6B 跃迁、Q1 2026 回购首次归零、SOTP 拆分与分析师目标价对照。',
+    date: '2026-05-03',
+    type: 'visualization',
+    category: 'company',
+    tags: ['投资分析', 'Tech', 'Alphabet', 'GOOG', 'AI Capex', 'Cloud'],
+    component: () => import('./2026-05-google-alphabet/index.jsx'),
+  },
+  {
+    slug: '2026-05-xingye-yinxi',
+    title: '兴业银锡：26 年看银，27 年看利润回归后的韧性',
+    description:
+      '整合两份兴业银锡研究稿，并将银价/锡价接到 metals 页面同一数据源，动态估算 2026E 营收、利润与当前价格对应 PE。',
+    date: '2026-05-03',
+    type: 'visualization',
+    category: 'company',
+    tags: ['投资分析', 'Mining', 'Silver', 'Tin', '兴业银锡'],
+    component: () => import('./2026-05-xingye-yinxi/index.jsx'),
+  },
+  {
+    slug: '2026-04-neocloud-sector',
+    title: 'Neocloud 板块反推估值全景：7 家公司隐含预期与安全边际',
+    description:
+      '反推估值框架下的 NBIS / CRWV / WULF / APLD / IREN / CIFR / CLSK 横评，含 Backlog 风险调整、Implied CAGR 反推与 NBIS $146 红队专项检验。',
+    date: '2026-04-25',
+    type: 'visualization',
+    category: 'industry',
+    tags: ['投资分析', 'Neocloud', 'AI Infrastructure', 'NBIS', 'CoreWeave'],
+    component: () => import('./2026-04-neocloud-sector/index.jsx'),
+  },
   {
     slug: '2026-04-high-voltage-platform',
     title: '800V 高压平台升级：从四种定价方式到产业链映射',
     description: '围绕 800V 电动车 / 高压平台升级，先解释四种市场定价方式，再按功率器件、模拟控制、系统架构三层重排海外与 A 股映射。',
     date: '2026-04-21',
     type: 'html',
+    category: 'industry',
     tags: ['Research Topic', 'EV', '800V', 'Power Electronics', '高压平台'],
     component: () => import('./2026-04-high-voltage-platform/index.jsx'),
   },
@@ -14,6 +54,7 @@ export const reports = [
     description: '围绕长征十号乙、海上网捕、朱雀三号与 SpaceX/蓝箭资本化预期整理的商业航天专题页，含发射环节爆炸图和 2026 年催化时间轴。',
     date: '2026-04-21',
     type: 'visualization',
+    category: 'industry',
     tags: ['Research Topic', 'Commercial Space', 'Rocket', 'SpaceX', '商业航天'],
     component: () => import('./2026-04-commercial-space/index.jsx'),
   },
@@ -23,6 +64,7 @@ export const reports = [
     description: '整合 Tesla 与 SpaceX 主要制造基地的全球地图，覆盖工厂位置、状态、类型、产能与备注口径。',
     date: '2026-04-21',
     type: 'visualization',
+    category: 'viz',
     tags: ['Research Topic', 'Tesla', 'SpaceX', 'Manufacturing', 'Map'],
     component: () => import('./2026-04-elon-musk-factories/index.jsx'),
   },
@@ -32,6 +74,7 @@ export const reports = [
     description: '按价值捕获点、供给卡点与验证深度重排的光通信产业链页面，覆盖光纤、器件、光源、模块、设备、光引擎与制造装备。',
     date: '2026-04-15',
     type: 'html',
+    category: 'industry',
     tags: ['Research Topic', 'Optical', 'Supply Chain', 'AI Infrastructure', '光通信'],
     component: () => import('./2026-04-optical-value-chain/index.jsx'),
   },
@@ -41,6 +84,7 @@ export const reports = [
     description: '整合 44 个全球锂项目/集群的地图与数据库，覆盖产能、储量/资源、成本、运输路线与供给兑现风险。',
     date: '2026-04-15',
     type: 'html',
+    category: 'industry',
     tags: ['Research Topic', 'Lithium', 'Mining', 'Supply Curve', '锂'],
     component: () => import('./2026-04-global-lithium/index.jsx'),
   },
@@ -50,6 +94,7 @@ export const reports = [
     description: '从材料、设备、零部件到晶圆厂的半导体上游图谱，含细分市场规模、代表公司与市场分布。',
     date: '2026-04-14',
     type: 'html',
+    category: 'industry',
     tags: ['Research Topic', 'Semiconductor', 'Supply Chain', '半导体'],
     component: () => import('./2026-04-semiconductor-upstream/index.jsx'),
   },
@@ -59,6 +104,7 @@ export const reports = [
     description: '霍尔木兹危机下的 VLCC 结构性牛市分析: 可比估值、红队测试、交易指引, 含 VLCC 订单与船价比值的实时监控仪表盘。',
     date: '2026-04-11',
     type: 'visualization',
+    category: 'company',
     tags: ['投资分析', '航运', 'VLCC', 'LNG', '地缘政治'],
     component: () => import('./2026-04-cosco-shipping-energy/index.jsx'),
   },
@@ -68,6 +114,7 @@ export const reports = [
     description: 'Morgan Stanley研报摘要：光通信从升级周期到架构迁移，五条增量赛道TAM估算，OCS/CPO技术解读，个股估值与关键争论。',
     date: '2026-02-24',
     type: 'visualization',
+    category: 'industry',
     tags: ['投资分析', 'Optical', 'AI Infrastructure', '光通信', 'CPO', 'OCS'],
     component: () => import('./2026-02-optical-communications/index.jsx'),
   },
@@ -77,6 +124,7 @@ export const reports = [
     description: '交互式3D太阳系模拟器，支持手势控制',
     date: '2026-02-04',
     type: 'visualization',
+    category: 'viz',
     tags: ['3D', 'WebGL', 'Interactive', 'Space'],
     component: () => import('./2026-02-solar-system/index.jsx'),
   },
@@ -86,6 +134,7 @@ export const reports = [
     description: '紫金矿业 (2899.HK / 601899.SS) 投研分析：全球铜金龙头，AI时代的"新石油"供应商，央行购金浪潮的核心受益者。',
     date: '2026-02-03',
     type: 'visualization',
+    category: 'company',
     tags: ['投资分析', 'Mining', 'Commodities', '铜', '黄金'],
     component: () => import('./2026-02-zijin-mining/index.jsx'),
   },
@@ -95,6 +144,7 @@ export const reports = [
     description: 'Interactive book report on "The Enigma of Reason" by Hugo Mercier & Dan Sperber — exploring the argumentative theory of reasoning.',
     date: '2025-02-01',
     type: 'visualization',
+    category: 'reading',
     tags: ['Cognitive Science', 'Psychology', 'Book Report'],
     component: () => import('./2025-01-enigma-of-reason/index.jsx'),
   },
@@ -104,7 +154,36 @@ export const reports = [
     description: '50-year historical data analysis of 8 major metals including gold, silver, copper, and more.',
     date: '2025-01-22',
     type: 'visualization',
+    category: 'viz',
     tags: ['Commodities', 'Metals', 'Data Visualization'],
     component: () => import('./2025-01-metals/index.jsx'),
+  },
+];
+
+export const REPORT_CATEGORIES = [
+  {
+    key: 'company',
+    label: '公司报告',
+    description: '单标的深度跟踪与季度财报投研',
+    icon: '🏢',
+  },
+  {
+    key: 'industry',
+    label: '行业分析',
+    description: '产业链 / 板块 / 主题横向研究',
+    icon: '🌐',
+  },
+  {
+    key: 'viz',
+    label: '可视化研究',
+    description: '交互地图、数据仪表盘、3D 模拟',
+    icon: '📊',
+  },
+  {
+    key: 'reading',
+    label: '读书笔记',
+    description: '书评 · 思想类作品',
+    icon: '📚',
+    collapsed: true,
   },
 ];

@@ -62,6 +62,82 @@ function buildGroupsFromExposureRecords(records) {
   return [...groups.values()];
 }
 
+function normalizeCompanyKey(name) {
+  return String(name || '')
+    .toLowerCase()
+    .replace(/[（(].*?[)）]/g, '')
+    .replace(/[\/&·.,:：\-\s]/g, '');
+}
+
+function buildExposureLookup(records) {
+  const lookup = new Map();
+
+  records.forEach((record) => {
+    lookup.set(normalizeCompanyKey(record.companyName), record);
+  });
+
+  return lookup;
+}
+
+function mergeCompanyWithExposure(baseCompany, exposureRecord) {
+  if (!exposureRecord) {
+    return baseCompany;
+  }
+
+  return {
+    ...baseCompany,
+    market: exposureRecord.market || baseCompany.market,
+    cap: exposureRecord.cap || baseCompany.cap,
+    summary: exposureRecord.summary || baseCompany.summary,
+    tags: exposureRecord.tags?.length ? exposureRecord.tags : (baseCompany.tags || []),
+    note: exposureRecord.note || baseCompany.note,
+    segmentExposure: exposureRecord.segmentExposure || baseCompany.segmentExposure || null,
+  };
+}
+
+function mergeGroups(baseGroups, exposureRecords) {
+  const hasBaseGroups = Array.isArray(baseGroups) && baseGroups.length > 0;
+  const hasExposureRecords = Array.isArray(exposureRecords) && exposureRecords.length > 0;
+
+  if (!hasExposureRecords) {
+    return hasBaseGroups ? baseGroups : [];
+  }
+
+  if (!hasBaseGroups) {
+    return buildGroupsFromExposureRecords(exposureRecords);
+  }
+
+  const exposureLookup = buildExposureLookup(exposureRecords);
+  const matchedKeys = new Set();
+
+  const mergedBaseGroups = baseGroups.map((group) => ({
+    ...group,
+    companies: (group.companies || []).map((company) => {
+      const key = normalizeCompanyKey(company.name);
+      const matchedRecord = exposureLookup.get(key);
+
+      if (matchedRecord) {
+        matchedKeys.add(key);
+      }
+
+      return mergeCompanyWithExposure(company, matchedRecord);
+    }),
+  }));
+
+  const unmatchedExposureRecords = exposureRecords.filter(
+    (record) => !matchedKeys.has(normalizeCompanyKey(record.companyName))
+  );
+
+  if (!unmatchedExposureRecords.length) {
+    return mergedBaseGroups;
+  }
+
+  return [
+    ...mergedBaseGroups,
+    ...buildGroupsFromExposureRecords(unmatchedExposureRecords),
+  ];
+}
+
 function resolveRuntimeSnapshot(subsegmentRecord) {
   if (subsegmentRecord?.snapshot) {
     return subsegmentRecord.snapshot;
@@ -83,7 +159,6 @@ function resolveRuntimeMarket(baseItem, subsegmentRecord) {
 }
 
 function mergeSubsegment(baseItem, subsegmentRecord, exposureRecords) {
-  const hasExposureRecords = Array.isArray(exposureRecords) && exposureRecords.length > 0;
   const runtimeSnapshot = resolveRuntimeSnapshot(subsegmentRecord);
 
   return {
@@ -100,9 +175,7 @@ function mergeSubsegment(baseItem, subsegmentRecord, exposureRecords) {
       sections: subsegmentRecord?.research?.sections || baseItem.detail?.sections || [],
       updateNote: subsegmentRecord?.research?.updateNote || baseItem.detail?.updateNote,
       badges: subsegmentRecord?.research?.badges || baseItem.detail?.badges || [],
-      groups: hasExposureRecords
-        ? buildGroupsFromExposureRecords(exposureRecords)
-        : (baseItem.detail?.groups || []),
+      groups: mergeGroups(baseItem.detail?.groups || [], exposureRecords),
     },
   };
 }

@@ -7,7 +7,15 @@ function Navbar() {
   const handleBooksClick = (e) => {
     if (isHome) {
       e.preventDefault();
-      document.getElementById('books')?.scrollIntoView({ behavior: 'smooth' });
+      const booksEl = document.getElementById('books');
+      // The 'books' subsection now lives inside a <details> that may be closed.
+      // Open all ancestor <details> first so scrollIntoView lands on visible content.
+      let parent = booksEl?.parentElement;
+      while (parent) {
+        if (parent.tagName === 'DETAILS') parent.open = true;
+        parent = parent.parentElement;
+      }
+      booksEl?.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
