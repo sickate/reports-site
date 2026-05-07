@@ -6,6 +6,17 @@
 
 export const reports = [
   {
+    slug: '2026-05-wafer-foundries',
+    title: '全球前十大晶圆代工与 IDM 制造版图：地点、产能与时间线',
+    description:
+      '基于 Knometa/IC Insights 2024 月度产能口径，可视化前十厂商 ~55 个 fab/site 的全球分布、产能聚合与 2025–2030 关键项目时间线，覆盖 Samsung / TSMC / SK hynix / Micron / Kioxia-WD / UMC / Intel / TI / SMIC / Powerchip-Nexchip。',
+    date: '2026-05-07',
+    type: 'visualization',
+    category: 'viz',
+    tags: ['Research Topic', 'Semiconductor', 'Foundry', 'Manufacturing', 'Map'],
+    component: () => import('./2026-05-wafer-foundries/index.jsx'),
+  },
+  {
     slug: '2026-05-google-alphabet',
     title: 'Alphabet Q1 2026 财报跟踪：CapEx 周期顶部、Cloud Backlog 5x 跃迁与回购暂停',
     description:

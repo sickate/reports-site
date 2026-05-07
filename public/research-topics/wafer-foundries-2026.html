@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>全球前十大晶圆代工与 IDM 制造版图（2024 月度产能）</title>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #11182d;
+      --panel2: #17203a;
+      --text: #eef3ff;
+      --muted: #a8b2cc;
+      --line: #2a365d;
+      --accent: #78a7ff;
+      --green: #4ade80;
+      --orange: #f59e0b;
+      --purple: #a78bfa;
+      --red: #fb7185;
+      --gray: #94a3b8;
+      --cyan: #22d3ee;
+      --gold: #f6c453;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      background:
+        radial-gradient(circle at top left, rgba(120, 167, 255, 0.14), transparent 30%),
+        radial-gradient(circle at top right, rgba(246, 196, 83, 0.09), transparent 24%),
+        var(--bg);
+      color: var(--text);
+      font-family: "IBM Plex Sans", "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+      line-height: 1.55;
+    }
+    a { color: inherit; text-decoration: none; }
+    .wrap { width: min(1500px, 96vw); margin: 18px auto 28px; }
+    .card {
+      background: linear-gradient(180deg, rgba(17,24,45,0.96), rgba(23,32,58,0.96));
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 22px 24px;
+      margin-bottom: 16px;
+    }
+    h1 { margin: 0 0 10px; font-size: 28px; line-height: 1.15; }
+    h2 { margin: 0 0 10px; font-size: 19px; }
+    h3 { margin: 0 0 8px; font-size: 15px; color: var(--text); }
+    p { margin: 6px 0; color: var(--muted); }
+    .eyebrow {
+      display: inline-block; padding: 5px 10px; border-radius: 999px;
+      font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+      color: #dbe7ff; background: rgba(120,167,255,0.13);
+      border: 1px solid rgba(120,167,255,0.28); margin-bottom: 10px;
+    }
+    .kpi-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px; margin-top: 18px;
+    }
+    .kpi {
+      background: rgba(13,20,48,0.66); border: 1px solid var(--line);
+      border-radius: 14px; padding: 14px 16px;
+    }
+    .kpi-label { font-size: 11px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+    .kpi-value { font-size: 26px; font-weight: 700; margin-top: 4px; color: var(--text); }
+    .kpi-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    .grid-2 {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    }
+    @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .filter-bar {
+      display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 14px;
+      align-items: center;
+    }
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 11px; border-radius: 999px; font-size: 12px;
+      border: 1px solid var(--line); background: rgba(13,20,48,0.66);
+      color: var(--muted); cursor: pointer; user-select: none;
+      transition: background .15s ease, color .15s ease, border-color .15s ease;
+    }
+    .chip:hover { color: var(--text); border-color: rgba(120,167,255,0.55); }
+    .chip.active { background: rgba(120,167,255,0.18); color: #eef5ff; border-color: rgba(120,167,255,0.55); }
+    .chip .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .filter-section { display: inline-flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+    .filter-label { font-size: 11px; color: var(--muted); margin-right: 4px; letter-spacing: 0.06em; text-transform: uppercase; }
+
+    #map {
+      width: 100%; height: 580px;
+      border-radius: 14px; overflow: hidden;
+      border: 1px solid var(--line);
+      background: #0a1124;
+    }
+    .leaflet-popup-content-wrapper {
+      background: rgba(17,24,45,0.96); color: var(--text);
+      border: 1px solid var(--line); border-radius: 12px;
+    }
+    .leaflet-popup-content { margin: 12px 14px; min-width: 240px; max-width: 320px; }
+    .leaflet-popup-tip { background: rgba(17,24,45,0.96); border: 1px solid var(--line); }
+    .leaflet-container a.leaflet-popup-close-button { color: var(--muted); }
+    .pop-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .pop-meta { font-size: 12px; color: var(--muted); }
+    .pop-row { display: flex; gap: 6px; font-size: 12px; margin: 3px 0; }
+    .pop-row b { color: var(--text); font-weight: 600; min-width: 60px; }
+    .status-pill {
+      display: inline-block; padding: 2px 7px; border-radius: 999px;
+      font-size: 10px; font-weight: 600; letter-spacing: 0.04em;
+    }
+    .st-operating { background: rgba(74,222,128,0.18); color: #86efac; }
+    .st-ramping { background: rgba(245,158,11,0.18); color: #fbbf24; }
+    .st-construction { background: rgba(120,167,255,0.18); color: #93c5fd; }
+    .st-planning { background: rgba(167,139,250,0.18); color: #c4b5fd; }
+    .st-stalled { background: rgba(251,113,133,0.18); color: #fda4af; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    th, td { padding: 9px 10px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; background: rgba(13,20,48,0.55); position: sticky; top: 0; }
+    tbody tr:hover { background: rgba(120,167,255,0.05); }
+    .table-wrap { max-height: 540px; overflow: auto; border: 1px solid var(--line); border-radius: 12px; }
+    .search-input {
+      width: 100%; max-width: 360px;
+      padding: 8px 12px; border-radius: 10px;
+      border: 1px solid var(--line); background: rgba(13,20,48,0.66);
+      color: var(--text); font-size: 13px;
+    }
+    .search-input::placeholder { color: var(--muted); }
+
+    .narrative { font-size: 13px; color: var(--muted); line-height: 1.7; max-width: 920px; }
+    .legend {
+      display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px;
+      color: var(--muted); margin-top: 10px;
+    }
+    .legend-item { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff3; }
+
+    .tier-tag {
+      display: inline-block; padding: 1px 6px; border-radius: 4px;
+      font-size: 10px; margin-left: 4px; font-weight: 600;
+    }
+    .tier-logic { background: rgba(34,211,238,0.18); color: #67e8f9; }
+    .tier-memory { background: rgba(167,139,250,0.18); color: #c4b5fd; }
+    .tier-mature { background: rgba(246,196,83,0.18); color: #fde68a; }
+
+    details { margin-top: 8px; }
+    summary { cursor: pointer; font-size: 13px; color: var(--accent); padding: 6px 0; }
+    summary::-webkit-details-marker { color: var(--accent); }
+
+    .timeline-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 0; border-bottom: 1px dashed var(--line);
+    }
+    .timeline-year {
+      font-weight: 700; min-width: 56px; color: var(--gold);
+      font-variant-numeric: tabular-nums;
+    }
+    .timeline-text { flex: 1; font-size: 13px; }
+    .timeline-text small { color: var(--muted); display: block; margin-top: 2px; }
+
+    .footnote { font-size: 11px; color: var(--gray); margin-top: 10px; }
+    .src-list { columns: 2; column-gap: 24px; font-size: 12px; }
+    @media (max-width: 700px) { .src-list { columns: 1; } }
+    .src-list li { break-inside: avoid; margin: 3px 0; color: var(--muted); }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div class="wrap">
+
+    <!-- HERO -->
+    <header class="card">
+      <span class="eyebrow">Foundry &amp; IDM Footprint · 2024 capacity</span>
+      <h1>全球前十大晶圆代工与 IDM 制造版图</h1>
+      <p>口径：<b>Knometa / IC Insights · 2024 年底全球月度晶圆制造装机产能</b>（非 foundry-only 收入排名）。同时纳入纯晶圆代工、内存 IDM、NAND 合资体；前段 wafer fab 为统计对象，封测 / 先进封装不计入主表。</p>
+      <p class="footnote">报告原文 <code>deep-research-report (5).md</code> · 数据快照 2026-05-07。地址按官方公开信息，对未披露 site-level WSPM 标注 估(H/M/L)。</p>
+      <div class="kpi-grid" id="kpiGrid"></div>
+    </header>
+
+    <!-- COMPANY RANKING -->
+    <section class="card">
+      <h2>公司排名：2024 月度装机产能 (k wafers/month)</h2>
+      <div id="rankingChart" style="width:100%; height:420px;"></div>
+      <p class="narrative">前十产能呈 <b>“存储主导、逻辑牵引”</b> 结构：按装机能力计，前十里有五家本质由存储/NAND 驱动 — 三星、SK hynix、美光、Kioxia/WD JV，以及力晶系部分产能；真正以先进逻辑节点为扩张主线的，仍是 <b>TSMC、Samsung Foundry、Intel</b> 三家。<b>UMC、TI、SMIC、Nexchip</b> 的核心增量则集中在 <b>28nm–180nm 的成熟与特色工艺</b>。前 2 家 (Samsung+TSMC) 合计占 Top-10 的 41.7%，前 5 家占 70.5%。</p>
+    </section>
+
+    <!-- INTERACTIVE MAP -->
+    <section class="card">
+      <h2>互动工厂地图：~55 个 fab / site 全球分布</h2>
+      <p class="narrative">点 marker 看公司、fab、地址、产能、制程、状态。同园区 (如 Hsinchu Science Park、Pyeongtaek) 的多 fab 已加微抖动避免重叠。<b>颜色</b> = 公司，<b>大小</b> = 产能档位，<b>边框样式</b> = 状态。</p>
+      <div class="filter-bar">
+        <div class="filter-section">
+          <span class="filter-label">公司</span>
+          <div id="companyChips" style="display:inline-flex; flex-wrap:wrap; gap:6px;"></div>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <div class="filter-section">
+          <span class="filter-label">区域</span>
+          <div id="regionChips" style="display:inline-flex; flex-wrap:wrap; gap:6px;"></div>
+        </div>
+        <div class="filter-section">
+          <span class="filter-label">状态</span>
+          <div id="statusChips" style="display:inline-flex; flex-wrap:wrap; gap:6px;"></div>
+        </div>
+        <div class="filter-section">
+          <span class="filter-label">尺寸</span>
+          <div id="waferChips" style="display:inline-flex; flex-wrap:wrap; gap:6px;"></div>
+        </div>
+        <button id="resetFilters" class="chip" style="background:rgba(251,113,133,0.10); color:#fecdd3; border-color:rgba(251,113,133,0.32);">重置</button>
+      </div>
+      <div id="map"></div>
+      <div class="legend" id="legendArea"></div>
+    </section>
+
+    <!-- AGGREGATIONS 2x2 -->
+    <section class="grid-2">
+      <div class="card">
+        <h2>按区域汇总产能</h2>
+        <div id="regionChart" style="width:100%; height:340px;"></div>
+        <p class="narrative">东北亚仍是绝对中心。台湾、韩国、日本、中国大陆四地合计占公开装机产能的绝大部分；美国、欧洲、东南亚虽有增量项目（TSMC AZ/Dresden、Intel Ireland、Micron Singapore 10B、TI Sherman），但到 2026 年中真正稳定供给的新增前段项目仍有限。</p>
+      </div>
+      <div class="card">
+        <h2>按晶圆尺寸分布</h2>
+        <div id="waferChart" style="width:100%; height:340px;"></div>
+        <p class="narrative">300mm 已是绝对主力，但 <b>200mm 与 6-inch legacy</b> 并未被淘汰：UMC、TSMC、SMIC、PSMC 均仍维持 8-inch 群组，覆盖 RFSOI、BCD、HV、eNVM、CIS、显示驱动等长尾特色。这是成熟制程在汽车/工业/电源链路上的真实基底。</p>
+      </div>
+      <div class="card">
+        <h2>按状态汇总站点数</h2>
+        <div id="statusChart" style="width:100%; height:340px;"></div>
+        <p class="narrative">绝大多数 fab 处于 <b>Operating</b>。处于 <b>Construction / Planning</b> 的项目集中在 TSMC 海外 (AZ/Dresden/Kumamoto F2)、Samsung Texas、Intel Ohio、Micron Boise+NY+Singapore 10B、TI Sherman SM2-4。这是未来两年供给斜率的核心变量。</p>
+      </div>
+      <div class="card">
+        <h2>按节点分层汇总产能</h2>
+        <div id="tierChart" style="width:100%; height:340px;"></div>
+        <p class="narrative">三层结构：<span class="tier-tag tier-logic">先进逻辑</span> 决定 HPC/手机 SoC/AI 加速器；<span class="tier-tag tier-memory">AI 存储</span> 决定 HBM/DRAM/3D NAND；<span class="tier-tag tier-mature">成熟特色</span> 决定汽车 / 工业 / 电源 / 显示驱动 / 射频与模拟。AI 时代资本开支并不只在逻辑上，HBM/DRAM/3D NAND 是同步放大的另一条主线。</p>
+      </div>
+    </section>
+
+    <!-- TIMELINE -->
+    <section class="card">
+      <h2>2025–2030 项目时间线</h2>
+      <p class="narrative">仅纳入公开资料能较明确核验上线 / 量产时间的重点项目。</p>
+      <div id="timelineList" style="margin-top:14px;"></div>
+    </section>
+
+    <!-- DETAIL TABLE -->
+    <section class="card">
+      <h2>厂址明细表（~55 行，原报告数据）</h2>
+      <div style="display:flex; gap:12px; align-items:center; margin-bottom:10px; flex-wrap:wrap;">
+        <input id="tableSearch" class="search-input" type="search" placeholder="搜索公司、fab、地址、节点…" />
+        <span class="footnote" id="tableCount"></span>
+      </div>
+      <div class="table-wrap">
+        <table id="siteTable">
+          <thead>
+            <tr>
+              <th>公司</th><th>站点 / Fab</th><th>地址</th><th>投产</th>
+              <th>产能 / 面积</th><th>晶圆 / 制程</th><th>状态</th><th>员工 / 客户</th>
+            </tr>
+          </thead>
+          <tbody id="siteTableBody"></tbody>
+        </table>
+      </div>
+      <p class="footnote">说明：产能优先写公开值；若仅有公司总量则按官方 site class 分配为区间，标 估(H/M/L)。fab-level 客户分配通常不公开，多为公司级公开点名或终端行业。</p>
+    </section>
+
+    <!-- CONCLUSIONS -->
+    <section class="card">
+      <h2>结论与局限</h2>
+      <p class="narrative">如果把问题放到 <b>“至少交易到两年后”</b>，这份工厂清单最重要的结论不是“谁厂最多”，而是 <b>谁的新增 cleanroom 最可能在 2027–2028 真正转化成高价值晶圆产出</b>。最值得跟踪的兑现链条：<i>TSMC 海外先进逻辑良率与客户装载；Samsung Texas 2nm 与美国项目节奏；SK hynix / Micron 的 AI memory 兑现；Kioxia/WD K2 与后续 NAND 节点切换；TI / UMC / Nexchip 的成熟 300mm 稼动率。</i></p>
+      <p class="narrative">三个常被市场忽略的关键变量：① <b>成熟制程并不等于低壁垒</b> — TI / UMC / SMIC / Nexchip 的护城河在高良率、大规模 200/300mm 特种平台与长生命周期客户黏性；② <b>AI 资本开支不只在逻辑</b>，HBM / DRAM / 3D NAND 同步放大，存储制造商在未来两年的资本效率上反而更关键；③ <b>美国本土扩产节奏显著慢于政策叙事</b> — Samsung Taylor、Intel Ohio、Micron NY 都在不同程度上拉长兑现期，2026–2028 年供给格局仍偏向亚洲重心延续。</p>
+      <p class="footnote">本报告局限：site-level WSPM 与员工数在 Samsung、Intel、SMIC、SK hynix 与部分 TSMC 海外项目上不完整 → 已标 估(H/M/L) 或“未披露”。Fab-level 客户名单普遍不公开，尤其在 IDM 与存储厂。部分 campus 实际包含多栋 fab/line，本表遵循“以官方最细公开颗粒度列示”的原则。</p>
+    </section>
+
+    <!-- SOURCES -->
+    <section class="card">
+      <h2>数据来源</h2>
+      <details open>
+        <summary>核心来源（Knometa 排名 + 各公司官网 / 年报 / 项目披露）</summary>
+        <ul class="src-list">
+          <li>Knometa Research / IC Insights · 2024 capacity leaders</li>
+          <li>TSMC official manufacturing facility list (Hsinchu / Tainan / Taichung / Kaohsiung / overseas)</li>
+          <li>TSMC GIGAFAB 分类 (>100k 300mm/月)</li>
+          <li>JASM Kumamoto Fab 1 / Fab 2 公开披露</li>
+          <li>TSMC ESMC Dresden 40k 300mm/月（官方）</li>
+          <li>Samsung 半导体园区官方信息（Giheung / Hwaseong / Pyeongtaek / Xi'an / Austin / Taylor）</li>
+          <li>Pyeongtaek 园区面积 (~2.89m㎡, 单 fab ~120k㎡, P2 ~128.9k㎡)</li>
+          <li>Samsung Austin 2.76M sq ft / 4,500 employees</li>
+          <li>Samsung Taylor >5m㎡ site / >3,500 jobs / 2030 target</li>
+          <li>SK hynix Icheon / Cheongju / Wuxi / Yongin Cluster 公开披露</li>
+          <li>SK hynix M16 High-NA EUV 部署</li>
+          <li>SK hynix Yongin First Fab 2027H1 目标</li>
+          <li>Micron 全球 fab 列表（Manassas / Hiroshima / Singapore / Taiwan / Boise / NY）</li>
+          <li>Micron Singapore Fab 10B 700k sq ft cleanroom / 2028H2 初始出片</li>
+          <li>Micron Hiroshima 1β 量产 / 1γ EUV 2025</li>
+          <li>Micron Tongluo P5 conversion (从 PSMC 收购)</li>
+          <li>Kioxia Yokkaichi 694,000㎡ / 6,788 employees (2026/3/31)</li>
+          <li>Kioxia Kitakami K1 / K2 218-layer 第八代 3D NAND</li>
+          <li>UMC Fab 12A 87–90k 300mm/月（公开）</li>
+          <li>UMC Fab 12i Singapore 50k 300mm/月 + Phase 3</li>
+          <li>UMC United Semi Fab 12X Xiamen 50k 设计产能</li>
+          <li>UMC USJC Fab 12M Mie 35k 300mm/月</li>
+          <li>UMC 公司总 12 fab ≈ 850k 8-inch eq/月</li>
+          <li>Intel Ocotillo Campus ~700 acres (Fab 12/22/32/42/52/62)</li>
+          <li>Intel Oregon Ronler Acres / D1D + D1X · 21,000 employees</li>
+          <li>Intel Ireland Leixlip Fab 24 / Fab 34 · 4,500+ employees</li>
+          <li>Intel Ohio New Albany 进度延后 (2025)</li>
+          <li>TI DMOS6 Dallas / RFAB1+2 Richardson 650k sq ft / LFAB1+2 Lehi 620k+ sq ft / Sherman SM1-4 1.3M sq ft / $40B 项目</li>
+          <li>SMIC Shanghai Pudong / Beijing BDA / Tianjin / Shenzhen 厂群</li>
+          <li>PSMC Hsinchu Fab P1/P2/P3 / Fab 8A / Tongluo P5 (50k 300mm/月设计值)</li>
+          <li>Nexchip Hefei 12-inch Fab · ~115k+30–50k/月 · TDDI/OLED/BCD/CIS/MCU · Phase IV 55k/月设计</li>
+        </ul>
+      </details>
+      <p class="footnote">完整 cite turn 标识保留在原报告 markdown 中。本可视化口径与排名源原值一致；公司总产能与 Site 级估算不强行求和等于排名值，因为 IDM 公司有大量未对外披露的内部 line 分配。</p>
+    </section>
+
+  </div>
+</div>
+
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""
+></script>
+<script src="https://cdn.plot.ly/plotly-3.3.1.min.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  const HEIGHT_MESSAGE_TYPE = 'instap-research-topic-height';
+  const appRoot = document.getElementById('app');
+
+  // ============== DATA ==============
+
+  // Companies (Knometa/IC Insights 2024 capacity leaders, k wafers/month)
+  const COMPANIES = [
+    { id: 'samsung',  name: 'Samsung',           cap: 505.4, color: '#60a5fa', tier: 'memory',   role: '存储 + Foundry' },
+    { id: 'tsmc',     name: 'TSMC',              cap: 431.5, color: '#f87171', tier: 'logic',    role: '先进逻辑 Foundry' },
+    { id: 'skhynix',  name: 'SK hynix',          cap: 248.1, color: '#a78bfa', tier: 'memory',   role: 'DRAM/HBM + NAND' },
+    { id: 'micron',   name: 'Micron',            cap: 204.1, color: '#34d399', tier: 'memory',   role: 'DRAM + NAND' },
+    { id: 'kioxia',   name: 'Kioxia / WD JV',    cap: 191.9, color: '#fbbf24', tier: 'memory',   role: '3D NAND JV' },
+    { id: 'umc',      name: 'UMC',               cap: 168.9, color: '#22d3ee', tier: 'mature',   role: '成熟+特色 Foundry' },
+    { id: 'intel',    name: 'Intel',             cap: 154.0, color: '#f472b6', tier: 'logic',    role: 'IDM + Intel Foundry' },
+    { id: 'ti',       name: 'Texas Instruments', cap: 130.4, color: '#fde68a', tier: 'mature',   role: '模拟 / 嵌入式 IDM' },
+    { id: 'smic',     name: 'SMIC',              cap: 110.0, color: '#fb923c', tier: 'mature',   role: '成熟到 FinFET Foundry' },
+    { id: 'powerchip',name: 'Powerchip / Nexchip', cap: 100.0, color: '#c084fc', tier: 'mature', role: '成熟 12-inch + 显示驱动' },
+  ];
+
+  const COMPANY_BY_ID = Object.fromEntries(COMPANIES.map((c) => [c.id, c]));
+
+  const REGION_LABELS = {
+    TW: '中国台湾', KR: '韩国', JP: '日本', CN: '中国大陆',
+    US: '美国', EU: '欧洲', SEA: '东南亚', IL: '以色列',
+  };
+
+  const TIER_LABELS = {
+    logic: '先进逻辑', memory: 'AI 存储', mature: '成熟与特色',
+  };
+
+  const STATUS_LABELS = {
+    operating: '运行', ramping: '爬坡', construction: '在建', planning: '规划',
+  };
+
+  const STATUS_CLASS = {
+    operating: 'st-operating', ramping: 'st-ramping',
+    construction: 'st-construction', planning: 'st-planning',
+  };
+
+  // Sites — 55+ entries from the report. Coordinates: campus-level + small jitter for clusters.
+  // capBucket: 'low' (~10–35k), 'mid' (35–80k), 'high' (80–150k), 'gigafab' (>100k confirmed)
+  const SITES = [
+    // SAMSUNG
+    { co:'samsung', name:'Giheung Campus / S1 + Line 6', addr:'1, Samsung-ro, Giheung-gu, Yongin-si, Gyeonggi-do 17113, Korea', lat:37.241, lng:127.102, started:'1983', wafer:['8','12'], nodes:'350nm–8nm；成熟模拟/功率/逻辑/传感器', cap:'估 80–120k/月 (L)', capBucket:'high', status:'operating', staff:'未按厂披露', region:'KR', tier:'memory', area:'未披露' },
+    { co:'samsung', name:'Hwaseong Campus / S3', addr:'1, Samsungjeonja-ro, Hwaseong-si, Gyeonggi-do 18448, Korea', lat:37.246, lng:127.061, started:'2000', wafer:['12'], nodes:'10nm–3nm，含 EUV', cap:'估 150–220k/月 (L)', capBucket:'gigafab', status:'operating', staff:'未按厂披露', region:'KR', tier:'logic', area:'未披露' },
+    { co:'samsung', name:'Pyeongtaek Campus / S5 + S6', addr:'114, Samsung-ro, Godeok-myeon, Pyeongtaek-si, Gyeonggi-do 17786, Korea', lat:36.989, lng:127.111, started:'2017 起分期', wafer:['12'], nodes:'先进存储 + 先进 foundry', cap:'估 250–350k/月 (L)', capBucket:'gigafab', status:'ramping', staff:'未按厂披露', region:'KR', tier:'memory', area:'园区 ~2.89m㎡；单 fab ~120k㎡；P2 ~128.9k㎡' },
+    { co:'samsung', name:"Xi'an NAND Campus", addr:'No.1999, North Xiaohe Rd, Gaoxin District, Xi\'an, Shaanxi 710119, China', lat:34.180, lng:108.866, started:'2014 起', wafer:['12'], nodes:'3D NAND', cap:'估 100–150k/月 (L)', capBucket:'high', status:'operating', staff:'未按厂披露', region:'CN', tier:'memory', area:'未披露' },
+    { co:'samsung', name:'Austin Campus / S2', addr:'12100 Samsung Boulevard, Austin, TX 78754, USA', lat:30.385, lng:-97.668, started:'1996', wafer:['12'], nodes:'65nm–14nm；FD-SOI 扩建', cap:'估 90–130k/月 (L)', capBucket:'high', status:'operating', staff:'4,500 名员工', region:'US', tier:'mature', area:'2.76 million sq ft floor' },
+    { co:'samsung', name:'Taylor Campus / Fab + future Fab + R&D', addr:'1530 FM 973, Taylor, TX 76574, USA', lat:30.570, lng:-97.409, started:'2021 宣布', wafer:['12'], nodes:'2nm 逻辑（项目披露）', cap:'估最终 >30–60k/月 (L)', capBucket:'mid', status:'construction', staff:'>3,500 manufacturing jobs', region:'US', tier:'logic', area:'>5m㎡ site；目标 2030 前投运' },
+
+    // TSMC — Hsinchu Science Park (with jitter)
+    { co:'tsmc', name:'Fab 2', addr:'121, Park Ave. 3, Hsinchu Science Park, Hsinchu 300-096, Taiwan', lat:24.7805, lng:120.992, started:'—', wafer:['6'], nodes:'150mm 成熟特色', cap:'估 10–20k/月 (L)', capBucket:'low', status:'operating', staff:'公司 2025 服务 534 客户', region:'TW', tier:'mature', area:'—' },
+    { co:'tsmc', name:'Fab 3', addr:'9, Creation Rd. 1, Hsinchu Science Park, Hsinchu 300-092, Taiwan', lat:24.787, lng:121.001, started:'—', wafer:['8'], nodes:'200mm 成熟特色', cap:'估 20–50k/月 (L)', capBucket:'mid', status:'operating', staff:'同上', region:'TW', tier:'mature', area:'—' },
+    { co:'tsmc', name:'Fab 5', addr:'121, Park Ave. 3, Hsinchu Science Park, Hsinchu 300-096, Taiwan', lat:24.778, lng:120.989, started:'—', wafer:['8'], nodes:'200mm 成熟特色', cap:'估 20–50k/月 (L)', capBucket:'mid', status:'operating', staff:'同上', region:'TW', tier:'mature', area:'—' },
+    { co:'tsmc', name:'Fab 6', addr:'1, Nan-Ke North Rd., Southern Taiwan Science Park, Tainan 741-014, Taiwan', lat:23.069, lng:120.279, started:'—', wafer:['8'], nodes:'200mm 成熟特色（早期 300mm pilot 历史）', cap:'未披露', capBucket:'mid', status:'operating', staff:'同上', region:'TW', tier:'mature', area:'—' },
+    { co:'tsmc', name:'Fab 8', addr:'25, Li-Hsin Rd., Hsinchu Science Park, Hsinchu 300-094, Taiwan', lat:24.790, lng:121.005, started:'—', wafer:['8'], nodes:'200mm 成熟特色', cap:'估 20–50k/月 (L)', capBucket:'mid', status:'operating', staff:'同上', region:'TW', tier:'mature', area:'—' },
+    { co:'tsmc', name:'Fab 10 China', addr:'4000 Wen Xiang Road, Songjiang, Shanghai 201616, China', lat:31.000, lng:121.221, started:'—', wafer:['8'], nodes:'200mm 成熟/特色', cap:'估 30–60k/月 (L)', capBucket:'mid', status:'operating', staff:'同上', region:'CN', tier:'mature', area:'—' },
+    { co:'tsmc', name:'Fab 11 Washington', addr:'5509 N.W. Parker Street, Camas, WA 98607-9299, USA', lat:45.594, lng:-122.405, started:'—', wafer:['8'], nodes:'200mm 成熟/特色', cap:'估 20–40k/月 (L)', capBucket:'mid', status:'operating', staff:'同上', region:'US', tier:'mature', area:'—' },
+    { co:'tsmc', name:'Fab 12 (12A + 12B)', addr:'8, Li-Hsin Rd. 6 (12A) / 168, Park Ave. 2 (12B), Hsinchu Science Park, Hsinchu, Taiwan', lat:24.785, lng:120.997, started:'2002 起', wafer:['12'], nodes:'0.13μm 起多代节点', cap:'GIGAFAB · >100k 300mm/月（官方）', capBucket:'gigafab', status:'operating', staff:'同上', region:'TW', tier:'logic', area:'—' },
+    { co:'tsmc', name:'Fab 14', addr:'Southern Taiwan Science Park, Tainan, Taiwan', lat:23.075, lng:120.285, started:'—', wafer:['12'], nodes:'主力成熟到先进过渡节点', cap:'GIGAFAB · >100k/月', capBucket:'gigafab', status:'operating', staff:'同上', region:'TW', tier:'logic', area:'—' },
+    { co:'tsmc', name:'Fab 15', addr:'Central Taiwan Science Park, Taichung, Taiwan', lat:24.205, lng:120.661, started:'—', wafer:['12'], nodes:'16nm/7nm 等', cap:'GIGAFAB · >100k/月', capBucket:'gigafab', status:'operating', staff:'同上', region:'TW', tier:'logic', area:'—' },
+    { co:'tsmc', name:'Fab 16 Nanjing', addr:'Nanjing, Jiangsu, China', lat:32.013, lng:118.769, started:'2018 (约)', wafer:['12'], nodes:'12/16nm–28nm', cap:'未披露', capBucket:'mid', status:'operating', staff:'同上', region:'CN', tier:'mature', area:'—' },
+    { co:'tsmc', name:'Fab 18', addr:'Tainan, Taiwan', lat:23.063, lng:120.273, started:'2020 量产 (约)', wafer:['12'], nodes:'5nm/3nm 及后续', cap:'GIGAFAB · >100k/月', capBucket:'gigafab', status:'operating', staff:'同上', region:'TW', tier:'logic', area:'—' },
+    { co:'tsmc', name:'Fab 20', addr:'Hsinchu / Baoshan, Taiwan', lat:24.792, lng:120.992, started:'2025 前后 (约)', wafer:['12'], nodes:'N2 系列', cap:'GIGAFAB 分类，爬坡中', capBucket:'gigafab', status:'ramping', staff:'同上', region:'TW', tier:'logic', area:'—' },
+    { co:'tsmc', name:'Fab 21 Arizona', addr:'Phoenix, Arizona, USA', lat:33.737, lng:-112.110, started:'Phase 1 已投产', wafer:['12'], nodes:'先进逻辑', cap:'未披露', capBucket:'mid', status:'ramping', staff:'同上', region:'US', tier:'logic', area:'分期推进' },
+    { co:'tsmc', name:'Fab 22 Kaohsiung', addr:'Kaohsiung, Taiwan', lat:22.751, lng:120.281, started:'2024–2025 施工', wafer:['12'], nodes:'N2 系列', cap:'GIGAFAB 分类，未披露实际产出', capBucket:'gigafab', status:'construction', staff:'同上', region:'TW', tier:'logic', area:'—' },
+    { co:'tsmc', name:'JASM Kumamoto Fab 1', addr:'4106-1 Haramizu, Kikuyo-machi, Kikuchi-gun, Kumamoto 869-1102, Japan', lat:32.978, lng:130.795, started:'2024', wafer:['12'], nodes:'22/28nm + 12/16nm', cap:'55k/月', capBucket:'mid', status:'ramping', staff:'同上', region:'JP', tier:'mature', area:'Fab1+Fab2 合计 >100k/月' },
+    { co:'tsmc', name:'JASM Kumamoto Fab 2', addr:'Kikuyo, Kumamoto, Japan', lat:32.984, lng:130.805, started:'目标 2027', wafer:['12'], nodes:'6/7nm 规划', cap:'未披露', capBucket:'mid', status:'planning', staff:'同上', region:'JP', tier:'logic', area:'—' },
+    { co:'tsmc', name:'ESMC Dresden', addr:'Dresden, Germany', lat:51.099, lng:13.795, started:'计划 2027 年底投产', wafer:['12'], nodes:'28/22nm planar + 16/12nm FinFET', cap:'40k 300mm/月（官方）', capBucket:'mid', status:'construction', staff:'同上', region:'EU', tier:'mature', area:'—' },
+
+    // SK HYNIX
+    { co:'skhynix', name:'Icheon Campus / M10, M14, M16', addr:'2091, Gyeongchung-daero, Bubal-eup, Icheon-si, Gyeonggi-do 17336, Korea', lat:37.272, lng:127.435, started:'M14 2015；M16 2021', wafer:['12'], nodes:'DRAM / HBM；M16 部署 High-NA EUV', cap:'估 140–190k/月 (M)', capBucket:'gigafab', status:'operating', staff:'未按厂披露', region:'KR', tier:'memory', area:'—' },
+    { co:'skhynix', name:'Cheongju Campus / M11, M12, M15, M15X', addr:'215, Daesin-ro / 959, 2sunhwan-ro / 337, Jikji-daero / 120, SK-ro, Cheongju-si, Korea', lat:36.626, lng:127.491, started:'M15 2018；M15X 2022–2025', wafer:['12'], nodes:'NAND 转 DRAM/HBM 增量', cap:'估 80–120k/月 (M)', capBucket:'high', status:'ramping', staff:'未按厂披露', region:'KR', tier:'memory', area:'M15X 用地 60,000㎡' },
+    { co:'skhynix', name:'Wuxi Fab / C2 + C2F', addr:'Wuxi, Jiangsu, China', lat:31.491, lng:120.310, started:'C2 2006；C2F 2019', wafer:['12'], nodes:'DRAM', cap:'估 70–110k/月 (M)', capBucket:'high', status:'operating', staff:'未按厂披露', region:'CN', tier:'memory', area:'—' },
+    { co:'skhynix', name:'Yongin Semiconductor Cluster First Fab', addr:'Yongin, Gyeonggi-do, Korea', lat:37.241, lng:127.178, started:'目标 2027H1', wafer:['12'], nodes:'AI memory / HBM 方向', cap:'未披露', capBucket:'mid', status:'construction', staff:'未按厂披露', region:'KR', tier:'memory', area:'—' },
+
+    // MICRON
+    { co:'micron', name:'Manassas Virginia Fab', addr:'9600 Godwin Drive, Manassas, VA 20110, USA', lat:38.752, lng:-77.475, started:'前身较早，持续运营', wafer:['12'], nodes:'成熟 DRAM / 汽车与工业内存', cap:'估 35–55k/月 (M)', capBucket:'mid', status:'operating', staff:'未按厂披露', region:'US', tier:'memory', area:'—' },
+    { co:'micron', name:'Hiroshima DRAM Fab', addr:'7-10, Yoshikawa Kogyo Danchi, Higashihiroshima 739-0198, Japan', lat:34.426, lng:132.722, started:'核心 DRAM site', wafer:['12'], nodes:'1β 量产，1γ/EUV 2025 起', cap:'估 50–80k/月 (M)', capBucket:'mid', status:'operating', staff:'日本公开 4,000+ engineers/technicians', region:'JP', tier:'memory', area:'—' },
+    { co:'micron', name:'Singapore Fab 10N (Woodlands)', addr:'1 Woodlands Industrial Park D, Street 1, Singapore 738799', lat:1.435, lng:103.789, started:'既有厂', wafer:['12'], nodes:'3D NAND', cap:'估 40–60k/月 (M)', capBucket:'mid', status:'operating', staff:'未按厂披露', region:'SEA', tier:'memory', area:'—' },
+    { co:'micron', name:'Singapore Fab 10A/10X (North Coast)', addr:'1 North Coast Drive, Singapore 757432', lat:1.444, lng:103.789, started:'既有厂', wafer:['12'], nodes:'3D NAND', cap:'估 60–90k/月 (M)', capBucket:'mid', status:'operating', staff:'未按厂披露', region:'SEA', tier:'memory', area:'—' },
+    { co:'micron', name:'Singapore Fab 10B', addr:'North Coast Wafer Fab Park, Singapore', lat:1.448, lng:103.793, started:'2025 开建；目标 2028H2', wafer:['12'], nodes:'先进 3D NAND (>500 layers 路线)', cap:'未披露', capBucket:'mid', status:'construction', staff:'~1,600 jobs', region:'SEA', tier:'memory', area:'700k sq ft cleanroom' },
+    { co:'micron', name:'Taiwan Houli / Fab 16', addr:'No. 369, Sec. 4, Sanfong Rd., Houli Dist., Central Taiwan Science Park, Taichung 42152, Taiwan', lat:24.301, lng:120.715, started:'2023 台中四厂启用', wafer:['12'], nodes:'先进 DRAM / HBM 相关', cap:'估 70–100k/月 (M)', capBucket:'high', status:'operating', staff:'台湾公司级 >10,000', region:'TW', tier:'memory', area:'—' },
+    { co:'micron', name:'Taiwan Taoyuan / Fab 11', addr:'No. 667, Fuhsing 3rd Rd., Hwa-Ya Technology Park, Taoyuan City 333, Taiwan', lat:24.989, lng:121.286, started:'既有厂', wafer:['12'], nodes:'DRAM wafer manufacturing', cap:'估 40–70k/月 (M)', capBucket:'mid', status:'operating', staff:'未按厂披露', region:'TW', tier:'memory', area:'—' },
+    { co:'micron', name:'Boise Idaho New Fab', addr:'Boise, Idaho, USA', lat:43.616, lng:-116.220, started:'2024 起建设', wafer:['12'], nodes:'先进 DRAM', cap:'未披露', capBucket:'mid', status:'construction', staff:'未按厂披露', region:'US', tier:'memory', area:'leading-edge memory fab' },
+    { co:'micron', name:'New York Megafab (Clay)', addr:'Clay, New York, USA', lat:43.179, lng:-76.178, started:'2026 破土；目标 2030', wafer:['12'], nodes:'先进 DRAM', cap:'未披露', capBucket:'mid', status:'planning', staff:'未按厂披露', region:'US', tier:'memory', area:'up to four fabs' },
+    { co:'micron', name:'Tongluo P5 (former PSMC, 2026 acquired)', addr:'No. 8, Tongke 7th Rd., Tongluo Township, Miaoli County 366003, Taiwan', lat:24.493, lng:120.781, started:'2026 Micron 完成收购', wafer:['12'], nodes:'拟补充台湾 DRAM/存储制造版图', cap:'设计 50k 300mm/月', capBucket:'mid', status:'ramping', staff:'未按厂披露', region:'TW', tier:'memory', area:'既有 300k sq ft cleanroom' },
+
+    // KIOXIA / WD JV
+    { co:'kioxia', name:'Yokkaichi Plant', addr:'800 Yamanoisshiki-cho, Yokkaichi City, Mie 512-8550, Japan', lat:34.965, lng:136.617, started:'1992', wafer:['12'], nodes:'多代 BiCS FLASH / 3D NAND；Fab7 自 2022 起爬坡', cap:'估 120–160k/月 (M)', capBucket:'gigafab', status:'operating', staff:'6,788 employees (2026/3/31)', region:'JP', tier:'memory', area:'694,000㎡ site' },
+    { co:'kioxia', name:'Kitakami Plant / K1 + K2', addr:'5-29 Kitakogyodanchi, Kitakami City, Iwate, Japan', lat:39.288, lng:141.114, started:'K1 2020；K2 2025/9', wafer:['12'], nodes:'K2 面向 218-layer 第八代 3D NAND', cap:'未披露 (行业侧 ~25k/月)', capBucket:'mid', status:'ramping', staff:'未披露', region:'JP', tier:'memory', area:'—' },
+
+    // UMC
+    { co:'umc', name:'Fab 12A', addr:'Tainan, Southern Taiwan Science Park, Taiwan', lat:23.075, lng:120.272, started:'2002 量产', wafer:['12'], nodes:'14nm / 28nm 及特色工艺', cap:'87–90k 300mm/月（公开）', capBucket:'high', status:'operating', staff:'公司 ~20,000', region:'TW', tier:'mature', area:'最大生产与研发基地' },
+    { co:'umc', name:'Fab 12i', addr:'Pasir Ris Wafer Fab Park, Singapore', lat:1.382, lng:103.961, started:'既有厂；Phase 3 2024 first move-in', wafer:['12'], nodes:'130nm–40nm 及特色', cap:'50k 300mm/月', capBucket:'mid', status:'ramping', staff:'未按厂披露', region:'SEA', tier:'mature', area:'—' },
+    { co:'umc', name:'United Semi / Fab 12X', addr:'Xiamen, China', lat:24.502, lng:118.226, started:'2016Q4 量产', wafer:['12'], nodes:'28/40nm 为主', cap:'50k 300mm/月（设计）', capBucket:'mid', status:'operating', staff:'未按厂披露', region:'CN', tier:'mature', area:'—' },
+    { co:'umc', name:'USJC / Fab 12M', addr:'2000 Mizono, Tado-cho, Kuwana, Mie 511-0118, Japan', lat:35.064, lng:136.683, started:'UMC 2019 全资', wafer:['12'], nodes:'90nm–40nm 逻辑/特色', cap:'35k 300mm/月', capBucket:'mid', status:'operating', staff:'未按厂披露', region:'JP', tier:'mature', area:'—' },
+    { co:'umc', name:'Hsinchu 8-inch / Fab 8A', addr:'No. 3, Li-Hsin 2nd Rd., East Dist., Hsinchu City, Taiwan', lat:24.792, lng:121.000, started:'既有厂', wafer:['8'], nodes:'成熟 / 特色 / 高压 / 模拟', cap:'公司总 ~850k 8-inch eq/月', capBucket:'low', status:'operating', staff:'同上', region:'TW', tier:'mature', area:'—' },
+    { co:'umc', name:'Hsinchu 8-inch / Fab 8C + 8D', addr:'6, 8 Li-Hsin 3rd Rd., Hsinchu Science Park, Hsinchu 30078, Taiwan', lat:24.788, lng:121.003, started:'既有厂', wafer:['8'], nodes:'200mm 成熟 / 特色', cap:'同上', capBucket:'low', status:'operating', staff:'同上', region:'TW', tier:'mature', area:'—' },
+    { co:'umc', name:'Hsinchu 8-inch / Fab 8E + 8F + 8S + WTK', addr:'Hsinchu, Taiwan', lat:24.781, lng:120.994, started:'既有厂', wafer:['8','6'], nodes:'200mm + 6-inch 成熟 / 特色', cap:'同上', capBucket:'low', status:'operating', staff:'同上', region:'TW', tier:'mature', area:'—' },
+    { co:'umc', name:'HeJian / Fab 8N', addr:'Suzhou, China', lat:31.296, lng:120.585, started:'既有厂', wafer:['8'], nodes:'200mm 成熟 / 特色', cap:'未披露', capBucket:'low', status:'operating', staff:'同上', region:'CN', tier:'mature', area:'—' },
+
+    // INTEL
+    { co:'intel', name:'Ocotillo Campus / Fab 12,22,32,42,52,62', addr:'4500 S. Dobson Road, Chandler, AZ 85248, USA', lat:33.319, lng:-111.943, started:'1990s 起；52/62 在 2021 后', wafer:['12'], nodes:'Intel 7 / 4 / 3 / 18A', cap:'Fab52 市场广泛引用 ~40k/月（非官方）', capBucket:'gigafab', status:'ramping', staff:'未按厂披露', region:'US', tier:'logic', area:'~700 acres campus' },
+    { co:'intel', name:'Oregon Ronler Acres / D1D + D1X', addr:'Ronler Acres, Hillsboro, Oregon, USA', lat:45.541, lng:-122.913, started:'D1X 2013 起', wafer:['12'], nodes:'研发 / 开发线', cap:'D1D+D1X >12 个美式足球场', capBucket:'high', status:'operating', staff:'Oregon 21,000 员工', region:'US', tier:'logic', area:'—' },
+    { co:'intel', name:'Leixlip Ireland / Fab 24 + Fab 34', addr:'Collinstown Industrial Park, Leixlip, Co. Kildare, Ireland', lat:53.366, lng:-6.499, started:'F24 2000s；F34 2023 HVM', wafer:['12'], nodes:'14nm (F24) 与 Intel 4/3 (F34)', cap:'未披露', capBucket:'high', status:'operating', staff:'4,500+ 员工', region:'EU', tier:'logic', area:'—' },
+    { co:'intel', name:'Israel Kiryat Gat / Fab 28 cluster', addr:'2 Tzoran Street, New Industrial Area, Qiryat Gat, Israel 82109', lat:31.610, lng:34.770, started:'既有厂，持续扩展', wafer:['12'], nodes:'主流逻辑工艺', cap:'未披露', capBucket:'mid', status:'operating', staff:'未按厂披露', region:'IL', tier:'logic', area:'—' },
+    { co:'intel', name:'New Mexico / Fab 11X', addr:'1600 Rio Rancho Blvd. S.E., Rio Rancho, NM 87124, USA', lat:35.288, lng:-106.659, started:'既有厂', wafer:['12'], nodes:'特种 / 硅光子；与 packaging campus 相邻', cap:'未披露', capBucket:'mid', status:'operating', staff:'未按厂披露', region:'US', tier:'mature', area:'—' },
+    { co:'intel', name:'Ohio New Albany / future fabs', addr:'Licking County / New Albany, Ohio, USA', lat:40.080, lng:-82.808, started:'2022 破土，2025 进度大幅延后', wafer:['12'], nodes:'未来先进逻辑', cap:'未披露', capBucket:'mid', status:'planning', staff:'未披露', region:'US', tier:'logic', area:'建设放缓' },
+
+    // TI
+    { co:'ti', name:'DMOS6', addr:'13011 TI Boulevard, Dallas, TX 75243, USA', lat:32.881, lng:-96.751, started:'既有厂', wafer:['12'], nodes:'模拟 / 功率 / 嵌入式', cap:'未披露', capBucket:'mid', status:'operating', staff:'公司级公开客户：Apple, Ford, Medtronic, NVIDIA, SpaceX', region:'US', tier:'mature', area:'—' },
+    { co:'ti', name:'Richardson / RFAB1 + RFAB2', addr:'Richardson, Texas, USA', lat:32.948, lng:-96.730, started:'RFAB1 2009；RFAB2 2022', wafer:['12'], nodes:'模拟 / 嵌入式成熟制程', cap:'>100M analog chips/day', capBucket:'high', status:'operating', staff:'同上', region:'US', tier:'mature', area:'650k sq ft cleanroom' },
+    { co:'ti', name:'Lehi / LFAB1 + LFAB2', addr:'4000 N Flash Drive, Lehi, UT 84043, USA', lat:40.391, lng:-111.851, started:'LFAB1 2022；LFAB2 目标 2026', wafer:['12'], nodes:'模拟 / 嵌入式', cap:'tens of millions chips/day', capBucket:'mid', status:'construction', staff:'同上', region:'US', tier:'mature', area:'620k+ sq ft cleanroom' },
+    { co:'ti', name:'Sherman / SM1 + SM2 + SM3 + SM4', addr:'501 West Shepherd Drive, Sherman, TX 75092, USA', lat:33.640, lng:-96.609, started:'SM1 2025；其他分期', wafer:['12'], nodes:'模拟 / 嵌入式', cap:'100s of millions chips/day', capBucket:'gigafab', status:'construction', staff:'~3,000 jobs；总投资潜在 $40B', region:'US', tier:'mature', area:'1.3M sq ft cleanroom' },
+
+    // SMIC
+    { co:'smic', name:'Shanghai 200mm + 300mm', addr:'No. 18 Zhangjiang Road, Pudong New Area, Shanghai 201203, China', lat:31.205, lng:121.604, started:'既有厂群', wafer:['8','12'], nodes:'成熟到 FinFET', cap:'估 30–45k/月 (L)', capBucket:'mid', status:'operating', staff:'未按厂披露', region:'CN', tier:'logic', area:'—' },
+    { co:'smic', name:'Beijing fabs', addr:'18 Wenchang Road, Beijing Economic-Technological Development Area, Beijing 100176, China', lat:39.788, lng:116.508, started:'既有厂群', wafer:['12'], nodes:'成熟到 FinFET', cap:'估 30–40k/月 (L)', capBucket:'mid', status:'operating', staff:'未按厂披露', region:'CN', tier:'logic', area:'—' },
+    { co:'smic', name:'Tianjin fab', addr:'Tianjin, China', lat:39.137, lng:117.205, started:'既有厂', wafer:['8'], nodes:'200mm 成熟 / 特色', cap:'估 15–25k/月 (L)', capBucket:'low', status:'operating', staff:'未按厂披露', region:'CN', tier:'mature', area:'—' },
+    { co:'smic', name:'Shenzhen fab', addr:'Shenzhen, China', lat:22.541, lng:114.054, started:'既有厂 / 扩充', wafer:['8','12'], nodes:'成熟 / 特色', cap:'估 20–30k/月 (L)', capBucket:'low', status:'ramping', staff:'未按厂披露', region:'CN', tier:'mature', area:'—' },
+
+    // POWERCHIP / NEXCHIP
+    { co:'powerchip', name:'Powerchip Fab P1 / P2', addr:'No. 12, Li-Hsin Rd. 1, Hsinchu Science Park, Hsinchu 300, Taiwan', lat:24.776, lng:120.996, started:'既有厂', wafer:['12'], nodes:'成熟逻辑 / 记忆体相关', cap:'估 20–35k/月 (L)', capBucket:'mid', status:'operating', staff:'未按厂披露', region:'TW', tier:'mature', area:'—' },
+    { co:'powerchip', name:'Powerchip Fab P3', addr:'No. 16-1, Li-Hsin Rd., Hsinchu Science Park, Hsinchu 300, Taiwan', lat:24.783, lng:120.995, started:'既有厂', wafer:['12'], nodes:'成熟 / 特色', cap:'估 20–35k/月 (L)', capBucket:'mid', status:'operating', staff:'未按厂披露', region:'TW', tier:'mature', area:'—' },
+    { co:'powerchip', name:'Powerchip Fab 8A', addr:'No. 18, Li-Hsin Rd. 1, Hsinchu Science Park, Hsinchu, Taiwan', lat:24.778, lng:121.001, started:'既有厂', wafer:['8'], nodes:'200mm 成熟', cap:'未披露', capBucket:'low', status:'operating', staff:'未按厂披露', region:'TW', tier:'mature', area:'—' },
+    { co:'powerchip', name:'Nexchip Hefei 12-inch Fab', addr:'No. 88, Xifeihe Rd., Hefei Comprehensive Bonded Zone, Xinzhan District, Hefei, Anhui', lat:31.927, lng:117.323, started:'2015 起分期投产', wafer:['12'], nodes:'TDDI / OLED / BCD / CIS / MCU；28nm–55nm', cap:'~115k/月 + 2024 再增 30–50k/月', capBucket:'gigafab', status:'ramping', staff:'2022 ~4,224 员工', region:'CN', tier:'mature', area:'—' },
+    { co:'powerchip', name:'Nexchip Hefei Phase IV', addr:'Hefei Xinzhan High-Tech Zone, Anhui, China', lat:31.932, lng:117.328, started:'2026 初动工；2028 满产', wafer:['12'], nodes:'40nm / 28nm', cap:'设计 55k/月', capBucket:'mid', status:'construction', staff:'未按厂披露', region:'CN', tier:'mature', area:'—' },
+  ];
+
+  const TIMELINE = [
+    { year:'2025', label:'TI Sherman SM1 开始生产', co:'ti', status:'operating' },
+    { year:'2025', label:'Kioxia Kitakami K2 开始运行 (218-layer 3D NAND)', co:'kioxia', status:'operating' },
+    { year:'2025', label:'SK hynix M15X 完成建设目标窗口', co:'skhynix', status:'ramping' },
+    { year:'2026', label:'TI Lehi LFAB2 目标投产', co:'ti', status:'construction' },
+    { year:'2026', label:'Kioxia K2 上半年进入更完整出货', co:'kioxia', status:'ramping' },
+    { year:'2026', label:'Micron Boise 持续建设', co:'micron', status:'construction' },
+    { year:'2027', label:'TSMC ESMC Dresden 目标投产 (40k 300mm/月, 28/22+16/12nm)', co:'tsmc', status:'construction' },
+    { year:'2027', label:'SK hynix Yongin 首 fab 目标 H1 2027', co:'skhynix', status:'construction' },
+    { year:'2028', label:'Micron Singapore Fab 10B 目标 H2 初始出片 (>500-layer NAND)', co:'micron', status:'construction' },
+    { year:'2030', label:'Samsung Texas (Taylor) 生态内全部设施目标投运', co:'samsung', status:'planning' },
+    { year:'2030', label:'Micron New York Megafab 目标开始生产 (Clay)', co:'micron', status:'planning' },
+  ];
+
+  // ============== INIT ==============
+
+  // Active filters (sets); empty set = all
+  const filters = {
+    company: new Set(COMPANIES.map((c) => c.id)),
+    region: new Set(Object.keys(REGION_LABELS)),
+    status: new Set(Object.keys(STATUS_LABELS)),
+    wafer: new Set(['6','8','12']),
+  };
+
+  // KPIs
+  const totalCap = COMPANIES.reduce((a, c) => a + c.cap, 0);
+  const top2Cap = COMPANIES[0].cap + COMPANIES[1].cap;
+  const top5Cap = COMPANIES.slice(0, 5).reduce((a, c) => a + c.cap, 0);
+  const regionsCovered = new Set(SITES.map((s) => s.region)).size;
+
+  document.getElementById('kpiGrid').innerHTML = `
+    <div class="kpi"><div class="kpi-label">Top-10 总产能</div><div class="kpi-value">${totalCap.toFixed(1)}<span style="font-size:14px;color:var(--muted)"> k/月</span></div><div class="kpi-sub">2024 年底装机产能合计</div></div>
+    <div class="kpi"><div class="kpi-label">Top-2 集中度</div><div class="kpi-value">${(top2Cap/totalCap*100).toFixed(1)}<span style="font-size:14px;color:var(--muted)">%</span></div><div class="kpi-sub">Samsung + TSMC 合计份额</div></div>
+    <div class="kpi"><div class="kpi-label">Top-5 集中度</div><div class="kpi-value">${(top5Cap/totalCap*100).toFixed(1)}<span style="font-size:14px;color:var(--muted)">%</span></div><div class="kpi-sub">前 5 家累计份额</div></div>
+    <div class="kpi"><div class="kpi-label">站点 / 区域</div><div class="kpi-value">${SITES.length}<span style="font-size:14px;color:var(--muted)"> · ${regionsCovered}</span></div><div class="kpi-sub">公开 fab/site · 覆盖区域数</div></div>
+  `;
+
+  // ============== RANKING CHART ==============
+
+  const tierColor = { logic: '#f87171', memory: '#a78bfa', mature: '#fde68a' };
+  function renderRanking() {
+    const sorted = [...COMPANIES].sort((a, b) => a.cap - b.cap);
+    const colors = sorted.map((c) => tierColor[c.tier]);
+    const trace = {
+      type: 'bar', orientation: 'h',
+      x: sorted.map((c) => c.cap),
+      y: sorted.map((c) => c.name),
+      marker: { color: colors, line: { color: '#1f2740', width: 1 } },
+      text: sorted.map((c) => c.cap.toFixed(1) + 'k'),
+      textposition: 'outside', textfont: { color: '#eef3ff', size: 12 },
+      hovertemplate: '<b>%{y}</b><br>%{x:.1f}k wafers/month<extra></extra>',
+    };
+    Plotly.newPlot('rankingChart', [trace], plotlyDarkLayout({
+      margin: { l: 130, r: 40, t: 20, b: 40 },
+      xaxis: { title: 'k wafers / month', gridcolor: '#1f2740' },
+      yaxis: { gridcolor: '#1f2740' },
+    }), plotlyConfig());
+  }
+
+  function plotlyDarkLayout(extra) {
+    return Object.assign({
+      paper_bgcolor: 'rgba(0,0,0,0)',
+      plot_bgcolor: 'rgba(0,0,0,0)',
+      font: { color: '#eef3ff', family: 'IBM Plex Sans, system-ui' },
+      showlegend: false,
+    }, extra || {});
+  }
+  function plotlyConfig() { return { displayModeBar: false, responsive: true }; }
+
+  // ============== MAP ==============
+
+  const map = L.map('map', { worldCopyJump: true, scrollWheelZoom: true }).setView([28, 110], 3);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap &copy; CARTO',
+    subdomains: 'abcd', maxZoom: 18,
+  }).addTo(map);
+
+  const markerLayer = L.layerGroup().addTo(map);
+
+  function radiusFor(bucket) {
+    return { low: 5, mid: 7, high: 10, gigafab: 13 }[bucket] || 6;
+  }
+  function dashFor(status) {
+    return { operating: null, ramping: '2,4', construction: '4,4', planning: '1,3' }[status] || null;
+  }
+
+  function statusPill(st) {
+    return `<span class="status-pill ${STATUS_CLASS[st]}">${STATUS_LABELS[st]}</span>`;
+  }
+
+  function tierTag(t) {
+    return `<span class="tier-tag tier-${t}">${TIER_LABELS[t]}</span>`;
+  }
+
+  function buildPopup(s) {
+    const c = COMPANY_BY_ID[s.co];
+    return `
+      <div class="pop-title">${c.name} · ${escape(s.name)}</div>
+      <div class="pop-meta" style="margin-bottom:6px;">${statusPill(s.status)} ${tierTag(s.tier)}</div>
+      <div class="pop-row"><b>地址</b><span>${escape(s.addr)}</span></div>
+      <div class="pop-row"><b>投产</b><span>${escape(s.started)}</span></div>
+      <div class="pop-row"><b>产能</b><span>${escape(s.cap)}</span></div>
+      <div class="pop-row"><b>晶圆</b><span>${s.wafer.join('"/')}" · ${escape(s.nodes)}</span></div>
+      ${s.area && s.area !== '—' ? `<div class="pop-row"><b>面积</b><span>${escape(s.area)}</span></div>` : ''}
+      <div class="pop-row"><b>员工</b><span>${escape(s.staff)}</span></div>
+    `;
+  }
+
+  function escape(v) {
+    if (v === null || v === undefined) return '—';
+    return String(v).replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+
+  function renderMap() {
+    markerLayer.clearLayers();
+    const visible = filteredSites();
+    visible.forEach((s) => {
+      const c = COMPANY_BY_ID[s.co];
+      const opts = {
+        radius: radiusFor(s.capBucket),
+        color: '#0b1020',
+        weight: 1.5,
+        fillColor: c.color,
+        fillOpacity: 0.85,
+      };
+      if (s.status !== 'operating') {
+        opts.color = c.color;
+        opts.fillOpacity = 0.35;
+        opts.weight = 2;
+        const dash = dashFor(s.status);
+        if (dash) opts.dashArray = dash;
+      }
+      const marker = L.circleMarker([s.lat, s.lng], opts);
+      marker.bindPopup(buildPopup(s), { maxWidth: 340 });
+      marker.bindTooltip(`${c.name} · ${s.name}`, { direction: 'top', offset: [0, -6] });
+      marker.addTo(markerLayer);
+    });
+  }
+
+  function filteredSites() {
+    return SITES.filter((s) =>
+      filters.company.has(s.co) &&
+      filters.region.has(s.region) &&
+      filters.status.has(s.status) &&
+      s.wafer.some((w) => filters.wafer.has(w))
+    );
+  }
+
+  // ============== FILTER CHIPS ==============
+
+  function buildChip(text, isActive, onClick, dotColor) {
+    const el = document.createElement('button');
+    el.className = 'chip' + (isActive ? ' active' : '');
+    el.type = 'button';
+    if (dotColor) {
+      const dot = document.createElement('span');
+      dot.className = 'dot';
+      dot.style.background = dotColor;
+      el.appendChild(dot);
+    }
+    el.appendChild(document.createTextNode(text));
+    el.addEventListener('click', () => {
+      onClick();
+      // toggle visual
+      el.classList.toggle('active');
+      renderMap();
+      renderTable();
+    });
+    return el;
+  }
+
+  function renderChipRows() {
+    const cc = document.getElementById('companyChips');
+    COMPANIES.forEach((c) => {
+      cc.appendChild(buildChip(c.name, true, () => {
+        if (filters.company.has(c.id)) filters.company.delete(c.id); else filters.company.add(c.id);
+      }, c.color));
+    });
+    const rc = document.getElementById('regionChips');
+    Object.keys(REGION_LABELS).forEach((k) => {
+      rc.appendChild(buildChip(REGION_LABELS[k], true, () => {
+        if (filters.region.has(k)) filters.region.delete(k); else filters.region.add(k);
+      }));
+    });
+    const sc = document.getElementById('statusChips');
+    Object.keys(STATUS_LABELS).forEach((k) => {
+      sc.appendChild(buildChip(STATUS_LABELS[k], true, () => {
+        if (filters.status.has(k)) filters.status.delete(k); else filters.status.add(k);
+      }));
+    });
+    const wc = document.getElementById('waferChips');
+    [['12','12-inch (300mm)'], ['8','8-inch (200mm)'], ['6','6-inch (150mm)']].forEach(([k,label]) => {
+      wc.appendChild(buildChip(label, true, () => {
+        if (filters.wafer.has(k)) filters.wafer.delete(k); else filters.wafer.add(k);
+      }));
+    });
+
+    document.getElementById('resetFilters').addEventListener('click', () => {
+      filters.company = new Set(COMPANIES.map((c) => c.id));
+      filters.region = new Set(Object.keys(REGION_LABELS));
+      filters.status = new Set(Object.keys(STATUS_LABELS));
+      filters.wafer = new Set(['6','8','12']);
+      // mark all chips active
+      document.querySelectorAll('#companyChips .chip, #regionChips .chip, #statusChips .chip, #waferChips .chip')
+        .forEach((c) => c.classList.add('active'));
+      renderMap();
+      renderTable();
+    });
+
+    // Legend
+    const legend = document.getElementById('legendArea');
+    const status = `<span class="legend-item">状态：</span>` +
+      `<span class="legend-item"><span class="status-pill st-operating">运行</span></span>` +
+      `<span class="legend-item"><span class="status-pill st-ramping">爬坡</span></span>` +
+      `<span class="legend-item"><span class="status-pill st-construction">在建</span></span>` +
+      `<span class="legend-item"><span class="status-pill st-planning">规划</span></span>`;
+    const tier = `<span class="legend-item">节点：</span>` +
+      Object.keys(TIER_LABELS).map((t) => `<span class="legend-item">${tierTag(t)}</span>`).join('');
+    const sizeText = `<span class="legend-item">marker 大小 = 产能档位 (small/mid/large/gigafab)</span>`;
+    legend.innerHTML = status + '<span style="opacity:.5">|</span>' + tier + '<span style="opacity:.5">|</span>' + sizeText;
+  }
+
+  // ============== AGGREGATIONS ==============
+
+  function aggregate() {
+    // For aggregations, use companies.cap as the authoritative monthly capacity, but distribute it
+    // across that company's sites by buckets so we can show region/wafer/tier composition.
+    // (Site-level WSPMs are largely undisclosed, so a per-bucket weighted distribution is the
+    // most defensible we can do.)
+    const bucketWeight = { low: 1, mid: 2, high: 4, gigafab: 7 };
+
+    const companySiteWeight = {};
+    COMPANIES.forEach((c) => {
+      const sites = SITES.filter((s) => s.co === c.id);
+      companySiteWeight[c.id] = sites.reduce((a, s) => a + bucketWeight[s.capBucket], 0) || 1;
+    });
+
+    function siteCap(s) {
+      const w = bucketWeight[s.capBucket];
+      const co = COMPANY_BY_ID[s.co];
+      return (co.cap * w) / companySiteWeight[s.co];
+    }
+
+    // by region (stacked bar by company)
+    const regionCompanyMap = {};
+    Object.keys(REGION_LABELS).forEach((r) => { regionCompanyMap[r] = {}; });
+    SITES.forEach((s) => {
+      regionCompanyMap[s.region][s.co] = (regionCompanyMap[s.region][s.co] || 0) + siteCap(s);
+    });
+
+    // by wafer size
+    const waferMap = { '12': 0, '8': 0, '6': 0 };
+    SITES.forEach((s) => {
+      const cap = siteCap(s);
+      // attribute to first listed wafer (primary)
+      const primary = s.wafer[0];
+      waferMap[primary] = (waferMap[primary] || 0) + cap;
+    });
+
+    // by status (count)
+    const statusCount = { operating: 0, ramping: 0, construction: 0, planning: 0 };
+    SITES.forEach((s) => { statusCount[s.status] = (statusCount[s.status] || 0) + 1; });
+
+    // by tier
+    const tierMap = { logic: 0, memory: 0, mature: 0 };
+    SITES.forEach((s) => { tierMap[s.tier] = (tierMap[s.tier] || 0) + siteCap(s); });
+
+    return { regionCompanyMap, waferMap, statusCount, tierMap };
+  }
+
+  function renderAggregations() {
+    const { regionCompanyMap, waferMap, statusCount, tierMap } = aggregate();
+
+    // Region stacked bar
+    const regionOrder = ['TW','KR','JP','CN','US','SEA','EU','IL'];
+    const regionTraces = COMPANIES.map((c) => ({
+      type: 'bar',
+      name: c.name,
+      x: regionOrder.map((r) => REGION_LABELS[r]),
+      y: regionOrder.map((r) => +(regionCompanyMap[r][c.id] || 0).toFixed(1)),
+      marker: { color: c.color },
+      hovertemplate: `<b>${c.name}</b><br>%{x}: %{y:.1f}k/月<extra></extra>`,
+    }));
+    Plotly.newPlot('regionChart', regionTraces, plotlyDarkLayout({
+      barmode: 'stack',
+      margin: { l: 50, r: 20, t: 20, b: 50 },
+      xaxis: { gridcolor: '#1f2740' },
+      yaxis: { title: 'k wafers / month', gridcolor: '#1f2740' },
+      legend: { font: { size: 10 }, orientation: 'h', y: -0.18 },
+      showlegend: true,
+    }), plotlyConfig());
+
+    // Wafer pie
+    Plotly.newPlot('waferChart', [{
+      type: 'pie',
+      labels: ['12-inch (300mm)', '8-inch (200mm)', '6-inch (150mm)'],
+      values: [waferMap['12'], waferMap['8'], waferMap['6']],
+      marker: { colors: ['#60a5fa', '#fde68a', '#f87171'] },
+      hovertemplate: '<b>%{label}</b><br>%{value:.1f}k/月 (%{percent})<extra></extra>',
+      textinfo: 'label+percent', textfont: { color: '#0b1020', size: 12 },
+      hole: 0.45,
+    }], plotlyDarkLayout({
+      margin: { l: 20, r: 20, t: 20, b: 20 },
+      showlegend: false,
+    }), plotlyConfig());
+
+    // Status bar
+    const statusKeys = ['operating', 'ramping', 'construction', 'planning'];
+    Plotly.newPlot('statusChart', [{
+      type: 'bar',
+      x: statusKeys.map((k) => STATUS_LABELS[k]),
+      y: statusKeys.map((k) => statusCount[k] || 0),
+      marker: { color: ['#4ade80','#fbbf24','#93c5fd','#c4b5fd'] },
+      text: statusKeys.map((k) => statusCount[k] || 0),
+      textposition: 'outside', textfont: { color: '#eef3ff' },
+      hovertemplate: '<b>%{x}</b><br>%{y} sites<extra></extra>',
+    }], plotlyDarkLayout({
+      margin: { l: 40, r: 20, t: 20, b: 40 },
+      xaxis: { gridcolor: '#1f2740' },
+      yaxis: { title: '站点数', gridcolor: '#1f2740' },
+    }), plotlyConfig());
+
+    // Tier bar
+    const tierKeys = ['logic', 'memory', 'mature'];
+    Plotly.newPlot('tierChart', [{
+      type: 'bar',
+      x: tierKeys.map((k) => TIER_LABELS[k]),
+      y: tierKeys.map((k) => +tierMap[k].toFixed(1)),
+      marker: { color: tierKeys.map((k) => tierColor[k]) },
+      text: tierKeys.map((k) => tierMap[k].toFixed(1) + 'k'),
+      textposition: 'outside', textfont: { color: '#eef3ff' },
+      hovertemplate: '<b>%{x}</b><br>%{y:.1f}k/月<extra></extra>',
+    }], plotlyDarkLayout({
+      margin: { l: 50, r: 20, t: 20, b: 40 },
+      xaxis: { gridcolor: '#1f2740' },
+      yaxis: { title: 'k wafers / month', gridcolor: '#1f2740' },
+    }), plotlyConfig());
+  }
+
+  // ============== TIMELINE ==============
+
+  function renderTimeline() {
+    const root = document.getElementById('timelineList');
+    root.innerHTML = '';
+    let lastYear = null;
+    TIMELINE.forEach((t) => {
+      const c = COMPANY_BY_ID[t.co];
+      const row = document.createElement('div');
+      row.className = 'timeline-row';
+      row.innerHTML = `
+        <div class="timeline-year">${t.year !== lastYear ? t.year : ''}</div>
+        <div class="timeline-text">
+          <span style="color:${c.color}; font-weight:600;">${c.name}</span> · ${escape(t.label)}
+          <small>${statusPill(t.status)}</small>
+        </div>
+      `;
+      root.appendChild(row);
+      lastYear = t.year;
+    });
+  }
+
+  // ============== TABLE ==============
+
+  function renderTable() {
+    const search = (document.getElementById('tableSearch').value || '').toLowerCase().trim();
+    const tbody = document.getElementById('siteTableBody');
+    const rows = filteredSites().filter((s) => {
+      if (!search) return true;
+      const blob = [
+        COMPANY_BY_ID[s.co].name, s.name, s.addr, s.nodes, s.cap, s.staff, s.area,
+      ].join(' ').toLowerCase();
+      return blob.includes(search);
+    });
+    tbody.innerHTML = rows.map((s) => {
+      const c = COMPANY_BY_ID[s.co];
+      return `
+        <tr>
+          <td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c.color};margin-right:6px;"></span>${c.name}</td>
+          <td>${escape(s.name)}</td>
+          <td style="color:var(--muted);font-size:12px;">${escape(s.addr)}</td>
+          <td>${escape(s.started)}</td>
+          <td>${escape(s.cap)}<br><small style="color:var(--muted)">${escape(s.area)}</small></td>
+          <td>${s.wafer.join('"/')}"<br><small style="color:var(--muted)">${escape(s.nodes)}</small></td>
+          <td>${statusPill(s.status)} ${tierTag(s.tier)}</td>
+          <td style="color:var(--muted);font-size:12px;">${escape(s.staff)}</td>
+        </tr>
+      `;
+    }).join('');
+    document.getElementById('tableCount').textContent = `${rows.length} / ${SITES.length} 行`;
+  }
+
+  // ============== HEIGHT SYNC ==============
+
+  function notifyParentHeight() {
+    if (window.parent === window || !appRoot) return;
+    window.requestAnimationFrame(() => {
+      const h = Math.ceil(Math.max(
+        appRoot.scrollHeight || 0,
+        document.body.scrollHeight || 0,
+        document.documentElement.scrollHeight || 0
+      ));
+      window.parent.postMessage({ type: HEIGHT_MESSAGE_TYPE, height: h }, '*');
+    });
+  }
+  if ('ResizeObserver' in window) {
+    new ResizeObserver(() => notifyParentHeight()).observe(appRoot);
+  }
+  window.addEventListener('load', () => {
+    setTimeout(() => { map.invalidateSize(); notifyParentHeight(); }, 150);
+    setTimeout(notifyParentHeight, 600);
+  });
+
+  // ============== START ==============
+  document.getElementById('tableSearch').addEventListener('input', renderTable);
+  renderRanking();
+  renderChipRows();
+  renderMap();
+  renderAggregations();
+  renderTimeline();
+  renderTable();
+})();
+</script>
+</body>
+</html>
