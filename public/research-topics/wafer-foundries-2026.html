@@ -537,10 +537,38 @@
   // ============== MAP ==============
 
   const map = L.map('map', { worldCopyJump: true, scrollWheelZoom: true }).setView([28, 110], 3);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap &copy; CARTO',
-    subdomains: 'abcd', maxZoom: 18,
-  }).addTo(map);
+
+  // Tile fallback chain: if the primary basemap stops loading we swap to the next provider.
+  // CARTO occasionally fails behind some networks; OSM is the universal safety net.
+  const tileSources = [
+    {
+      url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+      opts: { subdomains: 'abcd', attribution: '&copy; OpenStreetMap &copy; CARTO' },
+    },
+    {
+      url: 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png',
+      opts: { subdomains: 'abcd', attribution: '&copy; OpenStreetMap &copy; CARTO' },
+    },
+    {
+      url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      opts: { attribution: '&copy; OpenStreetMap contributors' },
+    },
+  ];
+  let activeTileLayer = null;
+  function applyTileSource(idx) {
+    if (activeTileLayer) { activeTileLayer.remove(); }
+    const src = tileSources[idx];
+    let errs = 0;
+    activeTileLayer = L.tileLayer(src.url, Object.assign({ maxZoom: 18 }, src.opts)).addTo(map);
+    activeTileLayer.on('tileerror', () => {
+      errs += 1;
+      if (errs >= 4 && idx < tileSources.length - 1) {
+        console.warn('[map] tile source ' + src.url + ' failing, falling back');
+        applyTileSource(idx + 1);
+      }
+    });
+  }
+  applyTileSource(0);
 
   const markerLayer = L.layerGroup().addTo(map);
 

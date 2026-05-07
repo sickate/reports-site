@@ -2368,10 +2368,41 @@
     const footnoteEl = document.getElementById('methodologySection');
 
     const map = L.map('map', { zoomControl: true, worldCopyJump: true }).setView([18, 10], 2);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors',
-      maxZoom: 8,
-    }).addTo(map);
+
+    // Tile fallback chain: try OSM first, fall back to CARTO if the primary stops loading.
+    const tileSources = [
+      {
+        url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        opts: { subdomains: 'abc', attribution: '&copy; OpenStreetMap contributors' },
+      },
+      {
+        url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+        opts: { attribution: '&copy; OpenStreetMap contributors' },
+      },
+      {
+        url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+        opts: { subdomains: 'abcd', attribution: '&copy; OpenStreetMap &copy; CARTO' },
+      },
+      {
+        url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+        opts: { subdomains: 'abcd', attribution: '&copy; OpenStreetMap &copy; CARTO' },
+      },
+    ];
+    let activeTileLayer = null;
+    function applyTileSource(idx) {
+      if (activeTileLayer) { activeTileLayer.remove(); }
+      const src = tileSources[idx];
+      let errs = 0;
+      activeTileLayer = L.tileLayer(src.url, Object.assign({ maxZoom: 8 }, src.opts)).addTo(map);
+      activeTileLayer.on('tileerror', () => {
+        errs += 1;
+        if (errs >= 4 && idx < tileSources.length - 1) {
+          console.warn('[map] tile source ' + src.url + ' failing, falling back');
+          applyTileSource(idx + 1);
+        }
+      });
+    }
+    applyTileSource(0);
 
     const markerLayer = L.layerGroup().addTo(map);
     const lineLayer = L.layerGroup().addTo(map);
