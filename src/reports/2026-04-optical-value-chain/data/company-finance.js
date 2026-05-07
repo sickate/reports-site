@@ -1,3 +1,21 @@
+// Photonics 7-Layer 财务快照 — 数据口径与 ticker 映射说明
+//
+// 时间轴：每条记录的 forwardPE / revenue / netProfit / grossMargin 默认 4 期
+//   FY2024A / FY2025A / FY2026E / FY2027E（按各家公司自身财年；少数 FY 跨自然年的
+//   公司，例如 LRCX = June、AMAT = Oct、ONTO = Dec、MTSI = Oct，按其披露口径）。
+//
+// forwardPE 来源：2026-05 抓取 stockanalysis.com 的 statistics API，取 NTM forward PE
+//   并写入 FY2026E 槽位。FY2027E 槽位仍为 null（暂无可复核的两年远端 PE 共识）。
+//   抓取脚本：scripts/fetch-photonics-forward-pe.mjs。
+//
+// 用户提供的原始 ticker 表里有三处需要明确映射，这里统一记录一次，避免误读：
+//   - $SHMN  → Hamamatsu Photonics（公开口径以 6965.T / OTC ADR HPHTY 为准；SHMN
+//             不是公开美股代码，按 Hamamatsu 处理）。
+//   - $MEMS  → MEMSCAP（Euronext Paris 上市的 MEMS.PA；不是 NASDAQ 'MEMS'）。
+//   - $6965  → 同上 Hamamatsu，主码 6965.T，副码 HPHTY（OTC ADR）。
+//   非 US listings（IQE.L / SOI.PA / AIXA.DE / ALRIB.PA / XFAB.PA / MEMS.PA /
+//   SIVE.ST / 6965.T）当前 forwardPE 仍为 null，stockanalysis.com 上没有覆盖。
+
 const SOURCE_PATH = '/src/reports/2026-04-optical-value-chain/data/company-finance.js';
 
 function formatNumber(value) {
@@ -32,6 +50,14 @@ function formatPercent(value) {
   return `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`;
 }
 
+function formatForwardPE(value) {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return '待补';
+  }
+
+  return `${value.toFixed(1)}x`;
+}
+
 function buildAnnualFinance({
   periodLabel,
   unit,
@@ -59,7 +85,7 @@ function buildAnnualFinance({
       revenue: display.revenue || revenue.map(formatNumber),
       netProfit: display.netProfit || netProfit.map(formatNumber),
       grossMargin: display.grossMargin || grossMargin.map(formatPercent),
-      forwardPE: display.forwardPE || forwardPE.map(() => '待补'),
+      forwardPE: display.forwardPE || forwardPE.map(formatForwardPE),
     },
     flags,
     note,
@@ -94,7 +120,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [99.4, 88.3, 125.0, 178.0],
       netProfit: [-11.6, -21.3, -2.9, 26.2],
       grossMargin: [24.0, 12.7, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 228.14, null],
       display: {
         revenue: ['99.4', '88.3', '~125', '~178'],
         netProfit: ['-11.6', '-21.3', '~-2.9', '~26.2'],
@@ -170,7 +196,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [9070, 10760, 12100, 12600],
       netProfit: [-467, 1400, 1586, 1571],
       grossMargin: [17.73, 24.70, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 22.28, null],
       display: {
         revenue: ['9,070', '10,760', '~12,100', '~12,600'],
         netProfit: ['-467', '1,400', '~1,586', '~1,571'],
@@ -441,7 +467,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [717.3, 664.3, 770.0, 843.4],
       netProfit: [73.7, 35.4, 57.3, 81.8],
       grossMargin: [42.4, 40.0, 41.0, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 29.94, null],
       display: {
         revenue: ['717.3', '664.3', '~770.0', '~843.4'],
         netProfit: ['73.7', '35.4', '~57.3', '~81.8'],
@@ -481,7 +507,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [14905, 18436, 22460, 28260],
       netProfit: [3828, 5358, 6700, 8970],
       grossMargin: [47.3, 48.7, 49.0, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 39.81, null],
       display: {
         revenue: ['14,905', '18,436', '~22,460', '~28,260'],
         netProfit: ['3,828', '5,358', '~6,700', '~8,970'],
@@ -521,7 +547,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [27176, 28368, 31383, 37316],
       netProfit: [7177, 6998, 8848, 10808],
       grossMargin: [47.5, 48.7, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 35.41, null],
       display: {
         revenue: ['27,176', '28,368', '~31,383', '~37,316'],
         netProfit: ['7,177', '6,998', '~8,848', '~10,808'],
@@ -560,7 +586,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [987.3, 1005.3, 1330.0, 1451.0],
       netProfit: [201.7, 136.8, 231.9, 319.7],
       grossMargin: [52.2, 49.7, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 37.06, null],
       display: {
         revenue: ['987.3', '1,005.3', '~1,330.0', '~1,451.0'],
         netProfit: ['201.7', '136.8', '~231.9', '~319.7'],
@@ -677,7 +703,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [729.6, 967.3, 1200.0, 1410.0],
       netProfit: [76.9, -3.8, 342.0, 424.0],
       grossMargin: [54.0, 54.7, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 65.28, null],
       display: {
         revenue: ['729.6', '967.3', '~1,200.0', '~1,410.0'],
         netProfit: ['76.9', '-3.8', '~342', '~424'],
@@ -716,7 +742,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [906.8, 832.2, 956.5, 1030.0],
       netProfit: [79.8, 43.9, 75.0, 105.0],
       grossMargin: [30.5, 30.6, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 24.66, null],
       display: {
         revenue: ['906.8', '832.2', '~956.5', '~1,030.0'],
         netProfit: ['79.8', '43.9', '~75', '~105'],
@@ -755,7 +781,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [13270, 11800, 13800, 15500],
       netProfit: [1560, 166, 1058, 1893],
       grossMargin: [39.3, 33.9, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 37.31, null],
       display: {
         revenue: ['13,270', '11,800', '~13,800', '~15,500'],
         netProfit: ['1,560', '166', '~1,058', '~1,893'],
@@ -794,7 +820,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [198.5, 261.3, 289.9, 331.4],
       netProfit: [-60.8, -23.5, 18.0, 28.0],
       grossMargin: [16.6, 29.8, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 223.56, null],
       display: {
         revenue: ['198.5', '261.3', '~289.9', '~331.4'],
         netProfit: ['-60.8', '-23.5', '~18', '~28'],
@@ -833,7 +859,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [1436, 1566, 1860, 2390],
       netProfit: [208, 220, 340, 560],
       grossMargin: [23.6, 23.2, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 73.17, null],
       display: {
         revenue: ['1,436', '1,566', '~1,860', '~2,390'],
         netProfit: ['208', '220', '~340', '~560'],
@@ -872,7 +898,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [2883, 3419, 4680, 5530],
       netProfit: [296.2, 332.5, 501, 598],
       grossMargin: [12.35, 12.09, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 41.44, null],
       display: {
         revenue: ['2,883', '3,419', '~4,680', '~5,530'],
         netProfit: ['296.2', '332.5', '~501', '~598'],
@@ -950,7 +976,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [7568, 8128, 14270, 16210],
       netProfit: [222.5, 245.9, 566, 674],
       grossMargin: [8.46, 8.81, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 20.28, null],
       display: {
         revenue: ['7,568', '8,128', '~14,270', '~16,210'],
         netProfit: ['222.5', '245.9', '~566', '~674'],
@@ -989,7 +1015,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [232.303, 237.553, 264.21, 291.03],
       netProfit: [47.211, 41.716, 48.8, 60.1],
       grossMargin: [32.6, 29.0, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 22.23, null],
       display: {
         revenue: ['232.303', '237.553', '~264.21', '~291.03'],
         netProfit: ['47.211', '41.716', '~48.8', '~60.1'],
@@ -1028,7 +1054,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [6750, 6791, 7310, 8030],
       netProfit: [-262, 888, 1002, 1302],
       grossMargin: [24.5, 24.9, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 36.67, null],
       display: {
         revenue: ['6,750', '6,791', '~7,310', '~8,030'],
         netProfit: ['-262', '888', '~1,002', '~1,302'],
@@ -1067,7 +1093,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [66.2, 59.0, 48.7, 83.8],
       netProfit: [33.2, -3.9, -4.1, 4.1],
       grossMargin: [49.1, 40.6, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 1.00, null],
       display: {
         revenue: ['66.2', '59.0', '~48.7', '~83.8'],
         netProfit: ['33.2', '-3.9', '~-4.1', '~4.1'],
@@ -1106,7 +1132,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [763.6, 785.0, 937.5, 1010.0],
       netProfit: [69.6, 54.4, 150.0, 182.0],
       grossMargin: [40.3, 39.3, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 59.11, null],
       display: {
         revenue: ['763.6', '785.0', '~937.5', '~1,010.0'],
         netProfit: ['69.6', '54.4', '~150', '~182'],
@@ -1145,7 +1171,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [401.8, 453.0, 518.1, 617.1],
       netProfit: [-69.8, -74.3, 25.0, 59.0],
       grossMargin: [44.9, 42.7, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 60.47, null],
       display: {
         revenue: ['401.8', '453.0', '~518.1', '~617.1'],
         netProfit: ['-69.8', '-74.3', '~25', '~59'],
@@ -1184,7 +1210,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [2820, 3190, 4200, 5000],
       netProfit: [542.4, 554.0, 991.0, 1306.0],
       grossMargin: [58.5, 58.2, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 57.05, null],
       display: {
         revenue: ['2,820', '3,190', '~4,200', '~5,000'],
         netProfit: ['542.4', '554.0', '~991', '~1,306'],
@@ -1223,7 +1249,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [1000, 1084, 1490, 1650],
       netProfit: [-25.8, 34.8, 197.0, 238.0],
       grossMargin: [57.6, 57.3, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 43.43, null],
       display: {
         revenue: ['1,000', '1,084', '~1,490', '~1,650'],
         netProfit: ['-25.8', '34.8', '~197', '~238'],
@@ -1262,7 +1288,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [595.4, 645.4, 766.9, 885.0],
       netProfit: [32.5, 40.7, 66.1, 92.4],
       grossMargin: [16.3, 17.7, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 28.32, null],
       display: {
         revenue: ['595.4', '645.4', '~766.9', '~885.0'],
         netProfit: ['32.5', '40.7', '~66.1', '~92.4'],
@@ -1301,7 +1327,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [6318, 6708, 7600, 8350],
       netProfit: [354, 374, 439, 575],
       grossMargin: [14.8, 14.0, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 34.23, null],
       display: {
         revenue: ['6,318', '6,708', '~7,600', '~8,350'],
         netProfit: ['354', '374', '~439', '~575'],
@@ -1340,7 +1366,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [1359, 1645, 2950, 4800],
       netProfit: [-546.5, 25.9, 544.8, 1037.4],
       grossMargin: [18.5, 28.0, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 59.63, null],
       display: {
         revenue: ['1,359', '1,645', '~2,950', '~4,800'],
         netProfit: ['-546.5', '25.9', '~544.8', '~1,037.4'],
@@ -1379,7 +1405,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [4708, 5810, 7070, 8800],
       netProfit: [-156.2, 49.4, 1066.3, 1472.6],
       grossMargin: [30.9, 35.2, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 47.27, null],
       display: {
         revenue: ['4,708', '5,810', '~7,070', '~8,800'],
         netProfit: ['-156.2', '49.4', '~1,066.3', '~1,472.6'],
@@ -1496,7 +1522,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [249.4, 455.7, 1000.0, 2300.0],
       netProfit: [-186.7, -38.2, 64.5, 302.3],
       grossMargin: [24.8, 30.1, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 219.07, null],
       display: {
         revenue: ['249.4', '455.7', '~1,000.0', '~2,300.0'],
         netProfit: ['-186.7', '-38.2', '~64.5', '~302.3'],
@@ -1612,7 +1638,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [193.0, 436.8, 1360.0, 2140.0],
       netProfit: [-28.4, 52.2, 623.6, 893.0],
       grossMargin: [61.9, 64.8, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 41.44, null],
       display: {
         revenue: ['193.0', '436.8', '~1,360', '~2,140'],
         netProfit: ['-28.4', '52.2', '~623.6', '~893.0'],
@@ -1651,7 +1677,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [5510.0, 5770.0, 8200.0, 11060.0],
       netProfit: [-933.0, -885.0, 2670.0, 3419.3],
       grossMargin: [41.6, 41.3, 51.0, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 44.93, null],
       display: {
         revenue: ['5,510', '5,770', '8,200', '~11,060'],
         netProfit: ['-933', '-885', '2,670', '~3,419.3'],
@@ -1690,7 +1716,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [868.8, 909.3, 1050.0, 1200.0],
       netProfit: [-1090.0, -161.9, null, null],
       grossMargin: [34.1, 50.2, 51.6, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 53.92, null],
       display: {
         revenue: ['868.8', '909.3', '1,050', '~1,200'],
         netProfit: ['-1,090', '-161.9', '待补', '待补'],
@@ -1728,7 +1754,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [4020.0, 4770.0, 6240.0, 7480.0],
       netProfit: [84.0, 123.3, 883.8, 1187.8],
       grossMargin: [42.8, 42.0, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 86.98, null],
       display: {
         revenue: ['4,020', '4,770', '~6,240', '~7,480'],
         netProfit: ['84.0', '123.3', '~883.8', '~1,187.8'],
@@ -1767,7 +1793,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [19220.0, 19890.0, 21110.0, 21960.0],
       netProfit: [1280.0, 650.0, 1841.4, 2120.4],
       grossMargin: [46.1, 43.5, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 31.87, null],
       display: {
         revenue: ['19,220', '19,890', '~21,110', '~21,960'],
         netProfit: ['1,280', '~650', '~1,841.4', '~2,120.4'],
@@ -1806,7 +1832,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [13120.0, 15630.0, 18870.0, 21290.0],
       netProfit: [506.0, 1600.0, 2697.3, 3367.3],
       grossMargin: [32.6, 36.0, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 54.10, null],
       display: {
         revenue: ['13,120', '15,630', '~18,870', '~21,290'],
         netProfit: ['506', '1,600', '~2,697.3', '~3,367.3'],
@@ -1845,7 +1871,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [396.3, 852.5, 1380.0, 1910.0],
       netProfit: [-83.4, 219.1, 431.7, 618.4],
       grossMargin: [76.4, 75.7, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 63.30, null],
       display: {
         revenue: ['396.3', '852.5', '~1,380', '~1,910'],
         netProfit: ['-83.4', '219.1', '~431.7', '~618.4'],
@@ -1884,7 +1910,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [7000.0, 9010.0, 11630.0, 14160.0],
       netProfit: [2850.0, 3510.0, 4523.4, 5493.6],
       grossMargin: [64.1, 64.1, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 38.85, null],
       display: {
         revenue: ['7,000', '9,010', '~11,630', '~14,160'],
         netProfit: ['2,850', '3,510', '~4,523.4', '~5,493.6'],
@@ -1923,7 +1949,7 @@ export const opticalCompanyFinanceRecords = [
       revenue: [51570.0, 63890.0, 107030.0, 164550.0],
       netProfit: [5620.0, 23130.0, 54395.0, 85035.4],
       grossMargin: [63.0, 67.8, null, null],
-      forwardPE: [null, null, null, null],
+      forwardPE: [null, null, 31.59, null],
       display: {
         revenue: ['51,570', '63,890', '~107,030', '~164,550'],
         netProfit: ['5,620', '23,130', '~54,395.0', '~85,035.4'],
