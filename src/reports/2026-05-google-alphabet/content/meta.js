@@ -21,9 +21,8 @@ export const reportMeta = {
   rating: '叙事跃迁季 · 资本周期顶部观察',
   confidence: '高（数据 100% 来自 SEC 8-K）',
   timeframe: '12-24 月跟踪',
-  template: '11 模块科技公司投研模板 v1',
   updatedAt: '2026-05-03',
-  revisionNote: '首次发布。Alphabet Q1 2026 财报公告于 2026-04-29，本报告作为 docs/2026-05-03_tech_company_research_template.md 模板的 Google 实例化版本。所有财务数据以 SEC EDGAR 8-K 原文为基准，KPI 数据以管理层口径 PR 为准，估值数据以 2026-05-01 收盘价为准。',
+  revisionNote: '首次发布。Alphabet Q1 2026 财报公告于 2026-04-29。所有财务数据以 SEC EDGAR 8-K 原文为基准，KPI 数据以管理层口径 PR 为准，估值数据以 2026-05-01 收盘价为准。',
 };
 
 // 三个最关键叙事拐点

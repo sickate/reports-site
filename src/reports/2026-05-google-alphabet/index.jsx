@@ -449,9 +449,6 @@ const GoogleAlphabetReport = () => (
     {/* Header */}
     <header id="overview" className="mb-6 scroll-mt-[130px]">
       <div className="flex items-center gap-3 mb-2 flex-wrap">
-        <span className="text-xs font-mono text-amber-400 uppercase tracking-widest">
-          投研模板 · {reportMeta.template}
-        </span>
         <span className="text-xs text-slate-500">更新于 {reportMeta.updatedAt}</span>
       </div>
       <h1 className="text-3xl md:text-4xl font-bold text-slate-50 mb-2 leading-tight">

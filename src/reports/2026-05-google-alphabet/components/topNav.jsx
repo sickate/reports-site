@@ -76,7 +76,7 @@ export const TopNav = () => {
     <div
       className="sticky top-[60px] z-30 -mx-4 mb-6 border-b border-slate-800/80 bg-slate-950/85 backdrop-blur-md"
     >
-      <div ref={containerRef} className="max-w-6xl mx-auto px-4 overflow-x-auto scrollbar-thin">
+      <div ref={containerRef} className="max-w-6xl mx-auto px-4 overflow-x-auto scrollbar-hide">
         <nav className="flex gap-1.5 py-2 whitespace-nowrap">
           {navSections.map((s) => {
             const active = s.id === activeId;

@@ -385,4 +385,4 @@ export const dataSources = [
 // ---------------------------------------------------------------------------
 // 6. 免责声明
 // ---------------------------------------------------------------------------
-export const disclaimer = '本报告为投研模板演示用途，所有财务数据基于 SEC EDGAR 8-K / 10-Q 原文披露，运营 KPI 和 commentary 来自 Alphabet 官方电话会和 IR 公告，估值数据来自第三方汇总（Yahoo / Morningstar / WallStreetZen 横向交叉验证）。本报告不构成投资建议，仅作为科技公司跟踪模板（docs/2026-05-03_tech_company_research_template.md）的 Google/Alphabet 实例化版本。模板设计哲学：时间序列 + 拐点识别 + 指引一致性。Q1 2026 三个最关键叙事拐点 — CapEx 周期顶部、Cloud Backlog 5x 跃迁、回购首次暂停 — 都在数据中有明确证据支持，但其市场含义仍存在合理争议。';
+export const disclaimer = '所有财务数据基于 SEC EDGAR 8-K / 10-Q 原文披露，运营 KPI 和 commentary 来自 Alphabet 官方电话会和 IR 公告，估值数据来自第三方汇总（Yahoo / Morningstar / WallStreetZen 横向交叉验证）。本报告不构成投资建议。Q1 2026 三个最关键叙事拐点 — CapEx 周期顶部、Cloud Backlog 5x 跃迁、回购首次暂停 — 都在数据中有明确证据支持，但其市场含义仍存在合理争议。';
