@@ -6,6 +6,17 @@
 
 export const reports = [
   {
+    slug: '2026-05-faraday-rotator',
+    title: '法拉第旋光片产业链深度解析',
+    description:
+      'AI 光模块时代的"光学单向阀"：BiRIG/YIG vs TGG/TSAG 四种磁光晶体路线、Coherent + Granopt 双寡头格局裂解、稀土反制下的国产替代窗口与 A 股横向比较表（福晶 / 东田微 / 长飞 / 隆华）。',
+    date: '2026-05-11',
+    type: 'html',
+    category: 'industry',
+    tags: ['Research Topic', 'Optical', 'Faraday Rotator', '光通信', '稀土', '产业链'],
+    component: () => import('./2026-05-faraday-rotator/index.jsx'),
+  },
+  {
     slug: '2026-05-wafer-foundries',
     title: '全球前十大晶圆代工与 IDM 制造版图：地点、产能与时间线',
     description:
