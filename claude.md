@@ -210,6 +210,41 @@ DATA_FILE=/var/www/reports/data/metals-prices.json node /var/www/reports/scripts
 
 Log file: `/var/log/metals-update.log`
 
+**Daily Price Store (for the YTD / Rolling-1Y report):**
+
+The yearly `metals-prices.json` keeps only one point per year. A separate
+`public/data/metals-daily.json` keeps one point **per metal per day** over a
+rolling ~420-day window, powering `src/reports/2026-06-metals-ytd/`.
+
+| Piece | File | Role |
+|-------|------|------|
+| Shared store helpers | `scripts/lib/daily-store.mjs` | read / upsert (same-day overwrite) / prune / write |
+| History source | `scripts/lib/sources/fred.mjs` | FRED `fredgraph.csv` (daily gold; monthly base/iron/cobalt) |
+| Per-metal map | `scripts/lib/sources/registry.mjs` | unit, cadence, FRED series + conversion; `METALS_API_KEY` key-later seam |
+| One-time backfill | `scripts/backfill-daily.mjs` | seeds yearly anchors + FRED history; degrades per-metal; re-runnable |
+| Ongoing append | `scripts/update-prices.js` | also upserts today's price into the daily store (`DAILY_FILE` env), then prunes |
+
+Data cadence is **honest, not uniform** (surfaced as a tag in the UI):
+`daily` (gold, silver, copper, aluminum, nickel, zinc, tin), `monthly`
+(iron ore, cobalt — FRED monthly), `manual`/flat (tungsten, molybdenum,
+lithium, titanium — no free daily feed). The YTD baseline is the prior
+year-end close (always present as a `YYYY-12-31` anchor).
+
+Ops notes:
+- The hourly cron must also set `DAILY_FILE`:
+  ```bash
+  # Cron: 0 * * * *
+  DATA_FILE=/var/www/reports/data/metals-prices.json \
+  DAILY_FILE=/var/www/reports/data/metals-daily.json \
+  node /var/www/reports/scripts/update-prices.js
+  ```
+- `scripts/deploy.sh` **excludes `data/metals-daily.json`** from the `--delete`
+  rsync so deploys never wipe accumulated history. Seed it once on the server:
+  `scp public/data/metals-daily.json maru:/var/www/reports/data/`, then run
+  `node scripts/backfill-daily.mjs` on `maru` (clean network reaches FRED) to
+  enrich history. Deploys keep `scripts/update-prices.js`, `backfill-daily.mjs`,
+  and `scripts/lib/` in sync automatically.
+
 **Data Sources & Units:**
 
 | Metal | Unit | Source | Auto-Update |
@@ -255,6 +290,23 @@ lithium: {
 ```
 
 Then run: `node scripts/update-prices.js` and `npm run deploy`
+
+### Metals Momentum — YTD & Rolling 1-Year (2026-06)
+
+Location: `src/reports/2026-06-metals-ytd/index.jsx`
+
+Short-horizon companion to the 50-year metals page, driven by the daily store
+above (`public/data/metals-daily.json`).
+
+**Features:**
+- Toggle between **YTD** and **Rolling 1-Year** modes on a shared one-year
+  time axis. YTD pins the axis to the full calendar year (Jan 1 → Dec 31); the
+  post-today span renders empty while keeping all month ticks.
+- Combined normalized %-change chart (all selected metals rebased to the period
+  start = 0%) + a grid of per-metal cards (absolute price line, return badge,
+  data-cadence tag).
+- Chip multi-select (all 13 metals); dynamic Y `%` domain; cold-start `*`
+  marker when the full-period baseline is not yet collected.
 
 ### 3D Solar System Simulator (2026-02)
 

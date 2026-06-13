@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.0] - 2026-06-13
+
+### Added
+
+- New report `2026-06-metals-ytd` — "Metals Momentum — YTD & Rolling 1-Year":
+  toggle between year-to-date and trailing rolling 12-month price-change trends
+  on a shared full-calendar-year time axis (post-today span left empty),
+  combined normalized %-change chart + per-metal price cards with data-cadence tags
+- Daily price store `public/data/metals-daily.json` (one point per metal per day, rolling ~420-day window)
+- Daily-data pipeline:
+  - `scripts/lib/daily-store.mjs` — read / upsert / prune / write helpers
+  - `scripts/lib/sources/fred.mjs` — FRED CSV history adapter (daily gold; monthly base/iron/cobalt)
+  - `scripts/lib/sources/registry.mjs` — per-metal source map + `METALS_API_KEY` key-later seam
+  - `scripts/backfill-daily.mjs` — one-time, re-runnable history backfill (degrades per-metal)
+
+### Changed
+
+- `scripts/update-prices.js` now also appends today's prices to the daily store (`DAILY_FILE` env), pruning to the rolling window
+- `scripts/deploy.sh` excludes `data/metals-daily.json` from the `--delete` rsync (preserves accumulated server history) and syncs `update-prices.js`, `backfill-daily.mjs`, and `scripts/lib/`
+- Report registry updated to include the new June 2026 metals momentum page
+
 ## [1.4.0] - 2026-04-22
 
 ### Added

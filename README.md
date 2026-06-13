@@ -125,9 +125,11 @@ reports-instap/
 - `npm run build` now runs `prebuild`, which generates shared research datasets such as `public/data/company-financials.jsonl`
 - Report pages can reuse shared company finance cards and generated JSONL instead of hardcoding tables into each page
 - Deployment now validates that `dist/data/company-financials.jsonl` exists before syncing to the server
+- Daily metals price store (`public/data/metals-daily.json`) accumulates one point per metal per day over a rolling ~420-day window: seeded by `scripts/backfill-daily.mjs` (FRED history) and appended hourly by `scripts/update-prices.js`. It is excluded from the deploy `--delete` so accumulated history survives deploys
 
 ## Recent Research Topics
 
+- `2026-06-metals-ytd`: 13 种金属的 YTD / 滚动一年价格动量页（共用整年横轴，按日累积）
 - `2026-04-optical-value-chain`: 光通信产业链价值捕获点、架构图示与分层财务卡片
 - `2026-04-semiconductor-upstream`: 半导体上游产业链关系图与细分赛道数据
 - `2026-04-high-voltage-platform`: 800V 高压平台升级与产业链映射

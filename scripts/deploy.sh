@@ -21,11 +21,16 @@ if [ ! -f "$BUILD_DIR/data/company-financials.jsonl" ]; then
 fi
 
 echo -e "${YELLOW}=== Syncing to server ===${NC}"
+# NOTE: data/metals-daily.json is excluded so deploys never wipe the daily price
+# history the cron accumulates server-side (it is created/owned by the cron, seeded
+# once via scp). The yearly metals-prices.json is intentionally NOT excluded — it
+# self-heals on the next hourly update.
 rsync -avz --delete --chmod=D755,F644 \
   --exclude '.git' \
   --exclude '.DS_Store' \
   --exclude 'node_modules' \
   --exclude 'scripts' \
+  --exclude 'data/metals-daily.json' \
   "$BUILD_DIR/" "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/"
 
 echo -e "${YELLOW}=== Syncing monitoring scripts ===${NC}"
@@ -34,6 +39,17 @@ rsync -avz --chmod=D755,F644 \
   scripts/cosco_price_ratio.py \
   scripts/requirements.txt \
   "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/scripts/"
+
+echo -e "${YELLOW}=== Syncing metals price scripts ===${NC}"
+# Keep the daily-price pipeline on the server in sync (the hourly cron runs
+# update-prices.js; backfill-daily.mjs is run manually to seed/enrich history).
+rsync -avz --chmod=D755,F644 \
+  scripts/update-prices.js \
+  scripts/backfill-daily.mjs \
+  "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/scripts/"
+rsync -avz --chmod=D755,F644 \
+  scripts/lib/ \
+  "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/scripts/lib/"
 
 echo -e "${YELLOW}=== Updating Python deps ===${NC}"
 ssh "$REMOTE_USER@$REMOTE_HOST" \

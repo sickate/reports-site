@@ -6,6 +6,17 @@
 
 export const reports = [
   {
+    slug: '2026-06-metals-ytd',
+    title: 'Metals Momentum：13 种金属的 YTD 与滚动一年价格趋势',
+    description:
+      '复用 50 年金属数据架构、按日累积的短周期视图：YTD 与滚动 12 个月两种模式（共用整年横轴，未来留空），含归一化 %涨跌合图与每种金属的价格小卡片，并按数据频率（日/月/低频）如实标注。',
+    date: '2026-06-12',
+    type: 'visualization',
+    category: 'viz',
+    tags: ['Commodities', 'Metals', 'YTD', 'Momentum', 'Data Visualization'],
+    component: () => import('./2026-06-metals-ytd/index.jsx'),
+  },
+  {
     slug: '2026-05-faraday-rotator',
     title: '法拉第旋光片产业链深度解析',
     description:

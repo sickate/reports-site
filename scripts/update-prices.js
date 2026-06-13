@@ -19,12 +19,22 @@ import path from 'path';
 import https from 'https';
 import { fileURLToPath } from 'url';
 
+import { METAL_META } from './lib/sources/registry.mjs';
+import {
+  readDaily, ensureMetal, upsertPoint, prune, writeDaily, todayStr, DEFAULT_WINDOW_DAYS,
+} from './lib/daily-store.mjs';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // On server: /var/www/reports/data/metals-prices.json
 // On local: /path/to/project/public/data/metals-prices.json
 const DATA_FILE = process.env.DATA_FILE || path.join(__dirname, '../public/data/metals-prices.json');
+
+// Daily store (one point per metal per day, rolling window). Updated alongside
+// the yearly file so the YTD / rolling-1Y page accrues real daily history.
+// On server: /var/www/reports/data/metals-daily.json
+const DAILY_FILE = process.env.DAILY_FILE || path.join(__dirname, '../public/data/metals-daily.json');
 
 // Metal configurations with data source info
 // gold-api.com uses USD/oz for gold/silver, USD/lb for copper
@@ -301,6 +311,7 @@ async function updatePrices() {
   let failCount = 0;
   let skipCount = 0;
   const updates = [];
+  const dailyPrices = {}; // metalId -> latest price, for the daily store
 
   // Fetch prices
   for (const [metalId, config] of Object.entries(METAL_SOURCES)) {
@@ -330,6 +341,7 @@ async function updatePrices() {
         newPrice: result.price,
         unit: data.metals[metalId].unit,
       });
+      dailyPrices[metalId] = result.price;
       successCount++;
     } else {
       failCount++;
@@ -349,6 +361,26 @@ async function updatePrices() {
   } catch (error) {
     console.error(`Error writing data file: ${error.message}`);
     process.exit(1);
+  }
+
+  // Also append today's prices to the daily store (rolling window). Non-fatal:
+  // a daily-store problem must never break the yearly update above.
+  try {
+    const daily = readDaily(DAILY_FILE);
+    const today = todayStr();
+    let dailyCount = 0;
+    for (const [metalId, price] of Object.entries(dailyPrices)) {
+      const meta = METAL_META[metalId];
+      if (!meta) continue;
+      ensureMetal(daily, metalId, meta);
+      upsertPoint(daily, metalId, today, price);
+      dailyCount++;
+    }
+    prune(daily, DEFAULT_WINDOW_DAYS);
+    writeDaily(DAILY_FILE, daily);
+    console.log(`Daily store updated: ${DAILY_FILE} (${dailyCount} metals @ ${today})`);
+  } catch (error) {
+    console.error(`Error updating daily store (non-fatal): ${error.message}`);
   }
 
   // Summary

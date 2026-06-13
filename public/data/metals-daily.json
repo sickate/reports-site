@@ -1,0 +1,227 @@
+{
+  "lastUpdated": "2026-06-12T02:30:58.992Z",
+  "windowDays": 420,
+  "metals": {
+    "gold": {
+      "name": "Gold",
+      "unit": "USD/oz",
+      "color": "#FFD700",
+      "frequency": "daily",
+      "source": "FRED GOLDPMGBD228NLBM + gold-api.com",
+      "data": [
+        {
+          "date": "2025-12-31",
+          "price": 4310
+        },
+        {
+          "date": "2026-06-12",
+          "price": 4891.4
+        }
+      ]
+    },
+    "silver": {
+      "name": "Silver",
+      "unit": "USD/oz",
+      "color": "#C0C0C0",
+      "frequency": "daily",
+      "source": "gold-api.com (history: yearly anchors)",
+      "data": [
+        {
+          "date": "2025-12-31",
+          "price": 71.63
+        },
+        {
+          "date": "2026-06-12",
+          "price": 85.4
+        }
+      ]
+    },
+    "copper": {
+      "name": "Copper",
+      "unit": "USD/ton",
+      "color": "#B87333",
+      "frequency": "daily",
+      "source": "FRED PCOPPUSDM + westmetall.com",
+      "data": [
+        {
+          "date": "2025-12-31",
+          "price": 12504
+        },
+        {
+          "date": "2026-06-12",
+          "price": 13195
+        }
+      ]
+    },
+    "aluminum": {
+      "name": "Aluminum",
+      "unit": "USD/ton",
+      "color": "#848789",
+      "frequency": "daily",
+      "source": "FRED PALUMUSDM + westmetall.com",
+      "data": [
+        {
+          "date": "2025-12-31",
+          "price": 3150
+        },
+        {
+          "date": "2026-06-12",
+          "price": 3110
+        }
+      ]
+    },
+    "iron": {
+      "name": "Iron",
+      "unit": "USD/ton",
+      "color": "#8B4513",
+      "frequency": "monthly",
+      "source": "FRED PIORECRUSDM (62% Fe CFR China)",
+      "data": [
+        {
+          "date": "2025-12-31",
+          "price": 110
+        },
+        {
+          "date": "2026-06-12",
+          "price": 106
+        }
+      ]
+    },
+    "nickel": {
+      "name": "Nickel",
+      "unit": "USD/ton",
+      "color": "#727472",
+      "frequency": "daily",
+      "source": "FRED PNICKUSDM + westmetall.com",
+      "data": [
+        {
+          "date": "2025-12-31",
+          "price": 15200
+        },
+        {
+          "date": "2026-06-12",
+          "price": 17540
+        }
+      ]
+    },
+    "cobalt": {
+      "name": "Cobalt",
+      "unit": "USD/lb",
+      "color": "#0047AB",
+      "frequency": "monthly",
+      "source": "FRED PCOBAUSDM (USD/ton -> USD/lb)",
+      "data": [
+        {
+          "date": "2025-12-31",
+          "price": 14
+        },
+        {
+          "date": "2026-06-12",
+          "price": 25.5
+        }
+      ]
+    },
+    "zinc": {
+      "name": "Zinc",
+      "unit": "USD/ton",
+      "color": "#7CB9E8",
+      "frequency": "daily",
+      "source": "FRED PZINCUSDM + westmetall.com",
+      "data": [
+        {
+          "date": "2025-12-31",
+          "price": 3195
+        },
+        {
+          "date": "2026-06-12",
+          "price": 3343.5
+        }
+      ]
+    },
+    "tin": {
+      "name": "Tin",
+      "unit": "USD/ton",
+      "color": "#8B8589",
+      "frequency": "daily",
+      "source": "FRED PTINUSDM + westmetall.com",
+      "data": [
+        {
+          "date": "2025-12-31",
+          "price": 45560
+        },
+        {
+          "date": "2026-06-12",
+          "price": 54000
+        }
+      ]
+    },
+    "tungsten": {
+      "name": "Tungsten",
+      "unit": "USD/mtu",
+      "color": "#e74c3c",
+      "frequency": "manual",
+      "source": "manual (no free feed)",
+      "data": [
+        {
+          "date": "2025-12-31",
+          "price": 1050
+        },
+        {
+          "date": "2026-06-12",
+          "price": 1200
+        }
+      ]
+    },
+    "molybdenum": {
+      "name": "Molybdenum",
+      "unit": "USD/lb",
+      "color": "#4A4A4A",
+      "frequency": "manual",
+      "source": "manual (no free feed)",
+      "data": [
+        {
+          "date": "2025-12-31",
+          "price": 24
+        },
+        {
+          "date": "2026-06-12",
+          "price": 23.5
+        }
+      ]
+    },
+    "lithium": {
+      "name": "Lithium",
+      "unit": "USD/ton",
+      "color": "#9b59b6",
+      "frequency": "manual",
+      "source": "manual (no free feed)",
+      "data": [
+        {
+          "date": "2025-12-31",
+          "price": 18000
+        },
+        {
+          "date": "2026-06-12",
+          "price": 22000
+        }
+      ]
+    },
+    "titanium": {
+      "name": "Titanium",
+      "unit": "USD/ton",
+      "color": "#1abc9c",
+      "frequency": "manual",
+      "source": "manual (no free feed)",
+      "data": [
+        {
+          "date": "2025-12-31",
+          "price": 12500
+        },
+        {
+          "date": "2026-06-12",
+          "price": 10000
+        }
+      ]
+    }
+  }
+}
