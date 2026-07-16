@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.0] - 2026-07-16
+
+### Added
+
+- New industry research page `2026-07-nvidia-memory-profit-pool` — "NVIDIA 与全球存储利润池":
+  a visual research layout covering the CY2026 profit-pool comparison, HBM market
+  boundary, financial-period normalization, verified company fact base, CY2027
+  scenario ranges, ASP monitoring dashboard, and explicit data-quality controls
+- Interactive CY2026E / CY2027E operating-profit range chart for NVIDIA, Samsung,
+  SK hynix, and Micron, with each range retaining its A/P/G/E/M/S data-state label
+- HBM revenue stack, profit-boundary framing, memory-cycle transmission diagram,
+  desktop/mobile responsive layout, and permanent withdrawn-number register
+
+### Changed
+
+- Report registry now includes the new NVIDIA / global memory profit-pool research topic
+
 ## [1.5.0] - 2026-06-13
 
 ### Added

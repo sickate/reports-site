@@ -6,6 +6,17 @@
 
 export const reports = [
   {
+    slug: '2026-07-nvidia-memory-profit-pool',
+    title: 'NVIDIA 与全球存储利润池：HBM 引爆、全品类 ASP 放大与 2027 情景框架',
+    description:
+      '按实际值、初步业绩、公司指引、外部预测、模型与情景分层，统一比较 NVIDIA、Samsung、SK hynix 与 Micron 的 CY2026 营业利润区间；可视化 HBM 市场边界、存储周期传导、2027 三情景和 ASP 跟踪框架。',
+    date: '2026-07-15',
+    type: 'visualization',
+    category: 'industry',
+    tags: ['Research Topic', 'Semiconductor', 'NVIDIA', 'Memory', 'HBM', 'Profit Pool'],
+    component: () => import('./2026-07-nvidia-memory-profit-pool/index.jsx'),
+  },
+  {
     slug: '2026-06-metals-ytd',
     title: 'Metals Momentum：13 种金属的 YTD 与滚动一年价格趋势',
     description:
