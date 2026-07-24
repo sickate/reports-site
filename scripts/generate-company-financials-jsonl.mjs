@@ -263,8 +263,8 @@ function buildGlobalLithiumRecord(row, options) {
     aliases = [],
     englishRow = [],
   } = options;
-  const [companyName, np24, np25, np26, np27, pe24, pe25, pe26, pe27, note] = row;
-  const englishNote = englishRow[9];
+  const [companyName, np24, np25, np26, np27, pe24, pe25, pe26, pe27, marketCap, note] = row;
+  const englishNote = englishRow[10];
   const profits = [np24, np25, np26, np27].map(parseApproxNumber);
   const pe = [pe24, pe25, pe26, pe27].map(parseApproxNumber);
 
@@ -292,6 +292,7 @@ function buildGlobalLithiumRecord(row, options) {
         netProfit: profits.map((entry) => entry.raw || '待补'),
         grossMargin: ['待补', '待补', '待补', '待补'],
         forwardPE: pe.map((entry) => entry.raw || '待补'),
+        marketCap: marketCap || '—',
       },
       flags: {
         approximateNetProfit: profits.map((entry) => entry.approx),

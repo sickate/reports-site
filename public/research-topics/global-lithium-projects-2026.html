@@ -919,6 +919,62 @@
     .changelog-asof { color: var(--muted); white-space: nowrap; }
     .changelog-items { margin: 0; padding-left: 18px; }
     .changelog-items li { margin: 2px 0; line-height: 1.55; }
+
+    /* ---- Market-cap cell ---- */
+    .company-table td.mktcap { color: var(--gold); font-variant-numeric: tabular-nums; }
+
+    /* ---- Database: updated row ---- */
+    tr.row-updated { background: rgba(120, 167, 255, 0.10); }
+    .db-updated-pill {
+      display: inline-block; margin-left: 6px; padding: 1px 6px;
+      font-size: 11px; border-radius: 6px; white-space: nowrap;
+      color: var(--accent); background: rgba(120, 167, 255, 0.14); border: 1px solid rgba(120, 167, 255, 0.32);
+    }
+
+    /* ---- Changelog diff (this vs previous) ---- */
+    .changelog-diff { padding: 12px 18px 0; }
+    .changelog-diff-title { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .changelog-diff-table { border-collapse: collapse; font-size: 13px; width: auto; }
+    .changelog-diff-table th, .changelog-diff-table td {
+      text-align: left; padding: 5px 16px 5px 0; border-bottom: 1px solid var(--line); white-space: nowrap;
+    }
+    .changelog-diff-table th { color: var(--muted); font-weight: 600; }
+    .changelog-diff-table td.diff-old { color: var(--muted); }
+    .changelog-diff-table td.diff-now { color: var(--text); font-weight: 600; }
+    .changelog-diff-table td.diff-change { font-weight: 600; color: var(--muted); }
+    .changelog-diff-table td.diff-change.diff-up { color: var(--green); }
+    .changelog-diff-table td.diff-change.diff-down { color: var(--red); }
+
+    /* ---- Research-update tags ---- */
+    .update-tags { display: flex; gap: 6px; margin: 2px 0 6px; flex-wrap: wrap; }
+    .tag { font-size: 11px; padding: 1px 8px; border-radius: 999px; font-weight: 600; white-space: nowrap; }
+    .tag-bull { color: #052e16; background: var(--green); }
+    .tag-bear { color: #4c0519; background: var(--red); }
+    .tag-neutral { color: #451a03; background: var(--gold); }
+    .tag-horizon { color: var(--muted); background: transparent; border: 1px solid var(--line); }
+
+    /* ---- Core price call ---- */
+    .price-call { margin: 8px 0 4px; }
+    .pc-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+    .pc-dir { font-size: 16px; font-weight: 700; padding: 3px 12px; border-radius: 8px; }
+    .pc-bull { color: #052e16; background: var(--green); }
+    .pc-neutral-bull { color: #073527; background: #7fd4b0; }
+    .pc-neutral { color: #451a03; background: var(--gold); }
+    .pc-bear { color: #4c0519; background: var(--red); }
+    .pc-conf { display: flex; align-items: center; gap: 8px; }
+    .pc-conf-label { font-size: 12px; color: var(--muted); white-space: nowrap; }
+    .pc-meter { width: 90px; height: 7px; border-radius: 4px; background: var(--panel2); overflow: hidden; }
+    .pc-meter-fill { display: block; height: 100%; }
+    .pc-fill-bull { background: var(--green); }
+    .pc-fill-neutral-bull { background: #7fd4b0; }
+    .pc-fill-neutral { background: var(--gold); }
+    .pc-fill-bear { background: var(--red); }
+    .pc-meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+    .pc-meta b { color: var(--text); font-weight: 600; }
+    .pc-rationale { margin: 6px 0; padding-left: 18px; font-size: 13px; }
+    .pc-rationale li { margin: 3px 0; line-height: 1.5; }
+    .pc-delta { font-size: 12.5px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 8px; margin-top: 6px; line-height: 1.55; }
+    .pc-delta b { color: var(--text); }
   </style>
 </head>
 <body>
@@ -973,7 +1029,9 @@
         </div>
 
         <div class="card findings">
-          <div class="section-kicker" id="findingsKicker"></div>
+          <div class="section-kicker" id="priceCallKicker"></div>
+          <div class="price-call" id="priceCall"></div>
+          <div class="section-kicker" id="findingsKicker" style="margin-top:18px;"></div>
           <ol class="findings-list" id="findingsList"></ol>
           <div class="section-kicker" id="riskKicker" style="margin-top:18px;"></div>
           <div class="risk-grid" id="riskGrid"></div>
@@ -989,6 +1047,7 @@
         </span>
         <span class="changelog-hint" id="changelogHint"></span>
       </summary>
+      <div class="changelog-diff" id="changelogDiff"></div>
       <div class="changelog-tablewrap">
         <table class="changelog-table">
           <thead>
@@ -1136,6 +1195,9 @@
   ></script>
   <script>
     const HEIGHT_MESSAGE_TYPE = 'instap-research-topic-height';
+    // Bump DATA_VERSION on every weekly update so browsers/CDN never serve stale
+    // /data/*.csv / *.jsonl (nginx sends no cache-control on these static files).
+    const DATA_VERSION = '2026-07-24';
     const DATA_URL = '/data/global-lithium-database-2026.csv';
     const COMPANY_FINANCIALS_URL = '/data/company-financials.jsonl';
     const LANG_STORAGE_KEY = 'instap-global-lithium-lang';
@@ -1181,7 +1243,24 @@
           pipeline: '建设/开发样本',
           unit: 'kt LCE/年',
         },
-        findingsKicker: '核心结论',
+        priceCallKicker: '核心判断',
+        priceCall: {
+          directionLabel: '中性偏多',
+          tone: 'neutral-bull',
+          target: '¥14–16 万/吨（旺季看 15–18 万）',
+          horizon: '3–6 个月',
+          confidence: 60,
+          asOf: '2026-07-24',
+          rationale: [
+            '价格已跌逾 70% 至约 14.5 万元、逼近成本支撑，多机构称"见底迹象明显"；',
+            '库存持续去化（8.69 万吨、年内 -2.3 万吨），周转天数偏低，供需紧平衡；',
+            '8 月排产 304/317GWh 超预期、旺季临近，需求上修对冲供给放量；',
+            '但上半年供给 +40.9%、枧下窝/藏格/津巴新增量陆续到位，压制上行斜率。',
+          ],
+          previous: { date: '2026-04-15', directionLabel: '看涨', confidence: 70, target: '¥16 万+（柴油挤压推动上行）' },
+          delta: '较上次下调：4 月"澳洲柴油挤压→供给收缩→上行"未兑现，澳矿已集中到港、供给反而放量；但去库 + 旺季 + 见底支撑，维持中性偏多而非转空。',
+        },
+        findingsKicker: '分析框架',
         findings: [
           '<strong>供给曲线高度集中：</strong>边际价格更多取决于少数低成本盐湖与硬岩巨头能否按计划扩产、爬坡，而不是“资源够不够”。',
           '<strong>第一梯队资产集中：</strong>低成本锂资产仍以智利 Salar de Atacama、澳洲 Greenbushes / Pilbara / Wodgina / Mt Holland，以及阿根廷部分成熟盐湖为核心。',
@@ -1199,11 +1278,22 @@
         changelogKicker: '更新时间线',
         changelogHint: '展开 / 收起',
         changelogLatestPrefix: '最近更新',
+        changelogPrevPrefix: '上次更新',
         changelogHeaders: ['更新日期', '数据截止', '核心变化'],
+        changelogDiffTitle: '本次 vs 上次（精选关键项）',
+        changelogDiffHeaders: ['指标', '上次', '本次', '变化'],
         changelog: [
           {
             date: '2026-07-24',
+            prevDate: '2026-04-15',
             asOf: '行情 07-23/24 · 研报 5–7 月',
+            diffs: [
+              { label: '碳酸锂基准(万元/吨)', old: '~16', now: '14.5–15', change: '-9%' },
+              { label: '中矿资源 26E PE', old: '20.8x', now: '13.1x', change: '-37%' },
+              { label: '盐湖股份 26E PE', old: '16.5x', now: '12.3x', change: '-25%' },
+              { label: '雅化集团 26E 净利(亿)', old: '14.2', now: '30.3', change: '+114%' },
+              { label: '锂价判断', old: '看涨 · 70%', now: '中性偏多 · 60%', change: '下调' },
+            ],
             items: [
               '基准锂价 16 万 → 14.5–15 万元/吨；研报更新区新增两条（柴油牛论证伪 + 见底信号；需求上修 + 宜春环保 / 津巴 2027 / 消费税）。',
               '10 只 A 股 + ALB / SQM 市值 / 现价刷新，26E / 27E 远期 PE 按当日市值 mark-to-market；逐个公司核对研报后仅雅化上修全年净利（东吴 7/7：26-28E 30.3 / 35.8 / 39.2 亿），盐湖 / 藏格附 26H1 预告，其余沿用 4 月一致预期。',
@@ -1213,7 +1303,18 @@
         ],
         updatesKicker: '最新研报更新',
         updatesTitle: '从柴油牛论到再平衡：2026 年年中的最新判断',
-        updatesSubtitle: '前两条为 2026-07-24 基于 Caspian 行情 / 研报与公开信息的现状刷新；其后为 4 月以来的供给扰动、澳洲柴油、需求上修、库存与权益弹性判断脉络。',
+        updatesSubtitle: '前两条为 2026-07-24 基于 Caspian 行情 / 研报与公开信息的现状刷新；其后为 4 月以来的供给扰动、澳洲柴油、需求上修、库存与权益弹性判断脉络。（更新于 2026-07-24）',
+        // 与 researchUpdates 同序（最新在前）：tone 决定颜色，impact/horizon 为显示文案。
+        researchUpdateMeta: [
+          { impact: '中性', tone: 'neutral', horizon: '短期' },
+          { impact: '利多', tone: 'bull', horizon: '短期' },
+          { impact: '利多', tone: 'bull', horizon: '短期' },
+          { impact: '利多', tone: 'bull', horizon: '短期' },
+          { impact: '利多', tone: 'bull', horizon: '短期' },
+          { impact: '利多', tone: 'bull', horizon: '短期' },
+          { impact: '利多', tone: 'bull', horizon: '长期' },
+          { impact: '利多', tone: 'bull', horizon: '长期' },
+        ],
         researchUpdates: [
           {
             title: '2026-07 现状检验：柴油牛论未兑现，锂价回落但见底信号增强',
@@ -1323,7 +1424,7 @@
         },
         loading: '正在从项目仓库加载锂资源数据库…',
         tableTitle: '项目数据库',
-        tableSubtitle: '优先展示容量、储量/资源、成本、运输路线与扰动因素，适合快速做供给曲线和兑现率筛查。',
+        tableSubtitle: '优先展示容量、储量/资源、成本、运输路线与扰动因素，适合快速做供给曲线和兑现率筛查。数据更新时间 2026-07-24 · 高亮行为本次更新。',
         tableHeaders: [
           '项目',
           '国家',
@@ -1380,7 +1481,24 @@
           pipeline: 'Construction / development assets',
           unit: 'kt LCE / year',
         },
-        findingsKicker: 'Key Findings',
+        priceCallKicker: 'Core Call',
+        priceCall: {
+          directionLabel: 'Moderately bullish',
+          tone: 'neutral-bull',
+          target: 'RMB 145–160k/t (peak season 150–180k)',
+          horizon: '3–6 months',
+          confidence: 60,
+          asOf: '2026-07-24',
+          rationale: [
+            'Price is >70% off the peak at ~RMB 145k, near cost support; desks call the bottom "clearly visible";',
+            'Continued destocking (86.9kt, -23kt YTD) with low turnover days keeps the balance tight;',
+            'August schedules 304/317 GWh beat and peak season is near, offsetting supply ramps;',
+            'but H1 supply +40.9% and Jianxiawo / Zangge / Zimbabwe additions cap the upside slope.',
+          ],
+          previous: { date: '2026-04-15', directionLabel: 'Bullish', confidence: 70, target: 'RMB 160k+ (diesel-squeeze driven)' },
+          delta: 'Downgraded: April’s "Australian diesel squeeze → supply contraction → rally" did not play out (ore arrived in bulk, supply ramped); but destocking + peak season + a visible bottom keep it moderately bullish rather than bearish.',
+        },
+        findingsKicker: 'Analysis Framework',
         findings: [
           '<strong>The supply curve is highly concentrated:</strong> marginal pricing depends less on whether the world has enough lithium in the ground and more on whether a small group of low-cost brine and hard-rock leaders actually expand on schedule.',
           '<strong>Tier-one assets remain concentrated:</strong> the low-cost core still centers on Salar de Atacama in Chile, Greenbushes / Pilbara / Wodgina / Mt Holland in Australia, and a handful of mature Argentine brine operations.',
@@ -1398,11 +1516,22 @@
         changelogKicker: 'Update Log',
         changelogHint: 'expand / collapse',
         changelogLatestPrefix: 'Last updated',
+        changelogPrevPrefix: 'Previous',
         changelogHeaders: ['Date', 'Data as of', 'Core changes'],
+        changelogDiffTitle: 'This vs previous (selected)',
+        changelogDiffHeaders: ['Metric', 'Previous', 'Now', 'Change'],
         changelog: [
           {
             date: '2026-07-24',
+            prevDate: '2026-04-15',
             asOf: 'Quotes Jul 23/24 · research May–Jul',
+            diffs: [
+              { label: 'Carbonate base (RMB k/t)', old: '~160', now: '145–150', change: '-9%' },
+              { label: 'Sinomine 26E P/E', old: '20.8x', now: '13.1x', change: '-37%' },
+              { label: 'Salt Lake 26E P/E', old: '16.5x', now: '12.3x', change: '-25%' },
+              { label: 'Yahua 26E NPAT (RMB bn)', old: '1.42', now: '3.03', change: '+114%' },
+              { label: 'Lithium call', old: 'Bullish · 70%', now: 'Mod. bullish · 60%', change: 'Downgraded' },
+            ],
             items: [
               'Base lithium price 160k → 145–150k RMB/t; two new notes added to the research section (diesel bull case disproven + bottoming; demand upgrade + Yichun / Zimbabwe-2027 / consumption tax).',
               'Market caps / spot refreshed for 10 A-shares + ALB / SQM; 26E / 27E forward P/E marked to that day’s cap; after a per-company research check only Yahua’s full-year estimate was revised up (Soochow Jul 7: 26-28E RMB 3.03 / 3.58 / 3.92bn), Salt Lake / Zangge carry 1H26 preliminaries, the rest keep April consensus.',
@@ -1412,7 +1541,18 @@
         ],
         updatesKicker: 'Research Update',
         updatesTitle: 'From The Diesel Bull Case To Rebalancing: The Mid-2026 View',
-        updatesSubtitle: 'The first two notes are a 2026-07-24 refresh built from Caspian quotes / research and public data; the rest trace the April-onward arc of supply disruptions, Australian diesel, demand upgrades, inventory and equity leverage.',
+        updatesSubtitle: 'The first two notes are a 2026-07-24 refresh built from Caspian quotes / research and public data; the rest trace the April-onward arc of supply disruptions, Australian diesel, demand upgrades, inventory and equity leverage. (Updated 2026-07-24)',
+        // Index-aligned with researchUpdates (newest first): tone drives color, impact/horizon are labels.
+        researchUpdateMeta: [
+          { impact: 'Neutral', tone: 'neutral', horizon: 'Short-term' },
+          { impact: 'Bullish', tone: 'bull', horizon: 'Short-term' },
+          { impact: 'Bullish', tone: 'bull', horizon: 'Short-term' },
+          { impact: 'Bullish', tone: 'bull', horizon: 'Short-term' },
+          { impact: 'Bullish', tone: 'bull', horizon: 'Short-term' },
+          { impact: 'Bullish', tone: 'bull', horizon: 'Short-term' },
+          { impact: 'Bullish', tone: 'bull', horizon: 'Long-term' },
+          { impact: 'Bullish', tone: 'bull', horizon: 'Long-term' },
+        ],
         researchUpdates: [
           {
             title: 'July 2026 reality check: the diesel bull case did not play out, but the price looks closer to a bottom',
@@ -1522,7 +1662,7 @@
         },
         loading: 'Loading the lithium project database from the repository…',
         tableTitle: 'Project Database',
-        tableSubtitle: 'Capacity, resource base, cost, logistics and execution risks are shown first so the table can be used directly for supply-curve and delivery analysis.',
+        tableSubtitle: 'Capacity, resource base, cost, logistics and execution risks are shown first so the table can be used directly for supply-curve and delivery analysis. Data updated 2026-07-24; highlighted rows changed in this update.',
         tableHeaders: [
           'Project',
           'Country',
@@ -1619,30 +1759,30 @@
         quickTakeNote:
           '口径说明：已逐个公司核对 2026-05 以来研报——仅雅化集团有可比的全年净利上修（东吴 7/7，26-28E 30.3 / 35.8 / 39.2 亿，已更新），其余多数窗口内无新的全年绝对额预测，故净利预期沿用 4 月一致预期，并在备注附 26H1 业绩预告作为方向性信号。远期 26E / 27E PE 已统一按 2026-07-23 A 股总市值 ÷ 表内净利预期重算，PE 仅作再评级方向参考。24A / 25A 为披露期历史 PE 快照，个别公司（如赣锋）历史 PE 采用 MarketScreener 合并口径，与 A 股总市值口径不完全可比。锂盐、锂精矿、权益口径彼此不可完全横比，避免假精确。',
         domesticTitle: '国内锂资源 / 资源绑定型公司样本（10 家）',
-        domesticSubtitle: '单位：归母净利为百万元人民币；26E/27E PE 按 2026-07-23 收盘总市值 ÷ 表内净利预期重算（备注列附当日市值）；N.M. = 亏损导致 PE 无意义，N.A. = 公开覆盖不足。',
-        tableHeaders: ['公司', '24A净利', '25A净利', '26E净利', '27E净利', '24A PE', '25A PE', '26E PE', '27E PE', '备注 / 来源'],
+        domesticSubtitle: '单位：归母净利为百万元人民币；26E/27E PE 按 2026-07-23 收盘市值 ÷ 表内净利预期重算（市值列为当日收盘，¥亿）；净利与 PE 列按强弱热力着色（绿=相对强、红=相对弱）；N.M. = 亏损导致 PE 无意义，N.A. = 公开覆盖不足。',
+        tableHeaders: ['公司', '24A净利', '25A净利', '26E净利', '27E净利', '24A PE', '25A PE', '26E PE', '27E PE', '市值(¥亿)', '备注 / 来源'],
         domesticRows: [
-          ['天齐锂业', '-7,905', '463', '5,053', '4,921', '-6.9x', '140x', '15.7x', '16.1x', 'Greenbushes + SQM 敞口，全球资源中枢弹性。来源：MarketScreener。 市值 ¥795 亿（2026-07-23 收盘）。'],
-          ['赣锋锂业', '~-2,062', '~1,645', '~5,433', '~5,099', '-34x', '262x', '19.8x', '21.0x', '净利按 EPS×股本近似，自给率提升最明确。历史 PE 为 MarketScreener 合并口径。来源：MarketScreener UK。 市值 ¥1,073 亿（2026-07-23 收盘）。'],
-          ['盐湖股份', '4,663', '8,476', '11,816', '13,565', '~44x', '~24x', '12.3x', '10.8x', '低成本盐湖底仓标的；五矿入主、开源 7/24 首次覆盖测算约 12X、账面现金近 300 亿；26H1 预告归母净利 60–63 亿（+131%~143%）。来源：开源 / 国投 / MarketScreener。 市值 ¥1,459 亿（2026-07-23 收盘）。'],
-          ['藏格矿业', '2,580', '3,502', '5,732', '7,121', '~51x', '~34x', '21.8x', '17.5x', '麻米错提供第二成长曲线，钾锂铜三线并行；26H1 预告归母净利 35.5–37.5 亿（+97%~108%）。来源：国投 / MarketScreener / 新浪财经。 市值 ¥1,247 亿（2026-07-23 收盘）。'],
-          ['中矿资源', '~758', '~458', '~2,795', '~4,223', '33.8x', '124x', '13.1x', '8.7x', 'Bikita + Tanco + 锂盐扩张，自给率上升；津巴 2027 禁令确认。来源：MarketScreener。 市值 ¥366 亿（2026-07-23 收盘）。'],
-          ['永兴材料', '1,043', '825', '1,130', '1,569', '19.1x', '50.9x', '21.9x', '15.8x', '云母路线中成本控制较优。来源：MarketScreener。 市值 ¥247 亿（2026-07-23 收盘）。'],
-          ['盛新锂能', '~-622', '~-535', '~859', '~767', '-20x', '-35.1x', '32.4x', '36.3x', '高弹性但受津巴布韦政策约束。来源：MarketScreener。 市值 ¥278 亿（2026-07-23 收盘）。'],
-          ['雅化集团', '257', '485', '3,030', '3,580', '~108x', '57.7x', '6.8x', '5.7x', '资源绑定 + 氢氧化锂利润修复；东吴 7/7 上修 26-28E 净利至 30.3 / 35.8 / 39.2 亿（+379%/18%/10%）、锂盐出货全年约 12 万吨、自供比例升至 25%。来源：东吴证券 / MarketScreener。 市值 ¥206 亿（2026-07-23 收盘）。'],
-          ['天华新能', '848', '402', '461', '844', '22.8x', '114x', '108.8x', '59.4x', '矿端可比性弱于纯资源股。来源：MarketScreener。 市值 ¥502 亿（2026-07-23 收盘）。'],
-          ['融捷股份', '215', '279', 'N.A.', 'N.A.', '38.5x', '48.2x', 'N.A.', 'N.A.', '川西锂矿高弹性，但公开覆盖不足。来源：MarketScreener。 市值 ¥167 亿（2026-07-23 收盘）。'],
+          ['天齐锂业', '-7,905', '463', '5,053', '4,921', '-6.9x', '140x', '15.7x', '16.1x', '¥795', 'Greenbushes + SQM 敞口，全球资源中枢弹性。来源：MarketScreener。'],
+          ['赣锋锂业', '~-2,062', '~1,645', '~5,433', '~5,099', '-34x', '262x', '19.8x', '21.0x', '¥1,073', '净利按 EPS×股本近似，自给率提升最明确。历史 PE 为 MarketScreener 合并口径。来源：MarketScreener UK。'],
+          ['盐湖股份', '4,663', '8,476', '11,816', '13,565', '~44x', '~24x', '12.3x', '10.8x', '¥1,459', '低成本盐湖底仓标的；五矿入主、开源 7/24 首次覆盖测算约 12X、账面现金近 300 亿；26H1 预告归母净利 60–63 亿（+131%~143%）。来源：开源 / 国投 / MarketScreener。'],
+          ['藏格矿业', '2,580', '3,502', '5,732', '7,121', '~51x', '~34x', '21.8x', '17.5x', '¥1,247', '麻米错提供第二成长曲线，钾锂铜三线并行；26H1 预告归母净利 35.5–37.5 亿（+97%~108%）。来源：国投 / MarketScreener / 新浪财经。'],
+          ['中矿资源', '~758', '~458', '~2,795', '~4,223', '33.8x', '124x', '13.1x', '8.7x', '¥366', 'Bikita + Tanco + 锂盐扩张，自给率上升；津巴 2027 禁令确认。来源：MarketScreener。'],
+          ['永兴材料', '1,043', '825', '1,130', '1,569', '19.1x', '50.9x', '21.9x', '15.8x', '¥247', '云母路线中成本控制较优。来源：MarketScreener。'],
+          ['盛新锂能', '~-622', '~-535', '~859', '~767', '-20x', '-35.1x', '32.4x', '36.3x', '¥278', '高弹性但受津巴布韦政策约束。来源：MarketScreener。'],
+          ['雅化集团', '257', '485', '3,030', '3,580', '~108x', '57.7x', '6.8x', '5.7x', '¥206', '资源绑定 + 氢氧化锂利润修复；东吴 7/7 上修 26-28E 净利至 30.3 / 35.8 / 39.2 亿（+379%/18%/10%）、锂盐出货全年约 12 万吨、自供比例升至 25%。来源：东吴证券 / MarketScreener。'],
+          ['天华新能', '848', '402', '461', '844', '22.8x', '114x', '108.8x', '59.4x', '¥502', '矿端可比性弱于纯资源股。来源：MarketScreener。'],
+          ['融捷股份', '215', '279', 'N.A.', 'N.A.', '38.5x', '48.2x', 'N.A.', 'N.A.', '¥167', '川西锂矿高弹性，但公开覆盖不足。来源：MarketScreener。'],
         ],
         domesticNote:
           '怎么看：真正更接近“估值不贵 + 资源端扎实”的，是盐湖股份、藏格矿业、中矿资源、天齐锂业、雅化集团；更接近高弹性交易品的是赣锋、盛新、融捷、天华。行业双击空间不是平均分布，而是集中在低成本盐湖与自给率提升的一体化龙头。',
         globalTitle: '国际巨头样本（5 家）',
         globalSubtitle: '单位：归母净利为百万美元或百万澳元；26E/27E 以公司披露口径和一致预期近似整理。',
         globalRows: [
-          ['Albemarle', '-1,316', '-677', '1,033', '1,267', '-7.7x', '-24.6x', '25.5x', '20.9x', 'USD；资源端强，但加工端回报承压。来源：MarketScreener / Albemarle。 现价 $116.9（2026-07-24）。'],
-          ['SQM', '-404', '588', '~1,489', '~1,827', 'N.M.', '~43x', '~17x', '~14x', 'USD；全球低成本盐湖核心资产。来源：SQM / MarketScreener。 现价 $69.3（2026-07-24）。'],
-          ['Pilbara Minerals', '257', '-196', '422', '1,181', '36.3x', '-21.1x', '38.9x', '15.6x', 'AUD；纯正硬岩 Beta，P1000 是核心看点。来源：MarketScreener。'],
-          ['Mineral Resources', '114', '-896', '790', '739', '84.3x', '-4.7x', '14.2x', '13.7x', 'AUD；Wodgina / Mt Marion 成本改善中。来源：MarketScreener / MinRes。'],
-          ['IGO', '2.8', '-954.6', '215', '752.8', '1524x', '-3.31x', '30.5x', '7.76x', 'AUD；集团混合口径，锂业务并非纯口径。来源：MarketScreener。'],
+          ['Albemarle', '-1,316', '-677', '1,033', '1,267', '-7.7x', '-24.6x', '25.5x', '20.9x', '—', 'USD；资源端强，但加工端回报承压。来源：MarketScreener / Albemarle。 现价 $116.9（2026-07-24）。'],
+          ['SQM', '-404', '588', '~1,489', '~1,827', 'N.M.', '~43x', '~17x', '~14x', '—', 'USD；全球低成本盐湖核心资产。来源：SQM / MarketScreener。 现价 $69.3（2026-07-24）。'],
+          ['Pilbara Minerals', '257', '-196', '422', '1,181', '36.3x', '-21.1x', '38.9x', '15.6x', '—', 'AUD；纯正硬岩 Beta，P1000 是核心看点。来源：MarketScreener。'],
+          ['Mineral Resources', '114', '-896', '790', '739', '84.3x', '-4.7x', '14.2x', '13.7x', '—', 'AUD；Wodgina / Mt Marion 成本改善中。来源：MarketScreener / MinRes。'],
+          ['IGO', '2.8', '-954.6', '215', '752.8', '1524x', '-3.31x', '30.5x', '7.76x', '—', 'AUD；集团混合口径，锂业务并非纯口径。来源：MarketScreener。'],
         ],
         globalNote:
           '国际样本的启示：SQM 仍是低成本核心资产；Albemarle 的问题不是资源，而是加工端回报率，2026 年 2 月已宣布把 Kemerton 剩余运行产线转入 care and maintenance；Pilbara、MinRes、IGO 更像澳洲硬岩周期 Beta，对精矿价格变化更敏感。口径：国际样本盈利与 PE 仍为 4 月一致预期（ASX 标的暂无实时重算），ALB / SQM 已附 2026-07-24 现价（$116.9 / $69.3）。',
@@ -1769,30 +1909,30 @@
         quickTakeNote:
           'Method note: a per-company check of research since May 2026 found only Yahua with a comparable full-year upward revision (Soochow Jul 7, 26-28E RMB 3.03 / 3.58 / 3.92bn, already updated); most others had no new absolute full-year forecast in the window, so their net-profit estimates keep the April 15 consensus, with 1H26 preliminary results added to the notes as a directional signal. The forward 26E / 27E P/E is re-marked to the 2026-07-23 A-share market cap divided by those estimates, so it only signals the direction of the re-rating. 24A / 25A are historical P/E snapshots, and a few names (e.g. Ganfeng) carry a MarketScreener combined basis not fully comparable to the A-share market-cap basis. Lithium chemicals, concentrates and equity-accounted exposures are not fully comparable.',
         domesticTitle: 'China Lithium Resource / Resource-Linked Sample (10 names)',
-        domesticSubtitle: 'Unit: attributable net profit in RMB mn; 26E/27E P/E re-marked to the 2026-07-23 closing market cap over the April net-profit estimates (the comment column carries that day’s cap). N.M. = P/E not meaningful because of losses; N.A. = insufficient public coverage.',
-        tableHeaders: ['Company', '24A NPAT', '25A NPAT', '26E NPAT', '27E NPAT', '24A P/E', '25A P/E', '26E P/E', '27E P/E', 'Comment / Source'],
+        domesticSubtitle: 'Unit: attributable net profit in RMB mn; 26E/27E P/E re-marked to the 2026-07-23 closing market cap over the April net-profit estimates (the Mkt cap column is that day’s close, RMB bn). Net-profit and P/E columns are heat-shaded by strength (green = relatively strong, red = weak). N.M. = P/E not meaningful because of losses; N.A. = insufficient public coverage.',
+        tableHeaders: ['Company', '24A NPAT', '25A NPAT', '26E NPAT', '27E NPAT', '24A P/E', '25A P/E', '26E P/E', '27E P/E', 'Mkt cap ¥bn', 'Comment / Source'],
         domesticRows: [
-          ['Tianqi Lithium', '-7,905', '463', '5,053', '4,921', '-6.9x', '140x', '15.7x', '16.1x', 'Greenbushes + SQM exposure; rerating tied to global core-asset recovery. Source: MarketScreener. Mkt cap ~RMB 79.5bn (Jul 23, 2026).'],
-          ['Ganfeng Lithium', '~-2,062', '~1,645', '~5,433', '~5,099', '-34x', '262x', '19.8x', '21.0x', 'Net profit approximated from EPS × shares; self-sufficiency story is clearest. Historical P/E on a MarketScreener combined basis. Source: MarketScreener UK. Mkt cap ~RMB 107.3bn (Jul 23, 2026).'],
-          ['Salt Lake Industry', '4,663', '8,476', '11,816', '13,565', '~44x', '~24x', '12.3x', '10.8x', 'Core low-cost brine holding; Minmetals in control, Kaiyuan initiation Jul 24 pegs ~12x with ~RMB 30bn cash; 1H26 preliminary net profit RMB 6.0-6.3bn (+131~143%). Source: Kaiyuan / Guotou / MarketScreener. Mkt cap ~RMB 145.9bn (Jul 23, 2026).'],
-          ['Zangge Mining', '2,580', '3,502', '5,732', '7,121', '~51x', '~34x', '21.8x', '17.5x', 'Mamicuo adds a second growth curve, with parallel potash-lithium-copper lines; 1H26 preliminary net profit RMB 3.55-3.75bn (+97~108%). Source: Guotou / MarketScreener / Sina Finance. Mkt cap ~RMB 124.7bn (Jul 23, 2026).'],
-          ['Sinomine Resource', '~758', '~458', '~2,795', '~4,223', '33.8x', '124x', '13.1x', '8.7x', 'Bikita + Tanco + lithium chemical expansion drive self-sufficiency; Zimbabwe 2027 ban confirmed. Source: MarketScreener. Mkt cap ~RMB 36.6bn (Jul 23, 2026).'],
-          ['Yongxing Materials', '1,043', '825', '1,130', '1,569', '19.1x', '50.9x', '21.9x', '15.8x', 'Among the better-managed lepidolite routes. Source: MarketScreener. Mkt cap ~RMB 24.7bn (Jul 23, 2026).'],
-          ['Chengxin Lithium', '~-622', '~-535', '~859', '~767', '-20x', '-35.1x', '32.4x', '36.3x', 'High beta, but still highly exposed to Zimbabwe policy. Source: MarketScreener. Mkt cap ~RMB 27.8bn (Jul 23, 2026).'],
-          ['Yahua Group', '257', '485', '3,030', '3,580', '~108x', '57.7x', '6.8x', '5.7x', 'Resource-linked model plus LiOH earnings recovery; Soochow (Jul 7) lifted 26-28E net profit to RMB 3.03 / 3.58 / 3.92bn (+379%/18%/10%), lithium-salt shipments ~120kt for the year, self-supply up to 25%. Source: Soochow / MarketScreener. Mkt cap ~RMB 20.6bn (Jul 23, 2026).'],
-          ['Tianhua New Energy', '848', '402', '461', '844', '22.8x', '114x', '108.8x', '59.4x', 'Mine exposure is less directly comparable than pure resource plays. Source: MarketScreener. Mkt cap ~RMB 50.2bn (Jul 23, 2026).'],
-          ['Youngy', '215', '279', 'N.A.', 'N.A.', '38.5x', '48.2x', 'N.A.', 'N.A.', 'High-beta western Sichuan exposure, but public forward coverage is thin. Source: MarketScreener. Mkt cap ~RMB 16.7bn (Jul 23, 2026).'],
+          ['Tianqi Lithium', '-7,905', '463', '5,053', '4,921', '-6.9x', '140x', '15.7x', '16.1x', '¥79.5', 'Greenbushes + SQM exposure; rerating tied to global core-asset recovery. Source: MarketScreener.'],
+          ['Ganfeng Lithium', '~-2,062', '~1,645', '~5,433', '~5,099', '-34x', '262x', '19.8x', '21.0x', '¥107.3', 'Net profit approximated from EPS × shares; self-sufficiency story is clearest. Historical P/E on a MarketScreener combined basis. Source: MarketScreener UK.'],
+          ['Salt Lake Industry', '4,663', '8,476', '11,816', '13,565', '~44x', '~24x', '12.3x', '10.8x', '¥145.9', 'Core low-cost brine holding; Minmetals in control, Kaiyuan initiation Jul 24 pegs ~12x with ~RMB 30bn cash; 1H26 preliminary net profit RMB 6.0-6.3bn (+131~143%). Source: Kaiyuan / Guotou / MarketScreener.'],
+          ['Zangge Mining', '2,580', '3,502', '5,732', '7,121', '~51x', '~34x', '21.8x', '17.5x', '¥124.7', 'Mamicuo adds a second growth curve, with parallel potash-lithium-copper lines; 1H26 preliminary net profit RMB 3.55-3.75bn (+97~108%). Source: Guotou / MarketScreener / Sina Finance.'],
+          ['Sinomine Resource', '~758', '~458', '~2,795', '~4,223', '33.8x', '124x', '13.1x', '8.7x', '¥36.6', 'Bikita + Tanco + lithium chemical expansion drive self-sufficiency; Zimbabwe 2027 ban confirmed. Source: MarketScreener.'],
+          ['Yongxing Materials', '1,043', '825', '1,130', '1,569', '19.1x', '50.9x', '21.9x', '15.8x', '¥24.7', 'Among the better-managed lepidolite routes. Source: MarketScreener.'],
+          ['Chengxin Lithium', '~-622', '~-535', '~859', '~767', '-20x', '-35.1x', '32.4x', '36.3x', '¥27.8', 'High beta, but still highly exposed to Zimbabwe policy. Source: MarketScreener.'],
+          ['Yahua Group', '257', '485', '3,030', '3,580', '~108x', '57.7x', '6.8x', '5.7x', '¥20.6', 'Resource-linked model plus LiOH earnings recovery; Soochow (Jul 7) lifted 26-28E net profit to RMB 3.03 / 3.58 / 3.92bn (+379%/18%/10%), lithium-salt shipments ~120kt for the year, self-supply up to 25%. Source: Soochow / MarketScreener.'],
+          ['Tianhua New Energy', '848', '402', '461', '844', '22.8x', '114x', '108.8x', '59.4x', '¥50.2', 'Mine exposure is less directly comparable than pure resource plays. Source: MarketScreener.'],
+          ['Youngy', '215', '279', 'N.A.', 'N.A.', '38.5x', '48.2x', 'N.A.', 'N.A.', '¥16.7', 'High-beta western Sichuan exposure, but public forward coverage is thin. Source: MarketScreener.'],
         ],
         domesticNote:
           'How to read it: the names closest to “reasonable valuation plus solid resource depth” are Salt Lake, Zangge, Sinomine, Tianqi and Yahua. The names closer to pure trading beta are Ganfeng, Chengxin, Youngy and Tianhua. The rerating is not evenly distributed across the sector.',
         globalTitle: 'Global Majors Sample (5 names)',
         globalSubtitle: 'Unit: attributable net profit in USD mn or AUD mn, summarized from company disclosures and consensus framing.',
         globalRows: [
-          ['Albemarle', '-1,316', '-677', '1,033', '1,267', '-7.7x', '-24.6x', '25.5x', '20.9x', 'USD; strong resource base, weaker conversion returns. Source: MarketScreener / Albemarle. Spot $116.9 (Jul 24, 2026).'],
-          ['SQM', '-404', '588', '~1,489', '~1,827', 'N.M.', '~43x', '~17x', '~14x', 'USD; global core low-cost brine asset. Source: SQM / MarketScreener. Spot $69.3 (Jul 24, 2026).'],
-          ['Pilbara Minerals', '257', '-196', '422', '1,181', '36.3x', '-21.1x', '38.9x', '15.6x', 'AUD; pure hard-rock beta with P1000 as the key catalyst. Source: MarketScreener.'],
-          ['Mineral Resources', '114', '-896', '790', '739', '84.3x', '-4.7x', '14.2x', '13.7x', 'AUD; Wodgina / Mt Marion costs are improving. Source: MarketScreener / MinRes.'],
-          ['IGO', '2.8', '-954.6', '215', '752.8', '1524x', '-3.31x', '30.5x', '7.76x', 'AUD; conglomerate framing, not a pure lithium line. Source: MarketScreener.'],
+          ['Albemarle', '-1,316', '-677', '1,033', '1,267', '-7.7x', '-24.6x', '25.5x', '20.9x', '—', 'USD; strong resource base, weaker conversion returns. Source: MarketScreener / Albemarle. Spot $116.9 (Jul 24, 2026).'],
+          ['SQM', '-404', '588', '~1,489', '~1,827', 'N.M.', '~43x', '~17x', '~14x', '—', 'USD; global core low-cost brine asset. Source: SQM / MarketScreener. Spot $69.3 (Jul 24, 2026).'],
+          ['Pilbara Minerals', '257', '-196', '422', '1,181', '36.3x', '-21.1x', '38.9x', '15.6x', '—', 'AUD; pure hard-rock beta with P1000 as the key catalyst. Source: MarketScreener.'],
+          ['Mineral Resources', '114', '-896', '790', '739', '84.3x', '-4.7x', '14.2x', '13.7x', '—', 'AUD; Wodgina / Mt Marion costs are improving. Source: MarketScreener / MinRes.'],
+          ['IGO', '2.8', '-954.6', '215', '752.8', '1524x', '-3.31x', '30.5x', '7.76x', '—', 'AUD; conglomerate framing, not a pure lithium line. Source: MarketScreener.'],
         ],
         globalNote:
           'Takeaway: SQM still looks like the cleanest low-cost core asset. Albemarle’s issue is not resource quality but conversion economics, and in February 2026 it announced that the remaining operating Kemerton train would be placed into care and maintenance. Pilbara, MinRes and IGO are closer to Australian hard-rock beta. Note: the global sample keeps April consensus earnings and P/E (no live re-mark for the ASX names); ALB / SQM carry the 2026-07-24 spot ($116.9 / $69.3).',
@@ -2907,19 +3047,58 @@
         .join('');
     }
 
+    // Parse a metric cell ("~2,795", "13.1x", "-6.9x", "N.M.", "—") to a number or null.
+    function parseMetricValue(value) {
+      if (value == null) return null;
+      const raw = String(value);
+      if (/N\.?M\.?|N\.?A\.?|待补|—/.test(raw)) return null;
+      const n = parseFloat(raw.replace(/[~,x×\s]/g, ''));
+      return Number.isFinite(n) ? n : null;
+    }
+
+    // strength in [0,1] (1 = strongest) -> subtle green->amber->red cell background.
+    function heatBg(strength) {
+      const hue = Math.max(0, Math.min(130, strength * 130)); // 0 red, 65 amber, 130 green
+      return `background:hsla(${hue.toFixed(0)}, 70%, 45%, 0.22);`;
+    }
+
     function renderMetricsTable(headEl, bodyEl, headers, rows) {
       headEl.innerHTML = headers.map((label) => `<th>${escapeHtml(label)}</th>`).join('');
+
+      // Per-column strength over the 8 metric columns (row indices 1..8):
+      // net-profit cols (0-3) higher = stronger; PE cols (4-7) lower positive = stronger.
+      const isPE = (c) => c >= 4;
+      const colRange = [];
+      for (let c = 0; c < 8; c += 1) {
+        const vals = rows
+          .map((r) => parseMetricValue(r[c + 1]))
+          .filter((v) => v !== null && (isPE(c) ? v > 0 : true));
+        colRange[c] = vals.length ? { min: Math.min(...vals), max: Math.max(...vals) } : null;
+      }
+
       bodyEl.innerHTML = rows
         .map((row) => {
           const [name, ...rest] = row;
           const metrics = rest.slice(0, 8)
-            .map((value) => `<td class="num">${escapeHtml(value)}</td>`)
+            .map((value, c) => {
+              const v = parseMetricValue(value);
+              const range = colRange[c];
+              let style = '';
+              if (v !== null && range && range.max > range.min && (!isPE(c) || v > 0)) {
+                const t = (v - range.min) / (range.max - range.min);
+                const strength = isPE(c) ? 1 - t : t; // PE: lower = cheaper = stronger
+                style = ` style="${heatBg(strength)}"`;
+              }
+              return `<td class="num"${style}>${escapeHtml(value)}</td>`;
+            })
             .join('');
-          const note = rest[8];
+          const marketCap = rest[8];
+          const note = rest[9];
           return `
             <tr>
               <td class="company-name">${escapeHtml(name)}</td>
               ${metrics}
+              <td class="num mktcap">${escapeHtml(marketCap)}</td>
               <td>${escapeHtml(note)}</td>
             </tr>
           `;
@@ -2954,7 +3133,7 @@
     }
 
     async function loadCompanyFinancials() {
-      const response = await fetch(COMPANY_FINANCIALS_URL);
+      const response = await fetch(`${COMPANY_FINANCIALS_URL}?v=${DATA_VERSION}`);
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
@@ -2972,7 +3151,9 @@
 
     function buildFinanceTableRows(baseRows) {
       return baseRows.map((row) => {
-        const [companyName, , , , , , , , , fallbackNote] = row;
+        const companyName = row[0];
+        const fallbackCap = row[9];
+        const fallbackNote = row[10];
         const record = getCompanyFinanceRecord(companyName);
 
         if (!record?.finance) {
@@ -2981,6 +3162,7 @@
 
         const netProfit = record.finance.display?.netProfit || ['待补', '待补', '待补', '待补'];
         const forwardPE = record.finance.display?.forwardPE || ['待补', '待补', '待补', '待补'];
+        const marketCap = record.finance.display?.marketCap || fallbackCap || '—';
         const note = record.finance.notes?.[currentLang] || fallbackNote || record.finance.note || '—';
 
         return [
@@ -2993,6 +3175,7 @@
           forwardPE[1] || '待补',
           forwardPE[2] || '待补',
           forwardPE[3] || '待补',
+          marketCap,
           note,
         ];
       });
@@ -3104,6 +3287,34 @@
       document.getElementById('statCurrentCapacityUnit').textContent = t.stats.unit;
       document.getElementById('statPlannedCapacityUnit').textContent = t.stats.unit;
 
+      // Core price call: direction + confidence + rationale + comparison vs previous update.
+      document.getElementById('priceCallKicker').textContent = t.priceCallKicker;
+      const pc = t.priceCall;
+      const pcEl = document.getElementById('priceCall');
+      if (pc) {
+        const L = currentLang === 'zh'
+          ? { conf: '置信度', target: '目标', horizon: '时间', vs: '较上次' }
+          : { conf: 'Confidence', target: 'Target', horizon: 'Horizon', vs: 'vs previous' };
+        pcEl.innerHTML = `
+          <div class="pc-head">
+            <span class="pc-dir pc-${pc.tone}">${escapeHtml(pc.directionLabel)}</span>
+            <span class="pc-conf">
+              <span class="pc-conf-label">${L.conf} ${pc.confidence}%</span>
+              <span class="pc-meter"><span class="pc-meter-fill pc-fill-${pc.tone}" style="width:${Math.max(0, Math.min(100, pc.confidence))}%"></span></span>
+            </span>
+          </div>
+          <div class="pc-meta">
+            <span><b>${L.target}:</b> ${escapeHtml(pc.target)}</span>
+            <span><b>${L.horizon}:</b> ${escapeHtml(pc.horizon)}</span>
+          </div>
+          <ul class="pc-rationale">${(pc.rationale || []).map((r) => `<li>${escapeHtml(r)}</li>`).join('')}</ul>
+          <div class="pc-delta">
+            <b>${L.vs} (${escapeHtml(pc.previous?.date || '')}):</b>
+            ${escapeHtml(pc.previous?.directionLabel || '')} · ${pc.previous?.confidence ?? ''}% →
+            <b>${escapeHtml(pc.directionLabel)} · ${pc.confidence}%</b><br>${escapeHtml(pc.delta || '')}
+          </div>`;
+      }
+
       document.getElementById('findingsKicker').textContent = t.findingsKicker;
       findingsList.innerHTML = t.findings.map((item) => `<li>${item}</li>`).join('');
       document.getElementById('riskKicker').textContent = t.riskKicker;
@@ -3112,10 +3323,41 @@
       const changelog = t.changelog || [];
       document.getElementById('changelogKicker').textContent = t.changelogKicker;
       document.getElementById('changelogHint').textContent = t.changelogHint;
+      const latest = changelog[0];
       const changelogLatestEl = document.getElementById('changelogLatest');
-      changelogLatestEl.innerHTML = changelog.length
-        ? `${escapeHtml(t.changelogLatestPrefix)} <b>${escapeHtml(changelog[0].date)}</b>`
+      changelogLatestEl.innerHTML = latest
+        ? `${escapeHtml(t.changelogLatestPrefix)} <b>${escapeHtml(latest.date)}</b>`
+          + (latest.prevDate ? ` · ${escapeHtml(t.changelogPrevPrefix)} ${escapeHtml(latest.prevDate)}` : '')
         : '';
+
+      // Diff table for the latest entry: 指标 | 上次 | 本次 | 变化 (curated key metrics).
+      const diffEl = document.getElementById('changelogDiff');
+      if (latest && latest.diffs && latest.diffs.length) {
+        const changeClass = (c) => {
+          const s = String(c);
+          if (/^-|下调|↓|Downgrad/.test(s)) return 'diff-down';
+          if (/^\+|上调|↑|Upgrad/.test(s)) return 'diff-up';
+          return '';
+        };
+        diffEl.innerHTML = `
+          <div class="changelog-diff-title">${escapeHtml(t.changelogDiffTitle)}</div>
+          <table class="changelog-diff-table">
+            <thead><tr>${(t.changelogDiffHeaders || [])
+              .map((h) => `<th>${escapeHtml(h)}</th>`)
+              .join('')}</tr></thead>
+            <tbody>${latest.diffs
+              .map((d) => `<tr>
+                <td>${escapeHtml(d.label)}</td>
+                <td class="diff-old">${escapeHtml(d.old)}</td>
+                <td class="diff-now">${escapeHtml(d.now)}</td>
+                <td class="diff-change ${changeClass(d.change)}">${escapeHtml(d.change)}</td>
+              </tr>`)
+              .join('')}</tbody>
+          </table>`;
+      } else {
+        diffEl.innerHTML = '';
+      }
+
       document.getElementById('changelogHead').innerHTML = (t.changelogHeaders || [])
         .map((label) => `<th>${escapeHtml(label)}</th>`)
         .join('');
@@ -3138,9 +3380,15 @@
       document.getElementById('updatesSubtitle').textContent = t.updatesSubtitle;
       updatesGrid.innerHTML = t.researchUpdates
         .map(
-          (item, index) => `
+          (item, index) => {
+          const meta = (t.researchUpdateMeta && t.researchUpdateMeta[index]) || null;
+          const tags = meta
+            ? `<div class="update-tags"><span class="tag tag-${meta.tone}">${escapeHtml(meta.impact)}</span><span class="tag tag-horizon">${escapeHtml(meta.horizon)}</span></div>`
+            : '';
+          return `
             <article class="update-card">
               <div class="update-index">${index + 1}</div>
+              ${tags}
               <h3 class="update-title">${escapeHtml(item.title)}</h3>
               <p class="update-body">${escapeHtml(item.body)}</p>
               ${
@@ -3152,8 +3400,8 @@
               }
               ${item.note ? `<p class="update-note">${escapeHtml(item.note)}</p>` : ''}
             </article>
-          `
-        )
+          `;
+        })
         .join('');
 
       searchBox.placeholder = t.searchPlaceholder;
@@ -3337,8 +3585,15 @@
 
       for (const item of data) {
         const tr = document.createElement('tr');
+        const isUpdated = item.updated && item.updated === DATA_VERSION;
+        if (isUpdated) {
+          tr.className = 'row-updated';
+        }
+        const updatedPill = isUpdated
+          ? `<span class="db-updated-pill">🔄 ${currentLang === 'zh' ? '本次更新' : 'Updated'}</span>`
+          : '';
         tr.innerHTML = `
-          <td>${escapeHtml(localizeValue(item.project, 'project', currentLang))}</td>
+          <td>${escapeHtml(localizeValue(item.project, 'project', currentLang))}${updatedPill}</td>
           <td>${renderCountryPill(item.country)}</td>
           <td>${escapeHtml(listedOwnerLabel(item.project, currentLang))}</td>
           <td>${renderStatusPill(item)}</td>
@@ -3431,7 +3686,7 @@
       renderStaticText();
 
       try {
-        const response = await fetch(DATA_URL);
+        const response = await fetch(`${DATA_URL}?v=${DATA_VERSION}`);
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}`);
         }
