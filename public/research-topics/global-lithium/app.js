@@ -4,7 +4,9 @@
 // Native ES modules, no bundler, mirroring public/research-topics/semiconductor-upstream/.
 // Pure data and parsing live in ./data/*.js so scripts/ can import the same code.
 
-import { HEIGHT_MESSAGE_TYPE, DATA_URL, COMPANY_FINANCIALS_URL } from './data/config.js';
+import {
+  HEIGHT_MESSAGE_TYPE, DATA_URL, COMPANY_FINANCIALS_URL, MARKET_URL,
+} from './data/config.js';
 import { DATA_CACHE_KEY, UPDATE_MARKER } from './core/version.js';
 import { colorMap, countryPillColors } from './data/palette.js';
 import {
@@ -24,6 +26,7 @@ import { createUrlSync, decodeState } from './core/url-state.js';
 import { assertViewConsistency } from './core/invariants.js';
 import { VIEWS, DEFAULT_VIEW, isValidView } from './views/registry.js';
 import { renderEmptyState, renderGapRegister } from './components/empty-state.js';
+import { renderMetricGrid } from './components/metric.js';
 import { GAPS, GAP_REGISTER_ORDER } from './data/gaps.js';
 
 // The bilingual UI toggle was removed: the page is Chinese-only. The English strings stay
@@ -114,6 +117,11 @@ const lineLayer = L.layerGroup().addTo(map);
 let rawData = [];
 let lastErrorMessage = '';
 let companyFinanceIndex = new Map();
+
+// Layer C. Null until /data/global-lithium-market.json arrives; every consumer checks,
+// because a failed fetch must degrade to a stated "unavailable" rather than to prose that
+// silently omits the core call.
+let market = null;
 
 // Single source of truth for view state.
 //
@@ -698,12 +706,12 @@ function renderStaticText() {
 
   // Core price call: direction + confidence + rationale + comparison vs previous update.
   document.getElementById('priceCallKicker').textContent = t.priceCallKicker;
-  const pc = t.priceCall;
+  const pc = market?.priceCall;
   const pcEl = document.getElementById('priceCall');
-  if (pc) {
-    const L = currentLang === 'zh'
-      ? { conf: '置信度', target: '目标', horizon: '时间', vs: '较上次' }
-      : { conf: 'Confidence', target: 'Target', horizon: 'Horizon', vs: 'vs previous' };
+  if (!pc) {
+    pcEl.innerHTML = `<p class="market-unavailable">${escapeHtml(t.marketUnavailable)}</p>`;
+  } else {
+    const L = { conf: '置信度', target: '目标', horizon: '时间', vs: '较上次' };
     pcEl.innerHTML = `
       <div class="pc-head">
         <span class="pc-dir pc-${pc.tone}">${escapeHtml(pc.directionLabel)}</span>
@@ -715,6 +723,8 @@ function renderStaticText() {
       <div class="pc-meta">
         <span><b>${L.target}:</b> ${escapeHtml(pc.target)}</span>
         <span><b>${L.horizon}:</b> ${escapeHtml(pc.horizon)}</span>
+        <span><b>口径:</b> ${escapeHtml(pc.basis)}</span>
+        <span><b>as of:</b> ${escapeHtml(pc.asOf)}</span>
       </div>
       <ul class="pc-rationale">${(pc.rationale || []).map((r) => `<li>${escapeHtml(r)}</li>`).join('')}</ul>
       <div class="pc-delta">
@@ -724,20 +734,29 @@ function renderStaticText() {
       </div>`;
   }
 
+  // Key metrics: the only numbers on this page that carry their own provenance envelope.
+  // Rendered exclusively through components/metric.js — see that file for why.
+  document.getElementById('keyMetricsKicker').textContent = market?.keyMetricsTitle || '关键指标';
+  document.getElementById('keyMetricsNote').textContent = market?.keyMetricsNote || '';
+  document.getElementById('keyMetricsGrid').innerHTML = market?.keyMetrics?.length
+    ? renderMetricGrid(market.keyMetrics, market.meta.asOf)
+    : `<p class="market-unavailable">${escapeHtml(t.marketUnavailable)}</p>`;
+
   document.getElementById('findingsKicker').textContent = t.findingsKicker;
   findingsList.innerHTML = t.findings.map((item) => `<li>${item}</li>`).join('');
   document.getElementById('riskKicker').textContent = t.riskKicker;
   riskGrid.innerHTML = t.risks.map((item) => `<div class="risk-pill">${escapeHtml(item)}</div>`).join('');
   // Update log (changelog) — pinned collapsible table at the top of the page.
-  const changelog = t.changelog || [];
+  const changelog = market?.changelog || [];
   document.getElementById('changelogKicker').textContent = t.changelogKicker;
   document.getElementById('changelogHint').textContent = t.changelogHint;
   const latest = changelog[0];
   const changelogLatestEl = document.getElementById('changelogLatest');
+  // An empty update log is indistinguishable from "nothing has ever changed". Say why.
   changelogLatestEl.innerHTML = latest
     ? `${escapeHtml(t.changelogLatestPrefix)} <b>${escapeHtml(latest.date)}</b>`
       + (latest.prevDate ? ` · ${escapeHtml(t.changelogPrevPrefix)} ${escapeHtml(latest.prevDate)}` : '')
-    : '';
+    : '<span class="changelog-unavailable">更新日志数据不可用</span>';
 
   // Diff table for the latest entry: 指标 | 上次 | 本次 | 变化 (curated key metrics).
   const diffEl = document.getElementById('changelogDiff');
@@ -785,14 +804,20 @@ function renderStaticText() {
     .join('');
 
   document.getElementById('updatesKicker').textContent = t.updatesKicker;
-  document.getElementById('updatesTitle').textContent = t.updatesTitle;
-  document.getElementById('updatesSubtitle').textContent = t.updatesSubtitle;
-  updatesGrid.innerHTML = t.researchUpdates
+  document.getElementById('updatesTitle').textContent = market?.updatesTitle || '';
+  document.getElementById('updatesSubtitle').textContent = market?.updatesSubtitle
+    ? `${market.updatesSubtitle}（数据整理于 ${market.meta.asOf}）`
+    : '';
+  // impact / tone / horizon are INLINE on each card. They used to live in a parallel
+  // `researchUpdateMeta` array addressed by index, so inserting one card at the top
+  // silently shifted every label onto the wrong story.
+  updatesGrid.innerHTML = !market?.researchUpdates?.length
+    ? `<p class="market-unavailable">${escapeHtml(t.marketUnavailable)}</p>`
+    : market.researchUpdates
     .map(
       (item, index) => {
-      const meta = (t.researchUpdateMeta && t.researchUpdateMeta[index]) || null;
-      const tags = meta
-        ? `<div class="update-tags"><span class="tag tag-${meta.tone}">${escapeHtml(meta.impact)}</span><span class="tag tag-horizon">${escapeHtml(meta.horizon)}</span></div>`
+      const tags = item.impact
+        ? `<div class="update-tags"><span class="tag tag-${item.tone}">${escapeHtml(item.impact)}</span><span class="tag tag-horizon">${escapeHtml(item.horizon)}</span></div>`
         : '';
       return `
         <article class="update-card">
@@ -815,7 +840,8 @@ function renderStaticText() {
 
   searchBox.placeholder = t.searchPlaceholder;
   document.getElementById('tableTitle').textContent = t.tableTitle;
-  document.getElementById('tableSubtitle').textContent = t.tableSubtitle;
+  document.getElementById('tableSubtitle').textContent =
+    t.tableSubtitle.replace('{updateMarker}', UPDATE_MARKER);
   tableScrollHint.textContent = t.tableScrollHint;
   footnoteEl.innerHTML = t.footnote;
   loadingNote.textContent = t.loading;
@@ -1072,12 +1098,29 @@ function render(state) {
   notifyParentHeight();
 }
 
+async function loadMarket() {
+  const response = await fetch(`${MARKET_URL}?v=${DATA_CACHE_KEY}`);
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
+}
+
 async function init() {
-  try {
-    await loadCompanyFinancials();
-  } catch (error) {
-    console.error('Failed to load shared company financials', error);
+  // Both are independent of the CSV and of each other, so they race rather than queue —
+  // and each failure is isolated: a missing market file must not cost us the project
+  // database, and vice versa.
+  const [financials, marketResult] = await Promise.allSettled([
+    loadCompanyFinancials(),
+    loadMarket(),
+  ]);
+
+  if (financials.status === 'rejected') {
+    console.error('Failed to load shared company financials', financials.reason);
     companyFinanceIndex = new Map();
+  }
+  if (marketResult.status === 'fulfilled') {
+    market = marketResult.value;
+  } else {
+    console.error('Failed to load market data', marketResult.reason);
   }
 
   renderStaticText();

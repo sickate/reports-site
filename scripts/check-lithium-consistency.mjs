@@ -25,11 +25,15 @@ import { listedOwners } from '../public/research-topics/global-lithium/data/list
 import {
   CODE_VERSION, DATA_CACHE_KEY, UPDATE_MARKER,
 } from '../public/research-topics/global-lithium/core/version.js';
+import {
+  validateMetric, classifyFreshness,
+} from '../public/research-topics/global-lithium/data/market-schema.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 
 const CSV_PATH = path.join(ROOT, 'public/data/global-lithium-database-2026.csv');
+const MARKET_PATH = path.join(ROOT, 'public/data/global-lithium-market.json');
 const INDEX_HTML_PATH = path.join(ROOT, 'public/research-topics/global-lithium/index.html');
 const WRAPPER_PATH = path.join(ROOT, 'src/reports/2026-04-global-lithium/index.jsx');
 const REGISTRY_PATH = path.join(ROOT, 'src/reports/index.js');
@@ -190,7 +194,74 @@ async function checkVersions() {
   if (!marked) warn(`no CSV row has updated="${UPDATE_MARKER}" — no "本次更新" pill will render`);
 }
 
+/**
+ * The market file is loaded at RUNTIME from /data/, so a malformed one is not a build
+ * error in any other sense — it just makes the cockpit render "unavailable" in production.
+ * Validating it here turns that into a build failure while it is still cheap to fix.
+ */
+async function checkMarket() {
+  let market;
+  try {
+    market = JSON.parse(await readFile(MARKET_PATH, 'utf8'));
+  } catch (error) {
+    fail(`global-lithium-market.json: ${error.message}`);
+    return null;
+  }
+
+  const reference = market.meta?.asOf;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(reference || '')) {
+    fail(`market.meta.asOf "${reference}" is not YYYY-MM-DD — every freshness badge is measured against it`);
+    return market;
+  }
+  if (reference < UPDATE_MARKER) {
+    fail(`market.meta.asOf ${reference} predates UPDATE_MARKER ${UPDATE_MARKER}`);
+  }
+
+  const metrics = market.keyMetrics || [];
+  if (!metrics.length) warn('market.keyMetrics is empty — the cockpit metric grid will be blank');
+
+  const ids = new Set();
+  metrics.forEach((metric, i) => {
+    for (const problem of validateMetric(metric, `keyMetrics[${i}] "${metric?.label ?? '?'}"`)) {
+      fail(problem);
+    }
+    if (metric?.id) {
+      if (ids.has(metric.id)) fail(`duplicate metric id "${metric.id}"`);
+      ids.add(metric.id);
+    }
+    // A metric can be legitimately old (an April consensus in a July update) — that is what
+    // the badge is for. Surfacing it as a warning keeps it a decision rather than a drift.
+    if (metric?.asOf && metric.series
+      && classifyFreshness(metric.asOf, reference, metric.series) === 'stale') {
+      warn(`metric "${metric.label}" is stale (asOf ${metric.asOf} vs ${reference})`);
+    }
+  });
+
+  // The changelog's newest entry is what the header renders as "最近更新". If it were
+  // out of order the page would advertise an old date as the latest one.
+  const dates = (market.changelog || []).map((e) => e.date);
+  const sorted = [...dates].sort().reverse();
+  if (dates.join() !== sorted.join()) {
+    fail(`market.changelog is not newest-first: ${dates.join(' , ')}`);
+  }
+  if (dates.length && dates[0] !== reference) {
+    warn(`newest changelog entry ${dates[0]} != market.meta.asOf ${reference}`);
+  }
+
+  // impact/tone/horizon are inline per card now. A card missing them renders with no
+  // badges at all, which reads as "no view expressed" rather than as a data omission.
+  (market.researchUpdates || []).forEach((u, i) => {
+    if (!u.title || !u.body) fail(`researchUpdates[${i}] missing title/body`);
+    if (!u.impact || !u.tone || !u.horizon) {
+      fail(`researchUpdates[${i}] ("${u.title}") missing impact/tone/horizon`);
+    }
+  });
+
+  return market;
+}
+
 const projects = await checkCsv();
+const market = await checkMarket();
 checkCompanyRows();
 await checkVersions();
 
@@ -205,6 +276,7 @@ if (errors.length) {
 
 console.log(
   `✓ global-lithium consistency: ${projects?.length ?? 0} projects, `
-  + `${companyResearchContent.zh.domesticRows.length + companyResearchContent.zh.globalRows.length} company rows`
+  + `${companyResearchContent.zh.domesticRows.length + companyResearchContent.zh.globalRows.length} company rows, `
+  + `${market?.keyMetrics?.length ?? 0} metrics`
   + (warnings.length ? `, ${warnings.length} warning(s)` : '')
 );
