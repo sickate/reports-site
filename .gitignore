@@ -29,4 +29,7 @@ npm-debug.log*
 # Cache
 .cache/
 
+# Playwright MCP scratch output (screenshots, page snapshots, downloaded files)
+.playwright-mcp/
+
 tmp/
