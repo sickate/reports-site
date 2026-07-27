@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 import { companyFinanceData } from '../public/research-topics/semiconductor-upstream/data/company-finance.js';
 import { sections as semiconductorSections } from '../public/research-topics/semiconductor-upstream/data/sections.js';
+import { companyResearchContent as globalLithiumResearchContent } from '../public/research-topics/global-lithium/data/company-research.js';
 import { keyMetrics, sensitivityMatrix } from '../src/reports/2026-02-zijin-mining/data/zijinData.js';
 import { opticalCompanyFinanceRecords } from '../src/reports/2026-04-optical-value-chain/data/company-finance.js';
 
@@ -13,7 +14,7 @@ const OUTPUT_PATH = path.join(ROOT, 'public/data/company-financials.jsonl');
 const SEMICONDUCTOR_SUBSEGMENTS_OUTPUT_PATH = path.join(ROOT, 'public/data/semiconductor-upstream-subsegments.jsonl');
 const SEMICONDUCTOR_EXPOSURES_OUTPUT_PATH = path.join(ROOT, 'public/data/semiconductor-upstream-company-exposures.jsonl');
 const SEMICONDUCTOR_RESEARCH_DRAFT_DIR = path.join(ROOT, 'researches/semiconductor-upstream');
-const GLOBAL_LITHIUM_PATH = path.join(ROOT, 'public/research-topics/global-lithium-projects-2026.html');
+const GLOBAL_LITHIUM_SOURCE_PATH = '/public/research-topics/global-lithium/data/company-research.js';
 
 function normalizeId(value) {
   return String(value ?? '')
@@ -94,22 +95,6 @@ function parseApproxNumber(rawValue) {
     approx,
     raw,
   };
-}
-
-function extractObjectLiteral(source, startMarker, endMarker) {
-  const start = source.indexOf(startMarker);
-  const end = source.indexOf(endMarker, start);
-
-  if (start === -1 || end === -1) {
-    throw new Error(`Unable to locate object literal between ${startMarker} and ${endMarker}`);
-  }
-
-  const expression = source
-    .slice(start + startMarker.length, end)
-    .trim()
-    .replace(/;\s*$/, '');
-
-  return Function(`"use strict"; return (${expression});`)();
 }
 
 function buildSemiconductorSubsegmentRecords() {
@@ -303,22 +288,22 @@ function buildGlobalLithiumRecord(row, options) {
         zh: note,
         en: englishNote || note,
       },
-      sourcePath: '/public/research-topics/global-lithium-projects-2026.html',
+      sourcePath: GLOBAL_LITHIUM_SOURCE_PATH,
     },
   };
 }
 
-async function buildGlobalLithiumRecords() {
-  const source = await readFile(GLOBAL_LITHIUM_PATH, 'utf8');
-  const companyResearchContent = extractObjectLiteral(
-    source,
-    'const companyResearchContent =',
-    'const dictionaries ='
-  );
-  const zhDomesticRows = companyResearchContent.zh.domesticRows;
-  const zhGlobalRows = companyResearchContent.zh.globalRows;
-  const enDomesticRows = companyResearchContent.en.domesticRows;
-  const enGlobalRows = companyResearchContent.en.globalRows;
+// Previously this string-sliced the report HTML between the literals
+// `const companyResearchContent =` and `const dictionaries =`, then eval'd the result —
+// renaming or reordering either declaration silently broke the build. The rows now live in
+// their own ES module, so this is a plain import: a syntax error there surfaces as a real
+// module parse error with a line number instead of "Unable to locate object literal".
+function buildGlobalLithiumRecords() {
+  const { zh, en } = globalLithiumResearchContent;
+  const zhDomesticRows = zh.domesticRows;
+  const zhGlobalRows = zh.globalRows;
+  const enDomesticRows = en.domesticRows;
+  const enGlobalRows = en.globalRows;
 
   return [
     ...zhDomesticRows.map((row, index) => buildGlobalLithiumRecord(row, {
@@ -397,7 +382,7 @@ async function main() {
   const records = [
     ...buildSemiconductorRecords(),
     ...opticalCompanyFinanceRecords,
-    ...(await buildGlobalLithiumRecords()),
+    ...buildGlobalLithiumRecords(),
     buildZijinRecord(),
   ];
   const semiconductorSubsegmentRecords = mergeRecords(

@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <title>全球锂资源项目地图与数据库（2026）</title>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #11182d;
+      --panel2: #17203a;
+      --text: #eef3ff;
+      --muted: #a8b2cc;
+      --line: #2a365d;
+      --accent: #78a7ff;
+      --green: #4ade80;
+      --orange: #f59e0b;
+      --purple: #a78bfa;
+      --red: #fb7185;
+      --gray: #94a3b8;
+      --cyan: #22d3ee;
+      --gold: #f6c453;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      scroll-behavior: smooth;
+      background:
+        radial-gradient(circle at top left, rgba(120, 167, 255, 0.14), transparent 30%),
+        radial-gradient(circle at top right, rgba(246, 196, 83, 0.09), transparent 24%),
+        var(--bg);
+      color: var(--text);
+      font-family: "IBM Plex Sans", "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .wrap {
+      width: min(1600px, 96vw);
+      margin: 18px auto 28px;
+    }
+
+    .top {
+      display: grid;
+      grid-template-columns: minmax(0, 1.22fr) minmax(340px, 0.92fr);
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .side-stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(17, 24, 45, 0.96), rgba(23, 32, 58, 0.96));
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .card[id],
+    .company-block {
+      scroll-margin-top: 86px;
+    }
+
+    .hero {
+      padding: 24px 26px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -12% -45% auto;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(120, 167, 255, 0.22), transparent 65%);
+      pointer-events: none;
+    }
+
+    .hero-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #dbe7ff;
+      background: rgba(120, 167, 255, 0.13);
+      border: 1px solid rgba(120, 167, 255, 0.28);
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 30px;
+      line-height: 1.12;
+      letter-spacing: 0.2px;
+      max-width: 860px;
+      position: relative;
+      z-index: 1;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    p {
+      margin: 8px 0;
+      color: var(--muted);
+      line-height: 1.65;
+      position: relative;
+      z-index: 1;
+    }
+
+    .badge-row,
+    .resource-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .badge,
+    .resource-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.035);
+      color: var(--text);
+    }
+
+    .resource-link {
+      transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+    }
+
+    .resource-link:hover {
+      border-color: rgba(120, 167, 255, 0.45);
+      background: rgba(120, 167, 255, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .resource-link strong {
+      color: #dfe9ff;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      padding: 18px;
+    }
+
+    .stat {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 16px;
+      min-height: 110px;
+    }
+
+    .stat .k {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      line-height: 1.45;
+    }
+
+    .stat .v {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      line-height: 1.15;
+    }
+
+    .stat .sub {
+      margin-top: 4px;
+      font-size: 12px;
+      color: #7f91bd;
+    }
+
+    .findings {
+      padding: 18px 20px 20px;
+    }
+
+    .section-kicker {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #8fb0ff;
+      margin-bottom: 10px;
+    }
+
+    .findings-list {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .findings-list li + li {
+      margin-top: 10px;
+    }
+
+    .findings-list strong {
+      color: #eff4ff;
+    }
+
+    .risk-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .risk-pill {
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(246, 196, 83, 0.2);
+      background: rgba(246, 196, 83, 0.06);
+      color: #f8e8bb;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .updates-section {
+      margin-bottom: 16px;
+      padding: 20px 22px 22px;
+    }
+
+    .page-nav {
+      position: sticky;
+      top: 12px;
+      z-index: 12;
+      margin-bottom: 16px;
+      padding: 12px 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      background: rgba(17, 24, 45, 0.92);
+      backdrop-filter: blur(10px);
+    }
+
+    .page-nav-link,
+    .subnav-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 9px 13px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.032);
+      color: #dbe7ff;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    }
+
+    .page-nav-link:hover,
+    .subnav-link:hover {
+      transform: translateY(-1px);
+      border-color: rgba(120, 167, 255, 0.42);
+      background: rgba(120, 167, 255, 0.1);
+    }
+
+    .updates-header {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+
+    .updates-header p {
+      margin: 0;
+      max-width: 1100px;
+    }
+
+    .updates-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .update-card {
+      border: 1px solid rgba(120, 167, 255, 0.14);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.028);
+      padding: 16px 16px 15px;
+    }
+
+    .update-index {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: rgba(120, 167, 255, 0.15);
+      color: #dbe7ff;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .update-title {
+      margin: 0 0 8px;
+      font-size: 16px;
+      line-height: 1.35;
+      color: #eef4ff;
+    }
+
+    .update-body,
+    .update-note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .update-note {
+      margin-top: 10px;
+      color: #d6e1ff;
+    }
+
+    .update-points {
+      margin: 10px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+      list-style: disc;
+    }
+
+    .update-points li + li {
+      margin-top: 8px;
+    }
+
+    .company-section {
+      margin-bottom: 16px;
+      padding: 20px 22px 22px;
+    }
+
+    .company-header p {
+      margin: 0;
+      max-width: 1150px;
+    }
+
+    .company-subnav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0 18px;
+    }
+
+    .company-block + .company-block {
+      margin-top: 20px;
+    }
+
+    .company-block-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .company-block-header p {
+      margin: 0;
+      font-size: 13px;
+    }
+
+    .company-summary-grid,
+    .focus-grid,
+    .ranking-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .focus-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .summary-card,
+    .focus-card,
+    .ranking-card,
+    .final-callout {
+      border: 1px solid rgba(120, 167, 255, 0.14);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.026);
+      padding: 16px 16px 15px;
+    }
+
+    .summary-card h3,
+    .focus-card h3,
+    .ranking-card h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      line-height: 1.35;
+      color: #eef4ff;
+    }
+
+    .summary-card p,
+    .focus-card p,
+    .ranking-card p,
+    .final-callout p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .summary-card ul {
+      margin: 10px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .summary-card li + li {
+      margin-top: 8px;
+    }
+
+    .section-note {
+      margin-top: 12px;
+      color: #d6e1ff;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .company-tablewrap {
+      overflow: auto;
+      border: 1px solid rgba(120, 167, 255, 0.1);
+      border-radius: 18px;
+    }
+
+    .company-table {
+      min-width: 1180px;
+    }
+
+    .company-table th {
+      background: #101834;
+    }
+
+    .company-name {
+      font-weight: 700;
+      color: #eef4ff;
+    }
+
+    .num {
+      white-space: nowrap;
+    }
+
+    .matrix-table {
+      min-width: 1400px;
+    }
+
+    .pill-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(246, 196, 83, 0.22);
+      background: rgba(246, 196, 83, 0.08);
+      color: #f8e8bb;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 10px;
+    }
+
+    .ranking-list {
+      margin-top: 10px;
+      color: #eef4ff;
+      font-weight: 700;
+      line-height: 1.6;
+    }
+
+    .final-callout {
+      margin-top: 20px;
+      background:
+        radial-gradient(circle at top right, rgba(120, 167, 255, 0.15), transparent 36%),
+        rgba(255, 255, 255, 0.03);
+    }
+
+    .final-callout h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      color: #f4f8ff;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr 180px 180px 180px;
+      gap: 10px;
+      padding: 14px 16px 8px;
+    }
+
+    input,
+    select {
+      background: #0d1430;
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    input::placeholder {
+      color: #8190b6;
+    }
+
+    .toolbar-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 0 16px 12px;
+      flex-wrap: wrap;
+    }
+
+    .result-summary {
+      color: #dce6ff;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      padding: 0 16px 16px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .legend-filter {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 7px 11px;
+      background: rgba(255, 255, 255, 0.035);
+      color: var(--text);
+      cursor: pointer;
+      transition: background 0.18s ease, border-color 0.18s ease, opacity 0.18s ease, transform 0.18s ease;
+    }
+
+    .legend-filter:hover {
+      border-color: rgba(120, 167, 255, 0.38);
+      transform: translateY(-1px);
+    }
+
+    .legend-filter.is-inactive {
+      opacity: 0.45;
+      background: rgba(255, 255, 255, 0.015);
+      color: #8c99bb;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+
+    #map {
+      height: 760px;
+      width: 100%;
+      border-radius: 18px;
+    }
+
+    .mapbox {
+      padding: 10px;
+    }
+
+    .tablewrap {
+      margin-top: 16px;
+      padding: 10px 12px 16px;
+      overflow: auto;
+    }
+
+    /* Hidden by default (the full 14-column table fits on desktop); the mobile media
+       query below turns it on. Declared HERE, before that query, so the cascade order
+       lets the media rule win — a later top-level rule would silently override it. */
+    .table-scroll-hint {
+      display: none;
+      padding: 0 6px 8px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .table-title {
+      padding: 8px 6px 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .table-title p {
+      margin: 0;
+      font-size: 13px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 13px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      padding: 10px 8px;
+      vertical-align: top;
+      text-align: left;
+      word-wrap: break-word;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #0f1731;
+      z-index: 1;
+      font-weight: 700;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .empty-state {
+      padding: 22px 12px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .cell-sub {
+      display: block;
+      margin-top: 4px;
+      color: #8594ba;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .table-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.15;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .footnote {
+      padding: 14px 18px 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .popup-title {
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 6px;
+    }
+
+    .popup-grid {
+      display: grid;
+      grid-template-columns: 104px 1fr;
+      gap: 6px 8px;
+      font-size: 12px;
+    }
+
+    .popup-label {
+      color: #69758f;
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .popup-value-primary {
+      color: #1f2937;
+      line-height: 1.45;
+    }
+
+    .leaflet-popup-content-wrapper {
+      border-radius: 14px;
+    }
+
+    .leaflet-popup-content {
+      margin: 12px 14px;
+      line-height: 1.45;
+      min-width: 280px;
+    }
+
+    .loading-note,
+    .error-note {
+      padding: 18px 16px 6px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .error-note {
+      color: #ffb4c2;
+    }
+
+    /* Shown only when the visible set contains rows without coordinates, so the
+       (legitimate) gap between table rows and map markers is stated rather than silent. */
+    .unmapped-note {
+      padding: 10px 16px 2px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 1180px) {
+      .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 980px) {
+      .top {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .risk-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .updates-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .company-summary-grid,
+      .focus-grid,
+      .ranking-grid {
+        grid-template-columns: 1fr;
+      }
+
+      #map {
+        height: 560px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .wrap {
+        width: min(96vw, 100%);
+        margin-top: 14px;
+      }
+
+      .hero,
+      .findings {
+        padding-inline: 18px;
+      }
+
+      .page-nav {
+        top: 8px;
+      }
+
+      .hero-topbar,
+      .toolbar-meta,
+      .table-title {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 26px;
+      }
+
+      .leaflet-popup-content {
+        min-width: 0;
+      }
+
+      .popup-grid {
+        grid-template-columns: 1fr;
+      }
+
+      /* ---- Mobile table triage ----
+         The project table is ~2,238px wide (14 inline column widths) and the company
+         tables are 1,180-1,400px. The iframe is rendered with scrolling="no", so anything
+         that escapes an overflow container is *clipped*, not scrollable. Two measures:
+         (1) guarantee each table sits in a real horizontal scroller with a visible hint,
+         (2) drop the three long narrative columns so the remaining width is tractable.
+         Phase 6 replaces this with proper cards; this is triage, not the destination. */
+      .tablewrap,
+      .company-tablewrap {
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .table-scroll-hint {
+        display: block;
+      }
+
+      /* 11 地址 · 12 运输/出口路线 · 14 数据来源摘要 — the narrative columns.
+         Kept in the DOM (and in the search haystack), just not rendered at this width. */
+      #dataTable th:nth-child(11),
+      #dataTable td:nth-child(11),
+      #dataTable th:nth-child(12),
+      #dataTable td:nth-child(12),
+      #dataTable th:nth-child(14),
+      #dataTable td:nth-child(14) {
+        display: none;
+      }
+
+      #dataTable th {
+        width: auto !important;
+      }
+
+      #dataTable th:nth-child(6),
+      #dataTable td:nth-child(6),
+      #dataTable th:nth-child(13),
+      #dataTable td:nth-child(13) {
+        max-width: 190px;
+      }
+    }
+
+    /* ---- Update log (changelog) ---- */
+    .changelog-card {
+      padding: 0;
+      overflow: hidden;
+    }
+    .changelog-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 18px;
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+    }
+    .changelog-summary::-webkit-details-marker { display: none; }
+    .changelog-summary-main {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .changelog-latest {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .changelog-latest b { color: var(--gold); font-weight: 600; }
+    .changelog-hint {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .changelog-hint::before { content: "▸ "; }
+    .changelog-card[open] .changelog-hint::before { content: "▾ "; }
+    .changelog-tablewrap {
+      overflow-x: auto;
+      border-top: 1px solid var(--line);
+    }
+    .changelog-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .changelog-table th,
+    .changelog-table td {
+      text-align: left;
+      padding: 10px 18px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    .changelog-table th {
+      color: var(--muted);
+      font-weight: 600;
+      background: var(--panel2);
+      white-space: nowrap;
+    }
+    .changelog-table tr:last-child td { border-bottom: none; }
+    .changelog-date { color: var(--gold); font-weight: 600; white-space: nowrap; }
+    .changelog-asof { color: var(--muted); white-space: nowrap; }
+    .changelog-items { margin: 0; padding-left: 18px; }
+    .changelog-items li { margin: 2px 0; line-height: 1.55; }
+
+    /* ---- Market-cap cell ---- */
+    .company-table td.mktcap { color: var(--gold); font-variant-numeric: tabular-nums; }
+
+    /* ---- Database: updated row ---- */
+    tr.row-updated { background: rgba(120, 167, 255, 0.10); }
+    .db-updated-pill {
+      display: inline-block; margin-left: 6px; padding: 1px 6px;
+      font-size: 11px; border-radius: 6px; white-space: nowrap;
+      color: var(--accent); background: rgba(120, 167, 255, 0.14); border: 1px solid rgba(120, 167, 255, 0.32);
+    }
+
+    /* ---- Changelog diff (this vs previous) ---- */
+    /* overflow-x here is load-bearing: the parent .changelog-card sets overflow:hidden for
+       its rounded corners, so without an inner scroller this ~400px table is CLIPPED rather
+       than scrollable on narrow screens, silently hiding the "this vs last" comparison. */
+    .changelog-diff { padding: 12px 18px 0; overflow-x: auto; }
+    .changelog-diff-title { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .changelog-diff-table { border-collapse: collapse; font-size: 13px; width: auto; }
+    .changelog-diff-table th, .changelog-diff-table td {
+      text-align: left; padding: 5px 16px 5px 0; border-bottom: 1px solid var(--line); white-space: nowrap;
+    }
+    .changelog-diff-table th { color: var(--muted); font-weight: 600; }
+    .changelog-diff-table td.diff-old { color: var(--muted); }
+    .changelog-diff-table td.diff-now { color: var(--text); font-weight: 600; }
+    .changelog-diff-table td.diff-change { font-weight: 600; color: var(--muted); }
+    .changelog-diff-table td.diff-change.diff-up { color: var(--green); }
+    .changelog-diff-table td.diff-change.diff-down { color: var(--red); }
+
+    /* ---- Research-update tags ---- */
+    .update-tags { display: flex; gap: 6px; margin: 2px 0 6px; flex-wrap: wrap; }
+    .tag { font-size: 11px; padding: 1px 8px; border-radius: 999px; font-weight: 600; white-space: nowrap; }
+    .tag-bull { color: #052e16; background: var(--green); }
+    .tag-bear { color: #4c0519; background: var(--red); }
+    .tag-neutral { color: #451a03; background: var(--gold); }
+    .tag-horizon { color: var(--muted); background: transparent; border: 1px solid var(--line); }
+
+    /* ---- Core price call ---- */
+    .price-call { margin: 8px 0 4px; }
+    .pc-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+    .pc-dir { font-size: 16px; font-weight: 700; padding: 3px 12px; border-radius: 8px; }
+    .pc-bull { color: #052e16; background: var(--green); }
+    .pc-neutral-bull { color: #073527; background: #7fd4b0; }
+    .pc-neutral { color: #451a03; background: var(--gold); }
+    .pc-bear { color: #4c0519; background: var(--red); }
+    .pc-conf { display: flex; align-items: center; gap: 8px; }
+    .pc-conf-label { font-size: 12px; color: var(--muted); white-space: nowrap; }
+    .pc-meter { width: 90px; height: 7px; border-radius: 4px; background: var(--panel2); overflow: hidden; }
+    .pc-meter-fill { display: block; height: 100%; }
+    .pc-fill-bull { background: var(--green); }
+    .pc-fill-neutral-bull { background: #7fd4b0; }
+    .pc-fill-neutral { background: var(--gold); }
+    .pc-fill-bear { background: var(--red); }
+    .pc-meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+    .pc-meta b { color: var(--text); font-weight: 600; }
+    .pc-rationale { margin: 6px 0; padding-left: 18px; font-size: 13px; }
+    .pc-rationale li { margin: 3px 0; line-height: 1.5; }
+    .pc-delta { font-size: 12.5px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 8px; margin-top: 6px; line-height: 1.55; }
+    .pc-delta b { color: var(--text); }
+  </style>
+</head>
+<body>
+  <div class="wrap" id="app">
+    <div class="top">
+      <div class="card hero">
+        <div class="hero-topbar">
+          <div class="eyebrow" id="heroEyebrow">Lithium Research 2026</div>
+        </div>
+        <h1 id="heroTitle">全球锂资源项目地图与数据库（2026）</h1>
+        <p id="heroIntro1"></p>
+        <p id="heroIntro2"></p>
+        <div class="badge-row" id="heroBadges"></div>
+        <div class="resource-links">
+          <a class="resource-link" href="/data/global-lithium-database-2026.csv" download id="resourceCsvLink"></a>
+          <a class="resource-link" href="/data/global-lithium-key-findings-2026.md" download id="resourceMdLink"></a>
+        </div>
+      </div>
+
+      <div class="side-stack">
+        <div class="card stats">
+          <div class="stat">
+            <div class="k" id="statProjectLabel"></div>
+            <div class="v" id="statProjectCount">--</div>
+          </div>
+          <div class="stat">
+            <div class="k" id="statCountryLabel"></div>
+            <div class="v" id="statCountryCount">--</div>
+          </div>
+          <div class="stat">
+            <div class="k" id="statOperatingLabel"></div>
+            <div class="v" id="statOperatingCount">--</div>
+          </div>
+          <div class="stat">
+            <div class="k" id="statCurrentCapacityLabel"></div>
+            <div class="v" id="statCurrentCapacity">--</div>
+            <div class="sub" id="statCurrentCapacityUnit"></div>
+          </div>
+          <div class="stat">
+            <div class="k" id="statPlannedCapacityLabel"></div>
+            <div class="v" id="statPlannedCapacity">--</div>
+            <div class="sub" id="statPlannedCapacityUnit"></div>
+          </div>
+          <div class="stat">
+            <div class="k" id="statPipelineLabel"></div>
+            <div class="v" id="statPipelineCount">--</div>
+          </div>
+        </div>
+
+        <div class="card findings">
+          <div class="section-kicker" id="priceCallKicker"></div>
+          <div class="price-call" id="priceCall"></div>
+          <div class="section-kicker" id="findingsKicker" style="margin-top:18px;"></div>
+          <ol class="findings-list" id="findingsList"></ol>
+          <div class="section-kicker" id="riskKicker" style="margin-top:18px;"></div>
+          <div class="risk-grid" id="riskGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <details class="card changelog-card" id="changelogSection" open>
+      <summary class="changelog-summary">
+        <span class="changelog-summary-main">
+          <span class="section-kicker" id="changelogKicker"></span>
+          <span class="changelog-latest" id="changelogLatest"></span>
+        </span>
+        <span class="changelog-hint" id="changelogHint"></span>
+      </summary>
+      <div class="changelog-diff" id="changelogDiff"></div>
+      <div class="changelog-tablewrap">
+        <table class="changelog-table">
+          <thead>
+            <tr id="changelogHead"></tr>
+          </thead>
+          <tbody id="changelogBody"></tbody>
+        </table>
+      </div>
+    </details>
+
+    <nav class="card page-nav" id="pageNav"></nav>
+
+    <section class="card updates-section" id="researchUpdatesSection">
+      <div class="updates-header">
+        <div class="section-kicker" id="updatesKicker"></div>
+        <h2 id="updatesTitle"></h2>
+        <p id="updatesSubtitle"></p>
+      </div>
+      <div class="updates-grid" id="updatesGrid"></div>
+    </section>
+
+    <section class="card company-section" id="companyResearchSection">
+      <div class="company-header">
+        <div class="section-kicker" id="companyKicker"></div>
+        <h2 id="companyTitle"></h2>
+        <p id="companySubtitle"></p>
+      </div>
+      <div class="company-subnav" id="companySubnav"></div>
+
+      <div class="company-block" id="quickTakeSection">
+        <div class="company-block-header">
+          <h2 id="quickTakeTitle"></h2>
+          <p id="quickTakeSubtitle"></p>
+        </div>
+        <div class="company-summary-grid" id="quickTakeGrid"></div>
+        <div class="section-note" id="quickTakeNote"></div>
+      </div>
+
+      <div class="company-block" id="domesticEquitiesSection">
+        <div class="company-block-header">
+          <h2 id="domesticTitle"></h2>
+          <p id="domesticSubtitle"></p>
+        </div>
+        <div class="company-tablewrap">
+          <table class="company-table" id="domesticTable">
+            <thead>
+              <tr id="domesticTableHead"></tr>
+            </thead>
+            <tbody id="domesticTableBody"></tbody>
+          </table>
+        </div>
+        <div class="section-note" id="domesticNote"></div>
+      </div>
+
+      <div class="company-block" id="globalEquitiesSection">
+        <div class="company-block-header">
+          <h2 id="globalTitle"></h2>
+          <p id="globalSubtitle"></p>
+        </div>
+        <div class="company-tablewrap">
+          <table class="company-table" id="globalTable">
+            <thead>
+              <tr id="globalTableHead"></tr>
+            </thead>
+            <tbody id="globalTableBody"></tbody>
+          </table>
+        </div>
+        <div class="section-note" id="globalNote"></div>
+      </div>
+
+      <div class="company-block" id="resourceMatrixSection">
+        <div class="company-block-header">
+          <h2 id="matrixTitle"></h2>
+          <p id="matrixSubtitle"></p>
+        </div>
+        <div class="company-tablewrap">
+          <table class="company-table matrix-table" id="matrixTable">
+            <thead>
+              <tr id="matrixTableHead"></tr>
+            </thead>
+            <tbody id="matrixTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="company-block" id="focusVariablesSection">
+        <div class="company-block-header">
+          <h2 id="focusTitle"></h2>
+          <p id="focusSubtitle"></p>
+        </div>
+        <div class="focus-grid" id="focusGrid"></div>
+      </div>
+
+      <div class="company-block" id="rankingSection">
+        <div class="company-block-header">
+          <h2 id="rankingTitle"></h2>
+          <p id="rankingSubtitle"></p>
+        </div>
+        <div class="ranking-grid" id="rankingGrid"></div>
+        <div class="final-callout">
+          <h3 id="finalCallTitle"></h3>
+          <p id="finalCallBody"></p>
+        </div>
+      </div>
+    </section>
+
+    <div class="card" id="projectMapSection">
+      <div class="toolbar">
+        <input id="searchBox" />
+        <select id="statusFilter"></select>
+        <select id="countryFilter"></select>
+        <select id="sortFilter"></select>
+      </div>
+      <div class="toolbar-meta">
+        <div class="result-summary" id="resultSummary"></div>
+      </div>
+      <div class="legend" id="legend"></div>
+      <div id="loadingNote" class="loading-note"></div>
+      <div id="errorNote" class="error-note" hidden></div>
+      <div class="mapbox">
+        <div id="map"></div>
+      </div>
+      <div id="unmappedNote" class="unmapped-note" hidden></div>
+    </div>
+
+    <div class="card tablewrap" id="projectDatabaseSection">
+      <div class="table-title">
+        <h2 id="tableTitle"></h2>
+        <p id="tableSubtitle"></p>
+      </div>
+      <p class="table-scroll-hint" id="tableScrollHint"></p>
+      <table id="dataTable">
+        <thead>
+          <tr id="dataTableHead"></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="card footnote" id="methodologySection"></div>
+  </div>
+
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+  <script type="module" src="./app.js?v=2026-07-27"></script>
+</body>
+</html>

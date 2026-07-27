@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 
-// Bump on every report update so the iframe requests a fresh, version-pinned URL
-// (the embedded HTML is otherwise heuristically cached by the browser).
+// Bump on every CODE update so the iframe requests a fresh, version-pinned URL.
+// Must stay in sync with the ?v= on index.html's app.js script tag — enforced by
+// scripts/check-lithium-consistency.mjs, which fails the build if they diverge.
+// (The separate DATA clock lives in the report's data/config.js as DATA_VERSION.)
 const REPORT_VERSION = '2026-07-27';
-const REPORT_URL = `/research-topics/global-lithium-projects-2026.html?v=${REPORT_VERSION}`;
+const REPORT_URL = `/research-topics/global-lithium/?v=${REPORT_VERSION}`;
 const MIN_FRAME_HEIGHT = 1400;
 const HEIGHT_MESSAGE_TYPE = 'instap-research-topic-height';
 

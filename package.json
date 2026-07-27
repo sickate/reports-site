@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "node scripts/generate-company-financials-jsonl.mjs",
+    "prebuild": "node scripts/check-lithium-consistency.mjs && node scripts/generate-company-financials-jsonl.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "deploy": "./scripts/deploy.sh"
