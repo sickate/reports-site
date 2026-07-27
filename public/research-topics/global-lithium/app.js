@@ -19,6 +19,9 @@ import {
 } from './core/selectors.js';
 import { createUrlSync, decodeState } from './core/url-state.js';
 import { assertViewConsistency } from './core/invariants.js';
+import { VIEWS, DEFAULT_VIEW, isValidView } from './views/registry.js';
+import { renderEmptyState, renderGapRegister } from './components/empty-state.js';
+import { GAPS, GAP_REGISTER_ORDER } from './data/gaps.js';
 
 // The bilingual UI toggle was removed: the page is Chinese-only. The English strings stay
 // in ./data/ because they still feed the bilingual search haystack and the build-time
@@ -50,7 +53,6 @@ const riskGrid = document.getElementById('riskGrid');
 const updatesGrid = document.getElementById('updatesGrid');
 const dataTableHead = document.getElementById('dataTableHead');
 const tableScrollHint = document.getElementById('tableScrollHint');
-const pageNav = document.getElementById('pageNav');
 const companySubnav = document.getElementById('companySubnav');
 const quickTakeGrid = document.getElementById('quickTakeGrid');
 const domesticTableHead = document.getElementById('domesticTableHead');
@@ -116,6 +118,7 @@ let companyFinanceIndex = new Map();
 // a module-level Set while the dropdown's value lived in the DOM, and the render path had
 // to AND them together. One field means they can never disagree.
 const store = createStore({
+  view: DEFAULT_VIEW,
   filters: { q: '', statusGroups: null, countries: [] },
   sort: 'capacity_desc',
 });
@@ -128,14 +131,15 @@ function notifyParentHeight() {
   }
 
   window.requestAnimationFrame(() => {
-    const nextHeight = Math.ceil(
-      Math.max(
-        appRoot.scrollHeight || 0,
-        appRoot.offsetHeight || 0,
-        document.body.scrollHeight || 0,
-        document.documentElement.scrollHeight || 0
-      )
-    );
+    // Measure ONLY the content root.
+    //
+    // This used to also max over document.body / document.documentElement scrollHeight,
+    // which creates a one-way ratchet: the parent sets the iframe's height, that height
+    // becomes the document's viewport height, so documentElement.scrollHeight can never
+    // report less than the height already applied. The frame could grow but never shrink.
+    // Harmless on a single long page; very visible once views made the content 8x shorter
+    // (the 772px catalysts view was left sitting in a 6,069px frame).
+    const nextHeight = Math.ceil(Math.max(appRoot.scrollHeight || 0, appRoot.offsetHeight || 0));
 
     window.parent.postMessage({ type: HEIGHT_MESSAGE_TYPE, height: nextHeight }, '*');
   });
@@ -362,11 +366,75 @@ function renderLegend() {
     .join('');
 }
 
+// ---- Views -----------------------------------------------------------------
+
+const viewTabs = document.getElementById('viewTabs');
+let lastRenderedView = null;
+
+function renderTabs(activeView) {
+  viewTabs.innerHTML = VIEWS.map((v) => `
+    <button class="view-tab" type="button" role="tab" id="tab-${v.id}"
+            data-view="${v.id}" aria-controls="view-${v.id}"
+            aria-selected="${v.id === activeView}" tabindex="${v.id === activeView ? 0 : -1}">
+      <span>${escapeHtml(v.label)}</span>
+      <span class="view-tab-hint">${escapeHtml(v.hint)}</span>
+    </button>`).join('');
+}
+
+function applyView(activeView) {
+  for (const v of VIEWS) {
+    const panel = document.getElementById(`view-${v.id}`);
+    if (panel) panel.hidden = v.id !== activeView;
+  }
+
+  if (activeView === lastRenderedView) return;
+  lastRenderedView = activeView;
+
+  // Leaflet measures its container on creation. A map that was sized while its view was
+  // display:none comes back as grey tiles, so re-measure on entry — and again after a
+  // frame, because the panel's own layout is not final until after this tick.
+  if (activeView === 'atlas') {
+    map.invalidateSize();
+    window.requestAnimationFrame(() => {
+      map.invalidateSize();
+      notifyParentHeight();
+    });
+  }
+
+  // Switching views changes the document height dramatically. One post now and one after
+  // layout settles, or the parent iframe keeps the previous view's height.
+  notifyParentHeight();
+  window.requestAnimationFrame(notifyParentHeight);
+  window.setTimeout(notifyParentHeight, 120);
+}
+
+// The three views whose data we could not source. Rendered once — the content is static
+// until the underlying gap is filled, at which point its entry leaves data/gaps.js.
+function renderGapViews() {
+  document.getElementById('supplySection').innerHTML =
+    `<div class="section-kicker">未来供给</div>` + renderEmptyState(GAPS.supplyBridge);
+
+  document.getElementById('costSection').innerHTML =
+    `<div class="section-kicker">成本曲线与价格敏感性</div>`
+    + renderEmptyState(GAPS.costCurve)
+    + renderEmptyState(GAPS.supplyDemandBalance)
+    + renderEmptyState(GAPS.priceScenarios);
+
+  document.getElementById('catalystsSection').innerHTML =
+    `<div class="section-kicker">催化剂与预警</div>` + renderEmptyState(GAPS.catalystFeed);
+
+  document.getElementById('gapRegisterSection').innerHTML =
+    `<div class="section-kicker">数据缺口登记</div>`
+    + `<p class="section-note">下列指标本页尚未呈现。「未披露」= 免费公开源确实不提供；`
+    + `「数据缺口」= 应当可得但尚未采集。逐条列出而不是留下破折号，是为了让缺口可被复核。</p>`
+    + renderGapRegister(GAP_REGISTER_ORDER.map((key) => GAPS[key]));
+}
+
 function renderJumpLinks(container, links) {
   container.innerHTML = links
     .map(
       (item) =>
-        `<a class="${container === pageNav ? 'page-nav-link' : 'subnav-link'}" href="${escapeHtml(item.href)}">${escapeHtml(item.label)}</a>`
+        `<a class="subnav-link" href="${escapeHtml(item.href)}">${escapeHtml(item.label)}</a>`
     )
     .join('');
 }
@@ -521,7 +589,9 @@ function renderMatrixTable(headEl, bodyEl, headers, rows) {
 function renderCompanyResearch() {
   const t = companyResearchContent[currentLang];
 
-  renderJumpLinks(pageNav, t.pageNav);
+  // pageNav was removed: its anchors pointed at sections that now live in different views,
+  // and the tab bar supersedes it. companySubnav still works — those sections are all
+  // inside the equities view.
   renderJumpLinks(companySubnav, t.subnav);
 
   document.getElementById('companyKicker').textContent = t.companyKicker;
@@ -944,6 +1014,9 @@ function render(state) {
   );
   const mappable = selectMappable(visible);
 
+  renderTabs(state.view);
+  applyView(state.view);
+
   renderFilters();
   renderLegend();
   renderTable(visible);
@@ -979,6 +1052,7 @@ async function init() {
   }
 
   renderStaticText();
+  renderGapViews();
 
   try {
     const response = await fetch(`${DATA_URL}?v=${DATA_VERSION}`);
@@ -996,6 +1070,7 @@ async function init() {
     const restored = decodeState(window.location.search, {
       validGroups: facets.statusGroups,
       validCountries: facets.countries,
+      validViews: VIEWS.map((v) => v.id),
     });
 
     // First commit triggers the first render via the subscription below.
@@ -1041,6 +1116,29 @@ countryFilter.addEventListener('change', () => {
 });
 
 sortFilter.addEventListener('change', () => store.commit({ sort: sortFilter.value }));
+
+viewTabs.addEventListener('click', (event) => {
+  const tab = event.target.closest('.view-tab');
+  if (tab?.dataset.view) store.commit({ view: tab.dataset.view });
+});
+
+// Roving tabindex: Left/Right (and Home/End) move between tabs, per the WAI-ARIA tabs
+// pattern. Without it a keyboard user can reach only the one tab with tabindex=0.
+viewTabs.addEventListener('keydown', (event) => {
+  const keys = ['ArrowLeft', 'ArrowRight', 'Home', 'End'];
+  if (!keys.includes(event.key)) return;
+
+  const current = store.getState().view;
+  const index = VIEWS.findIndex((v) => v.id === current);
+  const next = event.key === 'Home' ? 0
+    : event.key === 'End' ? VIEWS.length - 1
+    : event.key === 'ArrowLeft' ? (index - 1 + VIEWS.length) % VIEWS.length
+    : (index + 1) % VIEWS.length;
+
+  event.preventDefault();
+  store.commit({ view: VIEWS[next].id });
+  document.getElementById(`tab-${VIEWS[next].id}`)?.focus();
+});
 
 legend.addEventListener('click', (event) => {
   const button = event.target.closest('.legend-filter');

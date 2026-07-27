@@ -57,10 +57,11 @@
       margin: 18px auto 28px;
     }
 
-    .top {
-      display: grid;
-      grid-template-columns: minmax(0, 1.22fr) minmax(340px, 0.92fr);
-      gap: 16px;
+    /* The hero used to sit in a two-column grid beside the KPI + findings stack, which
+       is what stretched it to the height of its neighbour and left the large blank the
+       review flagged. It is now a full-width header and the cockpit stacks below it. */
+    .page-header {
+      display: block;
       margin-bottom: 16px;
     }
 
@@ -185,7 +186,7 @@
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(6, minmax(0, 1fr));
       gap: 12px;
       padding: 18px;
     }
@@ -774,8 +775,8 @@
     }
 
     @media (max-width: 980px) {
-      .top {
-        grid-template-columns: 1fr;
+      .stats {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
 
       .toolbar {
@@ -872,10 +873,10 @@
         display: none;
       }
 
-      #dataTable th {
-        width: auto !important;
-      }
-
+      /* Deliberately NOT `width: auto`. Letting 11 columns share 375px squeezes each to
+         ~34px, so every cell wraps into a tall stack and the table grows to ~41,000px —
+         far worse than scrolling. Keeping the declared widths gives normal ~2-line rows
+         and a horizontal scroll the hint above already advertises. */
       #dataTable th:nth-child(6),
       #dataTable td:nth-child(6),
       #dataTable th:nth-child(13),
@@ -1004,11 +1005,134 @@
     .pc-rationale li { margin: 3px 0; line-height: 1.5; }
     .pc-delta { font-size: 12.5px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 8px; margin-top: 6px; line-height: 1.55; }
     .pc-delta b { color: var(--text); }
+
+    /* ---- View tabs (the 7-view IA) ---- */
+    .view-tabs {
+      position: sticky;
+      top: 0;
+      z-index: 14;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      -webkit-overflow-scrolling: touch;
+      margin-bottom: 16px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(11, 16, 32, 0.94);
+      backdrop-filter: blur(10px);
+      scrollbar-width: none;
+    }
+    .view-tabs::-webkit-scrollbar { display: none; }
+
+    .view-tab {
+      flex: 0 0 auto;
+      display: inline-flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 8px 14px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+    }
+    .view-tab .view-tab-hint {
+      font-size: 11px;
+      font-weight: 500;
+      opacity: 0.72;
+      white-space: nowrap;
+    }
+    .view-tab:hover { color: var(--text); background: rgba(255, 255, 255, 0.04); }
+    .view-tab[aria-selected="true"] {
+      color: #eef5ff;
+      background: rgba(120, 167, 255, 0.16);
+      border-color: rgba(120, 167, 255, 0.34);
+    }
+    .view-tab:focus-visible {
+      outline: 2px solid var(--accent, #7dd3fc);
+      outline-offset: 2px;
+    }
+
+    /* display:none (not visibility) is deliberate: it is what actually collapses the
+       page height from ~14,000px to a few thousand. Leaflet needs invalidateSize() when
+       the atlas view becomes visible again — see onEnter in app.js. */
+    .view[hidden] { display: none; }
+    .view { display: block; }
+
+    /* ---- Empty states for data we do not have ---- */
+    .empty-state-block {
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px dashed rgba(148, 163, 184, 0.34);
+      background: rgba(255, 255, 255, 0.02);
+      padding: 22px 20px;
+    }
+    .empty-state-block + .empty-state-block { margin-top: 16px; }
+
+    .empty-state-hatch {
+      position: absolute;
+      inset: 0;
+      opacity: 0.08;
+      background-image: repeating-linear-gradient(
+        45deg, transparent 0 9px, currentColor 9px 10px
+      );
+      pointer-events: none;
+    }
+    .empty-state-body { position: relative; }
+    .empty-state-body h3 { margin: 8px 0 6px; font-size: 16px; color: var(--text); }
+
+    .empty-state-tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+    .is-undisclosed .empty-state-tag { background: rgba(251, 113, 133, 0.16); color: #fda4af; }
+    .is-gap .empty-state-tag { background: rgba(246, 196, 83, 0.16); color: #fcd34d; }
+
+    .empty-state-why { margin: 0 0 8px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .empty-state-needs { margin: 0 0 10px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .empty-state-needs b { color: #dbe7ff; }
+    .empty-state-have { font-size: 13px; color: var(--muted); line-height: 1.7; }
+    .empty-state-have b { color: #dbe7ff; }
+    .empty-state-have ul { margin: 6px 0 0; padding-left: 18px; }
+    .empty-state-have li { margin-bottom: 4px; }
+
+    /* ---- Gap register (method view) ---- */
+    .gap-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .gap-table th, .gap-table td {
+      text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line);
+      vertical-align: top; line-height: 1.65;
+    }
+    .gap-table th { color: var(--muted); font-weight: 600; white-space: nowrap; }
+    .gap-pill {
+      display: inline-block; padding: 2px 9px; border-radius: 999px;
+      font-size: 11px; font-weight: 700; white-space: nowrap;
+    }
+    .gap-pill.is-undisclosed { background: rgba(251, 113, 133, 0.16); color: #fda4af; }
+    .gap-pill.is-gap { background: rgba(246, 196, 83, 0.16); color: #fcd34d; }
+
+    @media (max-width: 640px) {
+      .view-tabs { padding: 8px; gap: 6px; }
+      .view-tab { padding: 7px 11px; font-size: 12px; }
+      .view-tab .view-tab-hint { display: none; }
+      .gap-table { display: block; overflow-x: auto; }
+    }
   </style>
 </head>
 <body>
   <div class="wrap" id="app">
-    <div class="top">
+    <header class="page-header">
       <div class="card hero">
         <div class="hero-topbar">
           <div class="eyebrow" id="heroEyebrow">Lithium Research 2026</div>
@@ -1022,9 +1146,15 @@
           <a class="resource-link" href="/data/global-lithium-key-findings-2026.md" download id="resourceMdLink"></a>
         </div>
       </div>
+    </header>
 
-      <div class="side-stack">
-        <div class="card stats">
+    <nav class="view-tabs" id="viewTabs" role="tablist" aria-label="报告视图"></nav>
+
+    <main id="viewHost">
+
+      <section class="view" data-view="cockpit" id="view-cockpit" role="tabpanel" aria-labelledby="tab-cockpit">
+        <div class="side-stack">
+        <div class="card stats" id="statsSection">
           <div class="stat">
             <div class="k" id="statProjectLabel"></div>
             <div class="v" id="statProjectCount">--</div>
@@ -1053,7 +1183,7 @@
           </div>
         </div>
 
-        <div class="card findings">
+        <div class="card findings" id="findingsSection">
           <div class="section-kicker" id="priceCallKicker"></div>
           <div class="price-call" id="priceCall"></div>
           <div class="section-kicker" id="findingsKicker" style="margin-top:18px;"></div>
@@ -1062,7 +1192,6 @@
           <div class="risk-grid" id="riskGrid"></div>
         </div>
       </div>
-    </div>
 
     <details class="card changelog-card" id="changelogSection" open>
       <summary class="changelog-summary">
@@ -1083,8 +1212,6 @@
       </div>
     </details>
 
-    <nav class="card page-nav" id="pageNav"></nav>
-
     <section class="card updates-section" id="researchUpdatesSection">
       <div class="updates-header">
         <div class="section-kicker" id="updatesKicker"></div>
@@ -1093,6 +1220,18 @@
       </div>
       <div class="updates-grid" id="updatesGrid"></div>
     </section>
+
+      </section>
+
+      <section class="view" data-view="supply" id="view-supply" role="tabpanel" aria-labelledby="tab-supply" hidden>
+        <div class="card" id="supplySection"></div>
+      </section>
+
+      <section class="view" data-view="cost" id="view-cost" role="tabpanel" aria-labelledby="tab-cost" hidden>
+        <div class="card" id="costSection"></div>
+      </section>
+
+      <section class="view" data-view="equities" id="view-equities" role="tabpanel" aria-labelledby="tab-equities" hidden>
 
     <section class="card company-section" id="companyResearchSection">
       <div class="company-header">
@@ -1179,6 +1318,10 @@
       </div>
     </section>
 
+      </section>
+
+      <section class="view" data-view="atlas" id="view-atlas" role="tabpanel" aria-labelledby="tab-atlas" hidden>
+
     <div class="card" id="projectMapSection">
       <div class="toolbar">
         <input id="searchBox" />
@@ -1212,7 +1355,18 @@
       </table>
     </div>
 
-    <div class="card footnote" id="methodologySection"></div>
+      </section>
+
+      <section class="view" data-view="catalysts" id="view-catalysts" role="tabpanel" aria-labelledby="tab-catalysts" hidden>
+        <div class="card" id="catalystsSection"></div>
+      </section>
+
+      <section class="view" data-view="method" id="view-method" role="tabpanel" aria-labelledby="tab-method" hidden>
+        <div class="card footnote" id="methodologySection"></div>
+        <div class="card" id="gapRegisterSection"></div>
+      </section>
+
+    </main>
   </div>
 
   <script

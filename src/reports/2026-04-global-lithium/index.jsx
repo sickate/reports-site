@@ -7,13 +7,15 @@ import { useSearchParams } from 'react-router-dom';
 // (The separate DATA clock lives in the report's data/config.js as DATA_VERSION.)
 const REPORT_VERSION = '2026-07-27';
 const REPORT_PATH = '/research-topics/global-lithium/';
-const MIN_FRAME_HEIGHT = 1400;
+// Was 1400 when the report was one long page. Now that it is split into views, the
+// shortest (catalysts) is under 800px, and a 1400px floor would leave visible dead space.
+const MIN_FRAME_HEIGHT = 420;
 const HEIGHT_MESSAGE_TYPE = 'instap-research-topic-height';
 const STATE_MESSAGE_TYPE = 'instap-research-topic-state';
 
 // Filter keys the embedded report owns. Mirrored onto this page's URL so a shared link
 // restores the reader's view; anything else in the query string is left untouched.
-const REPORT_STATE_KEYS = ['q', 'status', 'country', 'sort'];
+const REPORT_STATE_KEYS = ['view', 'q', 'status', 'country', 'sort'];
 
 function GlobalLithiumReport() {
   const iframeRef = useRef(null);

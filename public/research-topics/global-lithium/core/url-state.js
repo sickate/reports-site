@@ -7,6 +7,8 @@
 // states instead of leaving the report. That is the easiest way to make the host app feel
 // broken, and it is invisible when testing the page standalone.
 
+const DEFAULT_VIEW_ID = 'cockpit';
+
 const DEFAULTS = {
   q: '',
   statusGroups: null,   // null = all
@@ -17,8 +19,9 @@ const DEFAULTS = {
 const STATE_MESSAGE_TYPE = 'instap-research-topic-state';
 
 /** State -> "?q=pil&status=Operating,Ramp-up&country=Australia&sort=name_asc" */
-export function encodeState({ filters, sort }) {
+export function encodeState({ view, filters, sort }) {
   const params = new URLSearchParams();
+  if (view && view !== DEFAULT_VIEW_ID) params.set('view', view);
   if (filters.q && filters.q !== DEFAULTS.q) params.set('q', filters.q);
   if (filters.statusGroups && filters.statusGroups.length) {
     params.set('status', filters.statusGroups.join(','));
@@ -36,7 +39,7 @@ export function encodeState({ filters, sort }) {
  * defaults, so an old shared link can never throw — it just filters less than intended.
  * `validGroups` / `validCountries` drop values that no longer exist in the data.
  */
-export function decodeState(search, { validGroups = null, validCountries = null } = {}) {
+export function decodeState(search, { validGroups = null, validCountries = null, validViews = null } = {}) {
   const params = new URLSearchParams(search || '');
   const split = (key, valid) => {
     const raw = params.get(key);
@@ -47,7 +50,9 @@ export function decodeState(search, { validGroups = null, validCountries = null 
   };
 
   const sort = params.get('sort');
+  const view = params.get('view');
   return {
+    view: (validViews && validViews.includes(view)) ? view : DEFAULT_VIEW_ID,
     filters: {
       q: params.get('q') || DEFAULTS.q,
       statusGroups: split('status', validGroups),
