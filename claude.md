@@ -41,6 +41,20 @@ npm run preview      # Preview production build
 npm run deploy       # Build + deploy to server
 ```
 
+`prebuild` runs before every build and does two things — both can **fail the build**,
+which is intentional (`deploy.sh` is `set -e`, so it aborts before rsync):
+
+1. `scripts/check-lithium-consistency.mjs` — data invariants for the global-lithium
+   report (CSV shape, status groups, coordinate pairs, 11-cell company rows, version
+   clocks). It imports the same `csv.js` / `schema.js` modules the browser uses, so it
+   can never validate something the runtime parses differently.
+2. `scripts/generate-company-financials-jsonl.mjs` — regenerates
+   `public/data/company-financials.jsonl` from each report's source data module.
+   **Never hand-edit the JSONL**; it is overwritten on every build.
+
+Use `npx vite preview` (not `python -m http.server`) when testing locally: report pages
+live at `/reports/:slug` and need SPA fallback.
+
 ## Adding a New Report
 
 1. Create directory: `src/reports/YYYY-MM-slug/`
@@ -157,6 +171,30 @@ Local Machine                    Server (maru)
 ```bash
 npm run deploy              # Build + rsync
 ```
+
+### nginx caching: hand-written `.js` under `/research-topics/`
+
+`nginx/reports.instap.net.conf` has a generic `location ~* \.(js|css|…)$` block setting
+`expires 1y; Cache-Control: public, immutable`. That is correct for Vite's `/assets/*`,
+whose filenames are content-hashed — but **wrong for anything hand-written under
+`public/research-topics/`**, which keeps stable filenames. Without an exception, a
+returning visitor is pinned to last year's code with no 404, no console error and no
+visible symptom.
+
+A regex location for `^/research-topics/.*\.(js|css)$` sits **above** the generic block
+(nginx matches regex locations in definition order, first match wins) and forces
+`no-cache`. It re-declares the four security headers verbatim, because any `add_header`
+in a nested block discards every inherited one.
+
+Two consequences worth remembering:
+
+- **`deploy.sh` only rsyncs `dist/` — it never pushes nginx config.** Server-side nginx
+  changes are a manual SSH step (`sudo nginx -t && sudo systemctl reload nginx`, back up
+  the live conf first; it carries certbot SSL blocks the repo copy lacks).
+- Verify after deploying a new static module:
+  ```bash
+  curl -sI https://reports.instap.net/research-topics/<topic>/app.js | grep -i cache
+  ```
 
 ## Current Reports
 

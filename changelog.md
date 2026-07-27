@@ -2,6 +2,60 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.0] - 2026-07-27
+
+Rebuild of `2026-04-global-lithium` into a tabbed investment cockpit, driven by an
+external review. Phases 0–3 of a 7-phase plan; phases 4–7 (data contract, charts,
+table/map upgrades, accessibility) are still outstanding.
+
+### Fixed
+
+- Sample-count mismatch where the hero read 44 projects while the map and table showed 43.
+  `Other` is `normalizeStatusGroup`'s fallback but was never added to `statusLegendItems`,
+  so `Uyuni cluster` failed the legend test and was dropped from both the table and the
+  map while the KPI tiles still counted it
+- Status and country filter dropdowns that were permanently stuck on "全部":
+  `renderFilters()` was only reachable before the CSV fetch and was never called again
+- Mobile clipping at 390px: the 14-column project table and the "this vs last" changelog
+  diff table were cut off rather than scrollable
+- iframe height ratchet: the height sync maxed over `document.documentElement.scrollHeight`,
+  which is stretched by the parent-applied iframe height, so the frame could grow but never
+  shrink — a 772px view was left in a 6,069px frame
+- nginx served hand-written `/research-topics/**.js|css` with `Cache-Control: immutable`
+  and a one-year expiry, freezing returning visitors on old code with no visible symptom
+  (`semiconductor-upstream/app.js` was already affected)
+
+### Added
+
+- `public/research-topics/global-lithium/` — the report split into ES modules
+  (`index.html` + `app.js` + `core/` + `data/` + `views/` + `components/`), mirroring the
+  existing `semiconductor-upstream/` layout, with its own README
+- Single-store view state (`core/store.js`) with pure selectors (`core/selectors.js`);
+  KPI tiles, map and table all derive from one computed result
+- URL state sync (`core/url-state.js`), `replaceState`-only, mirrored to the host page via
+  `useSearchParams` so filter/sort/view state survives sharing and reload
+- Runtime invariant (`core/invariants.js`) asserting KPI count === table rows === map
+  markers after every commit
+- 7-view tabbed information architecture (市场状态 / 未来供给 / 成本与价格 / 权益标的 /
+  地图与项目库 / 催化剂与预警 / 方法与来源) with WAI-ARIA tabs keyboard support
+- `data/gaps.js` + the method view's gap register: an explicit record of what the page
+  cannot show, distinguishing 未披露 (no free source exists) from 数据缺口 (collectable
+  but not yet collected), each with what was searched and what would fill it
+- `scripts/check-lithium-consistency.mjs`, wired into `npm run prebuild`, failing the
+  build on CSV header drift, bad row widths, unrendered status groups, half coordinate
+  pairs, listed-owner ↔ CSV name drift, non-11-cell company rows, and version mismatches
+
+### Changed
+
+- `scripts/generate-company-financials-jsonl.mjs` imports
+  `global-lithium/data/company-research.js` instead of string-slicing and `eval`-ing an
+  object literal out of the report HTML
+- Language toggle removed (page is Chinese-only); the English data is retained because it
+  feeds the bilingual search haystack and the JSONL generator
+- `global-lithium-projects-2026.html` is now a redirect stub preserving previously shared
+  links, since `deploy.sh` rsyncs with `--delete`
+- Default-view page height reduced from 14,418px to 3,572px
+
 ## [1.6.0] - 2026-07-16
 
 ### Added
