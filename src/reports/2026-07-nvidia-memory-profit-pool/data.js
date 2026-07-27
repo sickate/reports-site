@@ -32,6 +32,158 @@ export const hbmMarket = [
   { year: 'CY2027E', hynix: 89, samsung: 34, micron: 33, total: 156 },
 ];
 
+// Sankey model supplied with the research workbook. Values are global market value
+// allocated to suppliers, not necessarily the suppliers' reported accounting revenue.
+const sankeyEdgeRows = [
+  [2026, '下游-NVIDIA平台', '品类-HBM', 45.6, 'M', '低'],
+  [2026, '下游-NVIDIA平台', '品类-DRAM（不含HBM）', 69.24, 'M', '低'],
+  [2026, '下游-NVIDIA平台', '品类-NAND', 15, 'M', '低'],
+  [2026, '下游-ASIC平台', '品类-HBM', 19, 'M', '低'],
+  [2026, '下游-ASIC平台', '品类-DRAM（不含HBM）', 46.16, 'M', '低'],
+  [2026, '下游-ASIC平台', '品类-NAND', 12, 'M', '低'],
+  [2026, '下游-其他门类', '品类-HBM', 11.4, 'M', '低'],
+  [2026, '下游-其他门类', '品类-DRAM（不含HBM）', 461.6, 'M', '低'],
+  [2026, '下游-其他门类', '品类-NAND', 123, 'M', '低'],
+  [2026, '品类-HBM', '供应商-三星', 16.72, 'E', '中'],
+  [2026, '品类-HBM', '供应商-SK海力士', 43.32, 'E', '中'],
+  [2026, '品类-HBM', '供应商-美光', 15.96, 'E', '中'],
+  [2026, '品类-DRAM（不含HBM）', '供应商-三星', 230.8, 'M', '低'],
+  [2026, '品类-DRAM（不含HBM）', '供应商-SK海力士', 144.25, 'M', '低'],
+  [2026, '品类-DRAM（不含HBM）', '供应商-美光', 126.94, 'M', '低'],
+  [2026, '品类-DRAM（不含HBM）', '供应商-长鑫存储', 34.62, 'M', '中低'],
+  [2026, '品类-DRAM（不含HBM）', '供应商-其他供应商', 40.39, 'M', '低'],
+  [2026, '品类-NAND', '供应商-三星', 45, 'E/M', '中低'],
+  [2026, '品类-NAND', '供应商-SK海力士', 30, 'E/M', '中低'],
+  [2026, '品类-NAND', '供应商-美光', 19.5, 'E/M', '中低'],
+  [2026, '品类-NAND', '供应商-Kioxia', 21, 'E/M', '中低'],
+  [2026, '品类-NAND', '供应商-SanDisk', 16.5, 'E/M', '中低'],
+  [2026, '品类-NAND', '供应商-其他供应商', 18, 'M', '低'],
+  [2026, '供应商-三星', '归属净利-三星', 152.1104, 'M', '低'],
+  [2026, '供应商-三星', '成本税费-三星', 140.4096, 'M', '低'],
+  [2026, '供应商-SK海力士', '归属净利-SK海力士', 130.542, 'M', '中低'],
+  [2026, '供应商-SK海力士', '成本税费-SK海力士', 87.028, 'M', '中低'],
+  [2026, '供应商-美光', '归属净利-美光', 94.192, 'M', '低'],
+  [2026, '供应商-美光', '成本税费-美光', 68.208, 'M', '低'],
+  [2026, '供应商-长鑫存储', '归属净利-长鑫存储', 15.579, 'M', '中'],
+  [2026, '供应商-长鑫存储', '成本税费-长鑫存储', 19.041, 'M', '中'],
+  [2026, '供应商-Kioxia', '归属净利-Kioxia', 7.98, 'M', '低'],
+  [2026, '供应商-Kioxia', '成本税费-Kioxia', 13.02, 'M', '低'],
+  [2026, '供应商-SanDisk', '归属净利-SanDisk', 6.6, 'M', '中低'],
+  [2026, '供应商-SanDisk', '成本税费-SanDisk', 9.9, 'M', '中低'],
+  [2026, '供应商-其他供应商', '归属净利-其他供应商', 17.517, 'M', '很低'],
+  [2026, '供应商-其他供应商', '成本税费-其他供应商', 40.873, 'M', '很低'],
+  [2027, '下游-NVIDIA平台', '品类-HBM', 78, 'M', '低'],
+  [2027, '下游-NVIDIA平台', '品类-DRAM（不含HBM）', 110.1, 'M', '低'],
+  [2027, '下游-NVIDIA平台', '品类-NAND', 33, 'M', '低'],
+  [2027, '下游-ASIC平台', '品类-HBM', 54.6, 'M', '低'],
+  [2027, '下游-ASIC平台', '品类-DRAM（不含HBM）', 102.76, 'M', '低'],
+  [2027, '下游-ASIC平台', '品类-NAND', 33, 'M', '低'],
+  [2027, '下游-其他门类', '品类-HBM', 23.4, 'M', '低'],
+  [2027, '下游-其他门类', '品类-DRAM（不含HBM）', 521.14, 'M', '低'],
+  [2027, '下游-其他门类', '品类-NAND', 154, 'M', '低'],
+  [2027, '品类-HBM', '供应商-三星', 43.68, 'M', '低'],
+  [2027, '品类-HBM', '供应商-SK海力士', 78, 'M', '低'],
+  [2027, '品类-HBM', '供应商-美光', 34.32, 'M', '低'],
+  [2027, '品类-DRAM（不含HBM）', '供应商-三星', 278.92, 'M', '很低'],
+  [2027, '品类-DRAM（不含HBM）', '供应商-SK海力士', 176.16, 'M', '很低'],
+  [2027, '品类-DRAM（不含HBM）', '供应商-美光', 154.14, 'M', '很低'],
+  [2027, '品类-DRAM（不含HBM）', '供应商-长鑫存储', 58.72, 'M', '低'],
+  [2027, '品类-DRAM（不含HBM）', '供应商-其他供应商', 66.06, 'M', '很低'],
+  [2027, '品类-NAND', '供应商-三星', 63.8, 'M', '低'],
+  [2027, '品类-NAND', '供应商-SK海力士', 44, 'M', '低'],
+  [2027, '品类-NAND', '供应商-美光', 30.8, 'M', '低'],
+  [2027, '品类-NAND', '供应商-Kioxia', 30.8, 'M', '低'],
+  [2027, '品类-NAND', '供应商-SanDisk', 24.2, 'M', '低'],
+  [2027, '品类-NAND', '供应商-其他供应商', 26.4, 'M', '低'],
+  [2027, '供应商-三星', '归属净利-三星', 193.2, 'M', '很低'],
+  [2027, '供应商-三星', '成本税费-三星', 193.2, 'M', '很低'],
+  [2027, '供应商-SK海力士', '归属净利-SK海力士', 166.9696, 'M', '很低'],
+  [2027, '供应商-SK海力士', '成本税费-SK海力士', 131.1904, 'M', '很低'],
+  [2027, '供应商-美光', '归属净利-美光', 120.593, 'M', '很低'],
+  [2027, '供应商-美光', '成本税费-美光', 98.667, 'M', '很低'],
+  [2027, '供应商-长鑫存储', '归属净利-长鑫存储', 24.6624, 'M', '低'],
+  [2027, '供应商-长鑫存储', '成本税费-长鑫存储', 34.0576, 'M', '低'],
+  [2027, '供应商-Kioxia', '归属净利-Kioxia', 11.396, 'M', '很低'],
+  [2027, '供应商-Kioxia', '成本税费-Kioxia', 19.404, 'M', '很低'],
+  [2027, '供应商-SanDisk', '归属净利-SanDisk', 9.196, 'M', '很低'],
+  [2027, '供应商-SanDisk', '成本税费-SanDisk', 15.004, 'M', '很低'],
+  [2027, '供应商-其他供应商', '归属净利-其他供应商', 25.8888, 'M', '很低'],
+  [2027, '供应商-其他供应商', '成本税费-其他供应商', 66.5712, 'M', '很低'],
+];
+
+const sankeyNodeOrder = [
+  '下游-NVIDIA平台', '下游-ASIC平台', '下游-其他门类',
+  '品类-HBM', '品类-DRAM（不含HBM）', '品类-NAND',
+  '供应商-三星', '供应商-SK海力士', '供应商-美光', '供应商-长鑫存储',
+  '供应商-Kioxia', '供应商-SanDisk', '供应商-其他供应商',
+  '归属净利-三星', '成本税费-三星', '归属净利-SK海力士', '成本税费-SK海力士',
+  '归属净利-美光', '成本税费-美光', '归属净利-长鑫存储', '成本税费-长鑫存储',
+  '归属净利-Kioxia', '成本税费-Kioxia', '归属净利-SanDisk', '成本税费-SanDisk',
+  '归属净利-其他供应商', '成本税费-其他供应商',
+];
+
+const sankeyNodeStage = (name) => {
+  if (name.startsWith('下游-')) return 0;
+  if (name.startsWith('品类-')) return 1;
+  if (name.startsWith('供应商-')) return 2;
+  return 3;
+};
+
+const sankeyNodeLabel = (name) => name
+  .replace(/^下游-/, '')
+  .replace(/^品类-/, '')
+  .replace(/^供应商-/, '')
+  .replace(/^归属净利-/, '归属净利 · ')
+  .replace(/^成本税费-/, '成本税费 · ');
+
+export const sankeyNodeColor = (name) => {
+  if (name.includes('NVIDIA')) return '#76b7ff';
+  if (name.includes('ASIC')) return '#a78bfa';
+  if (name === '下游-其他门类') return '#718096';
+  if (name === '品类-HBM') return '#e9c46a';
+  if (name.includes('DRAM')) return '#62c5e3';
+  if (name === '品类-NAND') return '#70d6a4';
+  if (name.startsWith('归属净利')) return '#34d399';
+  if (name.startsWith('成本税费')) return '#64748b';
+  if (name.includes('三星')) return '#f0bc72';
+  if (name.includes('SK海力士')) return '#f28e8e';
+  if (name.includes('美光')) return '#89d6ae';
+  if (name.includes('长鑫')) return '#c79af5';
+  if (name.includes('Kioxia')) return '#61c6d7';
+  if (name.includes('SanDisk')) return '#fb9e76';
+  if (name.includes('其他供应商')) return '#9aa7b5';
+  return '#64748b';
+};
+
+export const buildMemorySankey = (year) => {
+  const edges = sankeyEdgeRows
+    .filter(([edgeYear]) => edgeYear === year)
+    .map(([, source, target, value, status, confidence]) => ({ source, target, value, status, confidence }));
+  const names = sankeyNodeOrder.filter((name) => edges.some((edge) => edge.source === name || edge.target === name));
+  const indexByName = new Map(names.map((name, index) => [name, index]));
+
+  return {
+    nodes: names.map((name) => ({
+      name,
+      label: sankeyNodeLabel(name),
+      stage: sankeyNodeStage(name),
+      color: sankeyNodeColor(name),
+    })),
+    links: edges.map((edge) => ({
+      ...edge,
+      sourceName: edge.source,
+      targetName: edge.target,
+      source: indexByName.get(edge.source),
+      target: indexByName.get(edge.target),
+    })),
+  };
+};
+
+export const memorySankeySummary = {
+  2026: { market: 803, netProfit: 427.12, netMargin: 53.2, status: 'E / M', confidence: '中低' },
+  2027: { market: 1110, netProfit: 557.04, netMargin: 50.2, status: 'M', confidence: '很低' },
+};
+
 export const nvidiaFinancials = [
   { period: 'FY2026', revenue: 215.938, opProfit: 130.387, opMargin: 60.4, kind: 'A' },
   { period: 'Q4 FY2026', revenue: 68.127, opProfit: 44.299, opMargin: 65.0, kind: 'A' },

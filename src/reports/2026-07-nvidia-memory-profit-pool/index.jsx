@@ -10,12 +10,14 @@ import {
   Line,
   LineChart,
   ResponsiveContainer,
+  Sankey,
   Tooltip,
   XAxis,
   YAxis,
 } from 'recharts';
 import {
   AlertTriangle,
+  ArrowDown,
   ArrowDownRight,
   ArrowRight,
   ArrowUpRight,
@@ -32,9 +34,11 @@ import {
 } from 'lucide-react';
 import {
   dataLabels,
+  buildMemorySankey,
   financialCalendar,
   hbmMarket,
   memoryFinancials,
+  memorySankeySummary,
   nvidiaFinancials,
   profitPool2026,
   profitPool2027,
@@ -235,6 +239,148 @@ const MicronChart = ({ row }) => {
   );
 };
 
+const fmtSankeyBn = (value) => `$${Number(value).toFixed(value >= 100 ? 0 : 1)}B`;
+
+const SankeyLink = ({
+  sourceX,
+  sourceY,
+  sourceControlX,
+  targetX,
+  targetY,
+  targetControlX,
+  linkWidth,
+  payload,
+}) => {
+  const stroke = payload.source?.color || '#64748b';
+  const path = `M${sourceX},${sourceY} C${sourceControlX},${sourceY} ${targetControlX},${targetY} ${targetX},${targetY}`;
+  return (
+    <path
+      d={path}
+      fill="none"
+      stroke={stroke}
+      strokeOpacity={0.3}
+      strokeWidth={Math.max(linkWidth, 1)}
+    />
+  );
+};
+
+const SankeyNode = ({ x, y, width, height, payload }) => {
+  const labelOnLeft = payload.stage === 0 || payload.stage === 2;
+  const labelX = labelOnLeft ? x - 8 : x + width + 8;
+  const textAnchor = labelOnLeft ? 'end' : 'start';
+
+  return (
+    <g>
+      <rect x={x} y={y} width={width} height={Math.max(height, 1)} rx={2} fill={payload.color} />
+      <title>{`${payload.label} · ${fmtSankeyBn(payload.value)}`}</title>
+      {payload.stage < 3 && (
+        <text
+          x={labelX}
+          y={y + height / 2}
+          dy="0.35em"
+          fill="#cbd5e1"
+          fontSize={10}
+          fontWeight={500}
+          paintOrder="stroke"
+          stroke="#0f172a"
+          strokeWidth={3}
+          textAnchor={textAnchor}
+        >
+          {payload.label}
+        </text>
+      )}
+    </g>
+  );
+};
+
+const SankeyTooltip = ({ active, payload }) => {
+  if (!active || !payload?.length) return null;
+  const item = payload[0]?.payload?.payload || payload[0]?.payload;
+  const source = item?.source?.label;
+  const target = item?.target?.label;
+
+  if (!source || !target) return null;
+
+  return (
+    <div className="max-w-56 rounded-xl border border-slate-600/70 bg-slate-950/95 px-3 py-2.5 text-xs shadow-xl">
+      <div className="font-medium leading-5 text-slate-100">{source} <span className="text-slate-500">→</span> {target}</div>
+      <div className="mt-1 flex items-center justify-between gap-4"><span className="text-slate-500">流量</span><span className="font-mono font-semibold text-slate-100">{fmtSankeyBn(item.value)}</span></div>
+      <div className="mt-1 text-[10px] text-slate-500">{item.status} · 置信度 {item.confidence}</div>
+    </div>
+  );
+};
+
+const MobileSankeyLedger = ({ year }) => {
+  const data = buildMemorySankey(year);
+  const stageRows = (stage) => data.nodes
+    .map((node, index) => ({ node, index }))
+    .filter(({ node }) => node.stage === stage)
+    .map(({ node, index }) => {
+      const outgoing = data.links.filter((link) => link.source === index);
+      const incoming = data.links.filter((link) => link.target === index);
+      const value = [...outgoing, ...incoming].reduce((total, link) => total + link.value, 0) / (outgoing.length && incoming.length ? 2 : 1);
+      const profit = outgoing.find((link) => link.targetName.startsWith('归属净利'))?.value;
+      return { label: node.label, value, color: node.color, profit };
+    });
+  const total = memorySankeySummary[year].market;
+  const sections = [
+    ['下游平台', stageRows(0)],
+    ['内存品类', stageRows(1)],
+    ['供应商收入等价值 → 归属净利', stageRows(2)],
+  ];
+
+  return (
+    <div className="space-y-3 md:hidden">
+      {sections.map(([title, rows], sectionIndex) => (
+        <div key={title}>
+          {sectionIndex > 0 && <ArrowDown size={16} className="mx-auto mb-3 text-slate-600" aria-hidden="true" />}
+          <div className="mb-2 flex items-center justify-between"><span className="text-xs font-semibold text-slate-200">{title}</span><span className="text-[10px] text-slate-500">USD bn</span></div>
+          <div className="space-y-2">
+            {rows.map((row) => (
+              <div key={row.label} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3">
+                <div className="min-w-0">
+                  <div className="flex items-center justify-between gap-2 text-[11px]"><span className="truncate text-slate-300">{row.label}</span><span className="font-mono text-slate-200">{fmtSankeyBn(row.value)}</span></div>
+                  <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-800"><div className="h-full rounded-full" style={{ width: `${Math.max((row.value / total) * 100, 1.5)}%`, backgroundColor: row.color }} /></div>
+                </div>
+                {row.profit !== undefined && <span className="font-mono text-[10px] text-emerald-300">净利 {fmtSankeyBn(row.profit)}</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const MemorySankeyChart = ({ year }) => {
+  const data = buildMemorySankey(year);
+  return (
+    <div role="img" aria-label={`${year} 年全球存储市场从下游平台、内存品类、供应商到归属净利和成本税费的资金流向图`}>
+      <div className="hidden md:block">
+        <div className="mb-3 grid grid-cols-4 px-2 text-center text-[10px] font-medium tracking-wide text-slate-500">
+          <span>下游平台</span><span>内存品类</span><span>供应商</span><span>利润归属</span>
+        </div>
+        <ResponsiveContainer width="100%" height={620}>
+          <Sankey
+            data={data}
+            node={<SankeyNode />}
+            link={<SankeyLink />}
+            nodePadding={8}
+            nodeWidth={11}
+            linkCurvature={0.52}
+            iterations={32}
+            margin={{ top: 4, right: 110, bottom: 6, left: 110 }}
+            sort={false}
+          >
+            <Tooltip content={<SankeyTooltip />} cursor={false} />
+          </Sankey>
+        </ResponsiveContainer>
+      </div>
+      <MobileSankeyLedger year={year} />
+    </div>
+  );
+};
+
 const CompanyMetricCard = ({ data }) => (
   <div className="rounded-2xl border border-slate-700/50 bg-slate-900/30 p-5">
     <div className="flex items-start justify-between gap-3">
@@ -265,7 +411,9 @@ const CompanyMetricCard = ({ data }) => (
 
 const MemoryProfitPoolReport = () => {
   const [profitPeriod, setProfitPeriod] = useState('CY2026E');
+  const [sankeyYear, setSankeyYear] = useState(2026);
   const profitData = profitPeriod === 'CY2026E' ? profitPool2026 : profitPool2027;
+  const sankeySummary = memorySankeySummary[sankeyYear];
 
   return (
     <article className="mx-auto max-w-7xl px-1 pb-12 text-slate-200 md:px-4">
@@ -302,7 +450,7 @@ const MemoryProfitPoolReport = () => {
 
       <nav className="sticky top-16 z-20 mt-4 flex gap-2 overflow-x-auto rounded-2xl border border-slate-700/50 bg-slate-950/90 p-2 backdrop-blur">
         {[
-          ['overview', '核心结论'], ['profit-pool', '利润池'], ['drivers', '增长驱动'], ['scenarios', '2027 情景'], ['watch', '跟踪框架'], ['quality', '质量边界'],
+          ['overview', '核心结论'], ['profit-pool', '利润池'], ['drivers', '增长驱动'], ['sankey', 'Sankey'], ['scenarios', '2027 情景'], ['watch', '跟踪框架'], ['quality', '质量边界'],
         ].map(([href, label]) => (
           <a key={href} href={`#${href}`} className="whitespace-nowrap rounded-xl px-3 py-2 text-xs font-medium text-slate-400 transition hover:bg-slate-800 hover:text-slate-100">{label}</a>
         ))}
@@ -431,7 +579,40 @@ const MemoryProfitPoolReport = () => {
         <InsightCard icon={Network} label="客户边界" title="终端需求不等于直接客户收入" tone="emerald">ODM、OEM、云厂商、最终使用方和最终算力平台需区分。所有 Microsoft、Meta、Amazon、Google 与 NVIDIA 的精确客户收入归因均不可用。</InsightCard>
       </div>
 
-      <SectionHeading number="04" eyebrow="CURRENT FACT BASE" title="已验证的运行率：NVIDIA 强势，存储厂盈利弹性更高">
+      <SectionHeading id="sankey" number="04" eyebrow="MEMORY VALUE FLOW" title="从下游平台到供应商：完整的内存价值与利润流向">
+        该模型将全球市场价值沿“下游平台 → 内存品类 → 供应商 → 归属净利 / 成本税费”分配。供应商节点是市场价值按份额分配的收入等价值，并不等于会计报表收入；下游拆分、利润率和大部分 2027 参数均为模型假设。
+      </SectionHeading>
+      <section className="rounded-2xl border border-slate-700/50 bg-slate-900/30 p-5 md:p-6">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h3 className="font-semibold text-slate-100">全球 Memory 市场价值流向</h3>
+            <p className="mt-1 text-xs text-slate-500">单位：USD bn · 悬停任一流带可查看数值、数据状态与置信度</p>
+          </div>
+          <div className="flex rounded-xl border border-slate-700/60 bg-slate-950/60 p-1">
+            {[2026, 2027].map((year) => (
+              <button
+                key={year}
+                onClick={() => setSankeyYear(year)}
+                aria-pressed={sankeyYear === year}
+                className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${sankeyYear === year ? 'bg-slate-200 text-slate-950' : 'text-slate-400 hover:text-slate-200'}`}
+              >CY{year}</button>
+            ))}
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 border-y border-slate-800 py-4 sm:grid-cols-3">
+          <div><div className="text-[11px] text-slate-500">全球 Memory 市场价值</div><div className="mt-1 text-xl font-bold text-slate-100">${sankeySummary.market.toLocaleString()}B</div></div>
+          <div><div className="text-[11px] text-slate-500">模型归属净利</div><div className="mt-1 text-xl font-bold text-emerald-300">${sankeySummary.netProfit.toFixed(2)}B</div></div>
+          <div><div className="text-[11px] text-slate-500">模型净利率</div><div className="mt-1 text-xl font-bold text-slate-100">{sankeySummary.netMargin.toFixed(1)}%</div><div className="mt-0.5 text-[10px] text-slate-500">{sankeySummary.status} · 置信度 {sankeySummary.confidence}</div></div>
+        </div>
+        <MemorySankeyChart year={sankeyYear} />
+        <div className="flex flex-wrap gap-x-5 gap-y-2 border-t border-slate-800 pt-4 text-[11px] text-slate-400">
+          <span><i className="mr-1.5 inline-block h-2 w-2 rounded-full bg-emerald-400" />绿色：模型归属净利</span>
+          <span><i className="mr-1.5 inline-block h-2 w-2 rounded-full bg-slate-500" />灰色：成本、Opex、税费及其他</span>
+          <span>2026 HBM $76B 为 BNP Paribas 外部预测；2027 $1,110B 全球 Memory 市场为内部情景，不是 WSTS 预测。</span>
+        </div>
+      </section>
+
+      <SectionHeading number="05" eyebrow="CURRENT FACT BASE" title="已验证的运行率：NVIDIA 强势，存储厂盈利弹性更高">
         实际披露是报告的事实层；Q2 初步业绩、公司指引和内部模型必须在同一视图中明确区分。NVIDIA Q1 FY2027 的 Networking 收入同比 +199%，快于 Compute 的 +77%，系统与网络价值占比正在提高。
       </SectionHeading>
       <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
@@ -457,7 +638,7 @@ const MemoryProfitPoolReport = () => {
         {memoryFinancials.map((company) => <CompanyMetricCard key={company.company} data={company} />)}
       </div>
 
-      <SectionHeading id="scenarios" number="05" eyebrow="CY2027 SCENARIOS" title="相对于 CY2026 利润 = 100：决定收益弹性的，是 ASP 变化率">
+      <SectionHeading id="scenarios" number="06" eyebrow="CY2027 SCENARIOS" title="相对于 CY2026 利润 = 100：决定收益弹性的，是 ASP 变化率">
         2027 年不具备全公司、同更新时间、同日历年、同利润口径与同价格假设的公开数据集。因此，SK hynix 和 Micron 不提供伪精确的绝对利润点估计，只给出可审计的情景指数。
       </SectionHeading>
       <div className="grid gap-4 xl:grid-cols-3">
@@ -494,7 +675,7 @@ const MemoryProfitPoolReport = () => {
         </div>
       </section>
 
-      <SectionHeading id="watch" number="06" eyebrow="MONITORING DASHBOARD" title="真正需要跟踪的，不是已实现利润，而是下一季 ASP 预期差">
+      <SectionHeading id="watch" number="07" eyebrow="MONITORING DASHBOARD" title="真正需要跟踪的，不是已实现利润，而是下一季 ASP 预期差">
         最佳观察信号 = <span className="font-semibold text-slate-200">实际合约 ASP 上调幅度 / 市场预期的上调幅度</span>。即使合约价继续上涨，只要涨幅低于已计入水平，存储股仍可能见顶。
       </SectionHeading>
       <section className="overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-900/30">
@@ -505,7 +686,7 @@ const MemoryProfitPoolReport = () => {
       </section>
       <div className="mt-4 rounded-2xl border border-amber-400/20 bg-amber-400/[0.055] p-4 text-sm leading-6 text-slate-300"><span className="font-semibold text-amber-100">库存与应收的观察方法：</span>NVIDIA Q1 FY2027 库存由 $21.403B 增至 $25.797B，应收由 $38.466B 增至 $40.710B。当前并不自动构成需求风险；须与收入增速、供应准备共同观察。</div>
 
-      <SectionHeading id="quality" number="07" eyebrow="QUALITY CONTROL" title="研究可流转，但必须保留边界、置信度与撤销清单">
+      <SectionHeading id="quality" number="08" eyebrow="QUALITY CONTROL" title="研究可流转，但必须保留边界、置信度与撤销清单">
         本页的设计原则是让事实层、模型层与情景层始终可视化分离。这样既能用于利润池比较与相对交易框架，也不会制造不存在的客户级、产品级精确利润。
       </SectionHeading>
       <div className="grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
