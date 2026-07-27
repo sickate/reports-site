@@ -12,6 +12,7 @@ export function selectFacets(projects) {
   return {
     statusGroups: uniq('status_group'),
     countries: uniq('country'),
+    structures: uniq('structure'),
   };
 }
 
@@ -25,10 +26,12 @@ export function selectVisibleProjects(projects, filters, buildHaystack) {
   const q = (filters.q || '').trim().toLowerCase();
   const groups = filters.statusGroups;
   const countries = filters.countries;
+  const structures = filters.structures;
 
   return projects.filter((item) => {
     if (groups && !groups.includes(item.status_group)) return false;
     if (countries && countries.length && !countries.includes(item.country)) return false;
+    if (structures && structures.length && !structures.includes(item.structure)) return false;
     if (q && !buildHaystack(item).includes(q)) return false;
     return true;
   });
@@ -48,14 +51,25 @@ export function sortProjects(projects, sort) {
   return arr;
 }
 
-/** KPI tiles. Takes the ALREADY-FILTERED list — never the raw one. */
+/**
+ * KPI tiles. Takes the ALREADY-FILTERED list — never the raw one.
+ *
+ * These read `lifecycle`, NOT the `status_group` presentation bucket. That distinction is
+ * the whole point of the orthogonal columns: "在产样本" asks how many assets are producing,
+ * which includes the ones still ramping and the producing clusters. Counting the legend
+ * bucket instead is what made this tile read 17 against a true 26.
+ */
 export function selectKpis(visible) {
   return {
     projectCount: visible.length,
     countryCount: new Set(visible.map((d) => d.country)).size,
-    operatingCount: visible.filter((d) => d.status_group === 'Operating').length,
+    operatingCount: visible.filter((d) => d.lifecycle === 'operating').length,
+    rampingCount: visible.filter((d) => d.activity === 'ramping').length,
     pipelineCount: visible.filter(
-      (d) => d.status_group === 'Construction' || d.status_group === 'Development'
+      (d) => d.lifecycle === 'construction' || d.lifecycle === 'development'
+    ).length,
+    expandingCount: visible.filter(
+      (d) => d.activity === 'expanding' || d.activity === 'expansion-permitted'
     ).length,
     currentCapacity: visible.reduce((sum, d) => sum + Number(d.current_kta_lce || 0), 0),
     plannedCapacity: visible.reduce((sum, d) => sum + Number(d.planned_kta_lce || 0), 0),

@@ -16,10 +16,15 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { loadCsvData, parseCsv } from '../public/research-topics/global-lithium/data/csv.js';
-import { statusLegendItems } from '../public/research-topics/global-lithium/data/schema.js';
+import {
+  statusLegendItems, LIFECYCLE_VALUES, STRUCTURE_VALUES, ACTIVITY_VALUES,
+  STATUS_LIFECYCLE_EXPECTATION,
+} from '../public/research-topics/global-lithium/data/schema.js';
 import { companyResearchContent } from '../public/research-topics/global-lithium/data/company-research.js';
 import { listedOwners } from '../public/research-topics/global-lithium/data/listed-owners.js';
-import { DATA_VERSION } from '../public/research-topics/global-lithium/data/config.js';
+import {
+  CODE_VERSION, DATA_CACHE_KEY, UPDATE_MARKER,
+} from '../public/research-topics/global-lithium/core/version.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -30,20 +35,11 @@ const WRAPPER_PATH = path.join(ROOT, 'src/reports/2026-04-global-lithium/index.j
 const REGISTRY_PATH = path.join(ROOT, 'src/reports/index.js');
 
 const EXPECTED_COLUMNS = [
-  'project', 'country', 'region', 'status', 'deposit_type', 'reserve_resource', 'grade',
+  'project', 'country', 'region', 'status', 'lifecycle', 'structure', 'activity',
+  'deposit_type', 'reserve_resource', 'grade',
   'current_kta_lce', 'planned_kta_lce', 'cost', 'address', 'lat', 'lon', 'route',
   'port_lat', 'port_lon', 'risks', 'source_note', 'map_capacity_kta', 'updated',
 ];
-
-/**
- * Projects whose raw `status` legitimately falls through to the 'Other' bucket.
- * Anything NOT listed here that lands in 'Other' fails the build — that is exactly how
- * `Uyuni cluster` silently vanished from the table and map before (its status,
- * "Resource giant / commercial scale still limited", matched no heuristic branch and
- * 'Other' was missing from the legend, so it was filtered out of every surface).
- * Phase 4 replaces this heuristic with explicit lifecycle/structure/activity columns.
- */
-const KNOWN_OTHER_STATUS = new Set(['Uyuni cluster']);
 
 /** Company rows are destructured POSITIONALLY by generate-company-financials-jsonl.mjs. */
 const COMPANY_ROW_CELLS = 11;
@@ -73,15 +69,37 @@ async function checkCsv() {
 
   const projects = loadCsvData(text);
 
+  const enumChecks = [
+    ['lifecycle', LIFECYCLE_VALUES],
+    ['structure', STRUCTURE_VALUES],
+    ['activity', ACTIVITY_VALUES],
+  ];
+
   projects.forEach((p) => {
+    // Closed enums. An out-of-range value would land in deriveStatusGroup's default branch
+    // and quietly file the row as 'Resource stage' — the same class of silent
+    // misclassification the free-text `status` heuristic used to produce.
+    for (const [field, allowed] of enumChecks) {
+      if (!allowed.includes(p[field])) {
+        fail(`"${p.project}" has ${field}="${p[field]}", not one of: ${allowed.join(' | ')}`);
+      }
+    }
+
+    // `status` is prose and `lifecycle` is the machine-readable claim. If someone edits one
+    // and not the other, the pill and the filters start disagreeing with no visible error.
+    const expected = STATUS_LIFECYCLE_EXPECTATION[p.status];
+    if (expected === undefined) {
+      warn(`"${p.project}": status "${p.status}" is not declared in `
+        + `STATUS_LIFECYCLE_EXPECTATION, so its lifecycle cannot be cross-checked`);
+    } else if (expected !== p.lifecycle) {
+      fail(`"${p.project}": status "${p.status}" implies lifecycle "${expected}" `
+        + `but the row says "${p.lifecycle}"`);
+    }
+
     // Every project must land in a bucket the legend actually renders, or it disappears
     // from the table AND the map while still being counted in the KPIs.
     if (!statusLegendItems.includes(p.status_group)) {
       fail(`"${p.project}" → status group "${p.status_group}" is not in statusLegendItems`);
-    }
-    if (p.status_group === 'Other' && !KNOWN_OTHER_STATUS.has(p.project)) {
-      fail(`"${p.project}" (status: "${p.status}") fell through to 'Other'. `
-        + `Add a normalizeStatusGroup() branch, or allowlist it in KNOWN_OTHER_STATUS.`);
     }
 
     // Half a coordinate pair renders nothing but reads as "mapped" — catch it early.
@@ -147,16 +165,29 @@ async function checkVersions() {
   if (!reportVersion) fail('could not read REPORT_VERSION from the React wrapper');
   if (!registryDate) fail('could not read the registry `date` for 2026-04-global-lithium');
 
-  // Two INDEPENDENT clocks, deliberately:
-  //   code  — REPORT_VERSION (iframe URL pin) must match index.html's ?v= (module pin)
-  //   data  — DATA_VERSION (also the "本次更新" row marker) must match the registry date
-  // Conflating them is how a code-only release silently clears every update pill.
-  if (assetVersion && reportVersion && assetVersion !== reportVersion) {
-    fail(`code version mismatch: index.html ?v=${assetVersion} vs REPORT_VERSION ${reportVersion}`);
+  // THREE independent clocks (see core/version.js). Each pairing below can drift silently:
+  //   code  — index.html ?v= (module pin) ≡ REPORT_VERSION (iframe pin) ≡ CODE_VERSION
+  //   data  — UPDATE_MARKER ≡ the registry date shown on the homepage
+  //   cache — DATA_CACHE_KEY must not predate UPDATE_MARKER
+  if (assetVersion && assetVersion !== CODE_VERSION) {
+    fail(`code version mismatch: index.html ?v=${assetVersion} vs CODE_VERSION ${CODE_VERSION}`);
   }
-  if (registryDate && DATA_VERSION !== registryDate) {
-    fail(`data version mismatch: DATA_VERSION ${DATA_VERSION} vs registry date ${registryDate}`);
+  if (reportVersion && reportVersion !== CODE_VERSION) {
+    fail(`code version mismatch: REPORT_VERSION ${reportVersion} vs CODE_VERSION ${CODE_VERSION}`);
   }
+  if (registryDate && UPDATE_MARKER !== registryDate) {
+    fail(`data version mismatch: UPDATE_MARKER ${UPDATE_MARKER} vs registry date ${registryDate}`);
+  }
+  if (DATA_CACHE_KEY < UPDATE_MARKER) {
+    fail(`DATA_CACHE_KEY ${DATA_CACHE_KEY} predates UPDATE_MARKER ${UPDATE_MARKER} — `
+      + `a data change cannot be older than the data it describes`);
+  }
+
+  // The pill is opt-in per row: if no row carries the marker, the "本次更新" highlight is
+  // silently absent everywhere. That is legitimate for a code-only release, but it should
+  // be a deliberate state, not something noticed weeks later.
+  const marked = projects?.filter((p) => p.updated === UPDATE_MARKER).length ?? 0;
+  if (!marked) warn(`no CSV row has updated="${UPDATE_MARKER}" — no "本次更新" pill will render`);
 }
 
 const projects = await checkCsv();

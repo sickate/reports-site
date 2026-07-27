@@ -83,8 +83,7 @@ export const dictionaries = {
     Construction: '建设中',
     Development: '开发中',
     'On hold / stalled': '停摆 / 搁置',
-    Cluster: '项目群 / 集群',
-    Other: '资源阶段 / 未归类',
+    'Resource stage': '资源阶段',
   },
   depositType: {
     'Hard-rock pegmatite (spodumene)': '硬岩伟晶岩（锂辉石）',

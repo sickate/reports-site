@@ -4,9 +4,12 @@
 // Native ES modules, no bundler, mirroring public/research-topics/semiconductor-upstream/.
 // Pure data and parsing live in ./data/*.js so scripts/ can import the same code.
 
-import { HEIGHT_MESSAGE_TYPE, DATA_VERSION, DATA_URL, COMPANY_FINANCIALS_URL } from './data/config.js';
+import { HEIGHT_MESSAGE_TYPE, DATA_URL, COMPANY_FINANCIALS_URL } from './data/config.js';
+import { DATA_CACHE_KEY, UPDATE_MARKER } from './core/version.js';
 import { colorMap, countryPillColors } from './data/palette.js';
-import { CORE_STATUS_GROUPS, statusLegendItems } from './data/schema.js';
+import {
+  statusLegendItems, LIFECYCLE_LABELS, STRUCTURE_LABELS, ACTIVITY_LABELS,
+} from './data/schema.js';
 import { loadCsvData } from './data/csv.js';
 import { locales } from './data/copy.js';
 import { companyResearchContent } from './data/company-research.js';
@@ -39,6 +42,7 @@ const currentLang = 'zh';
 const searchBox = document.getElementById('searchBox');
 const statusFilter = document.getElementById('statusFilter');
 const countryFilter = document.getElementById('countryFilter');
+const structureFilter = document.getElementById('structureFilter');
 const sortFilter = document.getElementById('sortFilter');
 const tbody = document.querySelector('#dataTable tbody');
 const resultSummary = document.getElementById('resultSummary');
@@ -119,7 +123,7 @@ let companyFinanceIndex = new Map();
 // to AND them together. One field means they can never disagree.
 const store = createStore({
   view: DEFAULT_VIEW,
-  filters: { q: '', statusGroups: null, countries: [] },
+  filters: { q: '', statusGroups: null, countries: [], structures: [] },
   sort: 'capacity_desc',
 });
 
@@ -247,6 +251,12 @@ function localizeValue(value, field, lang = currentLang) {
     return dictionaries.statusGroup[value] || translateNarrativeToZh(value);
   }
 
+  // The orthogonal columns carry closed enums, so their labels live next to the enums in
+  // schema.js rather than in the CSV-value dictionaries.
+  if (field === 'lifecycle') return LIFECYCLE_LABELS[value] || String(value);
+  if (field === 'structure') return STRUCTURE_LABELS[value] || String(value);
+  if (field === 'activity') return ACTIVITY_LABELS[value] || String(value);
+
   if (field === 'deposit_type') {
     return dictionaries.depositType[value] || translateNarrativeToZh(value);
   }
@@ -277,10 +287,26 @@ function renderCountryPill(country) {
   return pillMarkup(label, color);
 }
 
+// Status cell = the free-text prose pill (coloured by its derived legend bucket) plus the
+// two orthogonal axes the prose can no longer be trusted to convey. Rendered as badges
+// inside the existing column rather than as new columns: the table already declares 14
+// fixed widths and adding columns is what previously blew its mobile layout up.
 function renderStatusPill(item) {
   const label = localizeValue(item.status, 'status', currentLang);
   const color = colorMap[item.status_group] || '#94a3b8';
-  return pillMarkup(label, color);
+  const badges = [
+    item.structure === 'cluster'
+      ? `<span class="axis-badge axis-cluster">${escapeHtml(STRUCTURE_LABELS.cluster)}</span>`
+      : '',
+    // Suppressed when the chip would restate its own legend bucket: `ramping` is exactly
+    // what puts a row in the 爬坡 bucket, so showing both reads as two facts, not one.
+    item.activity && item.activity !== 'none'
+      && !(item.activity === 'ramping' && item.status_group === 'Ramp-up')
+      ? `<span class="axis-badge axis-activity">${escapeHtml(ACTIVITY_LABELS[item.activity] || item.activity)}</span>`
+      : '',
+  ].join('');
+
+  return pillMarkup(label, color) + (badges ? `<div class="axis-badges">${badges}</div>` : '');
 }
 
 function getPairedValue(value, field) {
@@ -299,38 +325,29 @@ function renderFilters() {
   const { filters, sort } = store.getState();
   const facets = selectFacets(rawData);
 
-  const facetSignature = JSON.stringify([facets.statusGroups, facets.countries]);
+  const facetSignature = JSON.stringify([facets.statusGroups, facets.countries, facets.structures]);
   if (facetSignature !== lastFacetSignature) {
     lastFacetSignature = facetSignature;
 
-    statusFilter.innerHTML = '';
-    countryFilter.innerHTML = '';
+    const fill = (select, defaultLabel, values, field) => {
+      select.innerHTML = '';
+      const first = document.createElement('option');
+      first.value = 'all';
+      first.textContent = defaultLabel;
+      select.appendChild(first);
+      for (const value of values) {
+        const opt = document.createElement('option');
+        opt.value = value;
+        opt.textContent = localizeValue(value, field, currentLang);
+        select.appendChild(opt);
+      }
+    };
+
+    fill(statusFilter, t.allStatuses, facets.statusGroups, 'status_group');
+    fill(countryFilter, t.allCountries, facets.countries, 'country');
+    fill(structureFilter, t.allStructures, facets.structures, 'structure');
+
     sortFilter.innerHTML = '';
-
-    const statusDefault = document.createElement('option');
-    statusDefault.value = 'all';
-    statusDefault.textContent = t.allStatuses;
-    statusFilter.appendChild(statusDefault);
-
-    const countryDefault = document.createElement('option');
-    countryDefault.value = 'all';
-    countryDefault.textContent = t.allCountries;
-    countryFilter.appendChild(countryDefault);
-
-    for (const value of facets.statusGroups) {
-      const opt = document.createElement('option');
-      opt.value = value;
-      opt.textContent = localizeValue(value, 'status_group', currentLang);
-      statusFilter.appendChild(opt);
-    }
-
-    for (const value of facets.countries) {
-      const opt = document.createElement('option');
-      opt.value = value;
-      opt.textContent = localizeValue(value, 'country', currentLang);
-      countryFilter.appendChild(opt);
-    }
-
     for (const [value, label] of Object.entries(t.sortOptions)) {
       const opt = document.createElement('option');
       opt.value = value;
@@ -345,6 +362,7 @@ function renderFilters() {
   const groups = filters.statusGroups;
   statusFilter.value = groups && groups.length === 1 ? groups[0] : 'all';
   countryFilter.value = filters.countries.length === 1 ? filters.countries[0] : 'all';
+  structureFilter.value = filters.structures.length === 1 ? filters.structures[0] : 'all';
   sortFilter.value = sort;
   if (searchBox.value !== filters.q) searchBox.value = filters.q;
 }
@@ -352,13 +370,12 @@ function renderFilters() {
 function renderLegend() {
   const t = locales[currentLang];
   const { filters } = store.getState();
-  // Core buckets always render (stable legend); the 'Other' fallback only renders when
-  // something actually lands in it, so a healthy dataset shows no empty chip and an
-  // unmapped status becomes immediately visible instead of disappearing.
-  const presentGroups = new Set(rawData.map((item) => item.status_group));
+  // All buckets always render. Every one is reachable by construction now that
+  // deriveStatusGroup() is total over closed enums, so there is no "only render it if
+  // something lands in it" case left — that conditional existed for the 'Other' fallback,
+  // which was the hole rows fell into.
   const active = filters.statusGroups;
   legend.innerHTML = statusLegendItems
-    .filter((key) => CORE_STATUS_GROUPS.includes(key) || presentGroups.has(key))
     .map((key) => {
       const isOn = !active || active.includes(key);
       return `<button class="legend-filter ${isOn ? '' : 'is-inactive'}" data-status-group="${escapeHtml(key)}" type="button" aria-pressed="${isOn}"><span class="dot" style="background:${colorMap[key]}"></span>${escapeHtml(t.legend[key])}</button>`;
@@ -525,7 +542,7 @@ function getCompanyFinanceRecord(companyName) {
 }
 
 async function loadCompanyFinancials() {
-  const response = await fetch(`${COMPANY_FINANCIALS_URL}?v=${DATA_VERSION}`);
+  const response = await fetch(`${COMPANY_FINANCIALS_URL}?v=${DATA_CACHE_KEY}`);
 
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}`);
@@ -837,6 +854,13 @@ function updateStats(kpis) {
   document.getElementById('statCountryCount').textContent = formatCount(kpis.countryCount);
   document.getElementById('statOperatingCount').textContent = formatCount(kpis.operatingCount);
   document.getElementById('statPipelineCount').textContent = formatCount(kpis.pipelineCount);
+
+  // These two tiles moved from a legend bucket to `lifecycle`, which changed 在产样本 from
+  // 17 to 26. A number that jumps by half needs its definition visible next to it, or a
+  // returning reader has no way to tell a correction from a data error.
+  document.getElementById('statOperatingSub').textContent =
+    `含爬坡 ${formatCount(kpis.rampingCount)} · 扩产中 ${formatCount(kpis.expandingCount)}`;
+  document.getElementById('statPipelineSub').textContent = '建设中 + 开发中';
   document.getElementById('statCurrentCapacity').textContent = formatMetric(kpis.currentCapacity);
   document.getElementById('statPlannedCapacity').textContent = formatMetric(kpis.plannedCapacity);
 
@@ -901,6 +925,11 @@ function buildSearchHaystack(item) {
     localizeValue(item.region, 'region', 'zh'),
     item.status,
     localizeValue(item.status, 'status', 'zh'),
+    // Orthogonal axes are searchable by their Chinese labels too, so "集群" / "扩产" /
+    // "爬坡" find the right rows even though those words may not appear in the prose.
+    localizeValue(item.lifecycle, 'lifecycle', 'zh'),
+    localizeValue(item.structure, 'structure', 'zh'),
+    localizeValue(item.activity, 'activity', 'zh'),
     item.deposit_type,
     localizeValue(item.deposit_type, 'deposit_type', 'zh'),
     item.reserve_resource,
@@ -938,7 +967,7 @@ function renderTable(data) {
 
   for (const item of data) {
     const tr = document.createElement('tr');
-    const isUpdated = item.updated && item.updated === DATA_VERSION;
+    const isUpdated = item.updated && item.updated === UPDATE_MARKER;
     if (isUpdated) {
       tr.className = 'row-updated';
     }
@@ -1055,7 +1084,7 @@ async function init() {
   renderGapViews();
 
   try {
-    const response = await fetch(`${DATA_URL}?v=${DATA_VERSION}`);
+    const response = await fetch(`${DATA_URL}?v=${DATA_CACHE_KEY}`);
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }
@@ -1070,6 +1099,7 @@ async function init() {
     const restored = decodeState(window.location.search, {
       validGroups: facets.statusGroups,
       validCountries: facets.countries,
+      validStructures: facets.structures,
       validViews: VIEWS.map((v) => v.id),
     });
 
@@ -1115,6 +1145,11 @@ countryFilter.addEventListener('change', () => {
   commitFilters({ countries: value === 'all' ? [] : [value] });
 });
 
+structureFilter.addEventListener('change', () => {
+  const value = structureFilter.value;
+  commitFilters({ structures: value === 'all' ? [] : [value] });
+});
+
 sortFilter.addEventListener('change', () => store.commit({ sort: sortFilter.value }));
 
 viewTabs.addEventListener('click', (event) => {
@@ -1148,10 +1183,7 @@ legend.addEventListener('click', (event) => {
   store.commit((state) => {
     // null ("all") is materialised into the full list on first toggle, so that turning one
     // chip off means "all except this" rather than "only this".
-    const rendered = statusLegendItems.filter(
-      (key) => CORE_STATUS_GROUPS.includes(key) || rawData.some((d) => d.status_group === key)
-    );
-    const current = state.filters.statusGroups ?? rendered;
+    const current = state.filters.statusGroups ?? statusLegendItems;
     const next = current.includes(statusGroup)
       ? current.filter((key) => key !== statusGroup)
       : [...current, statusGroup];
@@ -1161,7 +1193,7 @@ legend.addEventListener('click', (event) => {
         ...state.filters,
         // Back to null when everything is on again, so the URL stays clean and the
         // dropdown reads "全部" rather than an exhaustive list.
-        statusGroups: next.length === rendered.length ? null : next,
+        statusGroups: next.length === statusLegendItems.length ? null : next,
       },
     };
   });

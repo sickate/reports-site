@@ -1,16 +1,17 @@
 // Colour tokens. Status colours are paired with distinct shapes in the legend so the
 // encoding survives colour-vision deficiency (see Phase 7).
 
+// Keyed by the legend buckets in schema.js `statusLegendItems`. The former 'Cluster' and
+// 'Other' swatches are gone: cluster-ness became its own axis (`structure`, rendered as a
+// table badge and its own filter), and 'Other' was a fallback bucket that can no longer
+// occur now that the lifecycle enum is closed.
 export const colorMap = {
   Operating: '#4ade80',
   'Ramp-up': '#f59e0b',
   Construction: '#a78bfa',
   Development: '#22d3ee',
   'On hold / stalled': '#fb7185',
-  Cluster: '#94a3b8',
-  // Warm stone, deliberately distinct from Cluster's cool slate: these two are
-  // the only muted swatches, so sharing a hex made them indistinguishable on the map.
-  Other: '#a8a29e',
+  'Resource stage': '#94a3b8',
 };
 
 export const countryPillColors = {

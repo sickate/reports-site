@@ -6,7 +6,7 @@ export const locales = {
     title: '全球锂资源项目地图与数据库（2026）',
     eyebrow: '2026 锂资源研究',
     heroIntro1:
-      '本页将全球锂资源按 <b>在产 / 爬坡 / 建设 / 开发 / 停摆 / 集群</b> 统一到同一套投研口径。容量优先使用 <b>kt LCE/年</b>；硬岩项目以公开的精矿吨数按近似 LCE 系数折算；盐湖项目优先使用公司披露的碳酸锂/氢氧化锂/氯化锂名义产能。',
+      '本页将全球锂资源按三个<b>互相独立</b>的维度统一到同一套投研口径：<b>生命周期</b>（在产 / 建设 / 开发 / 停摆 / 资源阶段）、<b>记录单元</b>（单体 / 集群）、<b>产能动作</b>（扩产 / 爬坡 / 稳产）。三者拆开是因为挤在一个字段里时，六个在产项目会因为名字里带「集群」或「扩建」而被误判为不在产。容量优先使用 <b>kt LCE/年</b>；硬岩项目以公开的精矿吨数按近似 LCE 系数折算；盐湖项目优先使用公司披露的碳酸锂/氢氧化锂/氯化锂名义产能。',
     heroIntro2:
       '地图使用 <b>Leaflet + OpenStreetMap</b>。圆点大小按 <b>当前或规划产能的较大值</b> 缩放，虚线代表典型物流/出口路线。对中国分散云母矿、玻利维亚巨型盐湖等披露不统一区域，使用 <b>项目群/盐湖群</b> 纳入，以保证覆盖面和供给曲线可比性。',
     badgeProfessional: '适用于专业投研',
@@ -16,7 +16,7 @@ export const locales = {
     stats: {
       project: '样本数',
       country: '国家数',
-      operating: '在产样本',
+      operating: '在产样本（含爬坡）',
       currentCapacity: '当前名义产能合计',
       plannedCapacity: '规划/设计产能合计',
       pipeline: '建设/开发样本',
@@ -186,6 +186,7 @@ export const locales = {
     searchPlaceholder: '搜索项目 / 国家 / 上市公司 / 风险关键词…',
     allStatuses: '全部状态',
     allCountries: '全部国家',
+    allStructures: '单体 + 集群',
     sortOptions: {
       capacity_desc: '按容量（高→低）',
       capacity_asc: '按容量（低→高）',
@@ -198,8 +199,7 @@ export const locales = {
       Construction: '建设中',
       Development: '开发 / 待开工',
       'On hold / stalled': '停摆 / 政治性卡点',
-      Cluster: '项目群 / 集群',
-      Other: '资源阶段 / 未归类',
+      'Resource stage': '资源阶段',
     },
     loading: '正在从项目仓库加载锂资源数据库…',
     tableTitle: '项目数据库',
@@ -245,7 +245,7 @@ export const locales = {
     title: 'Global Lithium Projects Map & Database (2026)',
     eyebrow: 'Lithium Research 2026',
     heroIntro1:
-      'This page organizes global lithium supply into one research framework across <b>Operating / Ramp-up / Construction / Development / On hold / Cluster</b> assets. Capacity is normalized to <b>kt LCE per year</b> whenever possible; hard-rock projects use approximate concentrate-to-LCE conversion when needed, while brine assets prioritize disclosed carbonate / hydroxide / chloride nameplate capacity.',
+      'This page organizes global lithium supply along three <b>independent</b> axes: <b>lifecycle</b> (operating / construction / development / on hold / resource stage), <b>record structure</b> (single asset / cluster) and <b>capacity activity</b> (expanding / ramping / steady). Capacity is normalized to <b>kt LCE per year</b> whenever possible; hard-rock projects use approximate concentrate-to-LCE conversion when needed, while brine assets prioritize disclosed carbonate / hydroxide / chloride nameplate capacity.',
     heroIntro2:
       'The map runs on <b>Leaflet + OpenStreetMap</b>. Marker size scales with the <b>larger of current or planned capacity</b>, and dashed lines indicate representative logistics or export routes. Fragmented disclosure areas such as China lepidolite districts or Bolivia salars are grouped as <b>project clusters</b> so the coverage remains comparable for supply-curve analysis.',
     badgeProfessional: 'Built for professional research',
@@ -425,6 +425,7 @@ export const locales = {
     searchPlaceholder: 'Search project / country / listed owner / risk keyword…',
     allStatuses: 'All statuses',
     allCountries: 'All countries',
+    allStructures: 'Single + cluster',
     sortOptions: {
       capacity_desc: 'Capacity (high to low)',
       capacity_asc: 'Capacity (low to high)',
@@ -437,8 +438,7 @@ export const locales = {
       Construction: 'Construction',
       Development: 'Development / pre-start',
       'On hold / stalled': 'On hold / stalled',
-      Cluster: 'Cluster',
-      Other: 'Resource stage / unclassified',
+      'Resource stage': 'Resource stage',
     },
     loading: 'Loading the lithium project database from the repository…',
     tableTitle: 'Project Database',
