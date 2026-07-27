@@ -13,6 +13,7 @@ const DEFAULTS = {
   q: '',
   statusGroups: null,   // null = all
   countries: [],        // [] = all
+  structures: [],       // [] = all
   sort: 'capacity_desc',
 };
 
@@ -29,6 +30,9 @@ export function encodeState({ view, filters, sort }) {
   if (filters.countries && filters.countries.length) {
     params.set('country', filters.countries.join(','));
   }
+  if (filters.structures && filters.structures.length) {
+    params.set('structure', filters.structures.join(','));
+  }
   if (sort && sort !== DEFAULTS.sort) params.set('sort', sort);
   const qs = params.toString();
   return qs ? `?${qs}` : '';
@@ -39,7 +43,9 @@ export function encodeState({ view, filters, sort }) {
  * defaults, so an old shared link can never throw — it just filters less than intended.
  * `validGroups` / `validCountries` drop values that no longer exist in the data.
  */
-export function decodeState(search, { validGroups = null, validCountries = null, validViews = null } = {}) {
+export function decodeState(search, {
+  validGroups = null, validCountries = null, validStructures = null, validViews = null,
+} = {}) {
   const params = new URLSearchParams(search || '');
   const split = (key, valid) => {
     const raw = params.get(key);
@@ -57,6 +63,7 @@ export function decodeState(search, { validGroups = null, validCountries = null,
       q: params.get('q') || DEFAULTS.q,
       statusGroups: split('status', validGroups),
       countries: split('country', validCountries) || [],
+      structures: split('structure', validStructures) || [],
     },
     sort: ['capacity_desc', 'capacity_asc', 'name_asc', 'country_asc'].includes(sort)
       ? sort

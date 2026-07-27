@@ -13,7 +13,10 @@ export const VIEWS = [
     id: 'cockpit',
     label: '市场状态',
     hint: '当前观点、置信度、关键发现与风险',
-    sections: ['statsSection', 'findingsSection', 'changelogSection', 'researchUpdatesSection'],
+    sections: [
+      'statsSection', 'findingsSection', 'keyMetricsSection',
+      'changelogSection', 'researchUpdatesSection',
+    ],
   },
   {
     id: 'supply',

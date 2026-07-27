@@ -125,8 +125,10 @@ export const reports = [
   {
     slug: '2026-04-global-lithium',
     title: '全球锂资源项目地图与数据库（2026）',
-    description: '整合 44 个全球锂项目/集群的地图与数据库，覆盖产能、储量/资源、成本、运输路线与供给兑现风险；行情、市值与研报判断更新至 2026-07。',
-    date: '2026-07-24',
+    description: '整合 44 个全球锂项目/集群的地图与数据库，覆盖产能、储量/资源、成本、运输路线与供给兑现风险；关键指标带出处信封，10 家 A 股补齐 26H1 业绩预告，行情与市值更新至 2026-07-27。',
+    // Tracks market.meta.asOf (the report's newest data), NOT the CSV's UPDATE_MARKER —
+    // enforced by scripts/check-lithium-consistency.mjs. See global-lithium/core/version.js.
+    date: '2026-07-27',
     type: 'html',
     category: 'industry',
     tags: ['Research Topic', 'Lithium', 'Mining', 'Supply Curve', '锂'],

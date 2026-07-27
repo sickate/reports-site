@@ -1,7 +1,7 @@
 // RFC-4180 CSV parsing + row normalisation. Shared by the browser app and the Node build
 // check so the two can never drift. Handles the UTF-8 BOM the database file carries.
 
-import { numericFields, normalizeStatusGroup } from './schema.js';
+import { numericFields, deriveStatusGroup } from './schema.js';
 
 export function parseCsv(text) {
   const rows = [];
@@ -77,7 +77,11 @@ export function loadCsvData(text) {
       item[key] = numericFields.has(key) ? toNumber(value) : value;
     });
 
-    item.status_group = normalizeStatusGroup(item.status);
+    // A presentation bucket derived from the RECORDED lifecycle/activity columns, not from
+    // parsing the free-text status. Filtering, KPIs and map colour all read the columns;
+    // `status` is prose. The build check rejects out-of-enum values before deploy, so the
+    // runtime can trust them.
+    item.status_group = deriveStatusGroup(item);
     item.map_capacity_kta = Math.max(
       Number(item.current_kta_lce || 0),
       Number(item.planned_kta_lce || 0),

@@ -4,7 +4,8 @@ import { useSearchParams } from 'react-router-dom';
 // Bump on every CODE update so the iframe requests a fresh, version-pinned URL.
 // Must stay in sync with the ?v= on index.html's app.js script tag — enforced by
 // scripts/check-lithium-consistency.mjs, which fails the build if they diverge.
-// (The separate DATA clock lives in the report's data/config.js as DATA_VERSION.)
+// (The two separate DATA clocks — DATA_CACHE_KEY and UPDATE_MARKER — live alongside
+// CODE_VERSION in the report's core/version.js; see that file for why there are three.)
 const REPORT_VERSION = '2026-07-27';
 const REPORT_PATH = '/research-topics/global-lithium/';
 // Was 1400 when the report was one long page. Now that it is split into views, the
