@@ -14,13 +14,19 @@
 //                     with no lifecycle column, and every project would silently collapse
 //                     into one bucket.
 //
-//   UPDATE_MARKER   — the value of a row's `updated` cell that earns the "本次更新" pill,
-//                     and the data as-of date shown to readers (kept equal to the report's
-//                     `date` in src/reports/index.js). Bump ONLY when project facts change.
+//   UPDATE_MARKER   — the value of a row's `updated` cell that earns the "本次更新" pill.
+//                     Scoped to the PROJECT CSV only. Bump when project facts change.
 //
 // The trap that motivated the split: a code-or-schema-only release has to bump the first
 // two but must NOT bump the third, because raising the marker past every row's `updated`
 // value clears all the pills at once and reads as "nothing changed this week".
+//
+// Note what is deliberately NOT here: the report's overall "last updated" date shown on the
+// homepage. That lives in src/reports/index.js and tracks `market.meta.asOf`, because a
+// refresh can update company financials and market data while leaving every project row
+// untouched — which is exactly what happened on 2026-07-27. Tying the homepage date to
+// UPDATE_MARKER would have forced a choice between advertising a stale date and wiping the
+// project table's update pills.
 //
 // scripts/check-lithium-consistency.mjs enforces all of the above and fails the build.
 

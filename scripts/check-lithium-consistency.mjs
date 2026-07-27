@@ -169,22 +169,31 @@ async function checkVersions() {
   if (!reportVersion) fail('could not read REPORT_VERSION from the React wrapper');
   if (!registryDate) fail('could not read the registry `date` for 2026-04-global-lithium');
 
-  // THREE independent clocks (see core/version.js). Each pairing below can drift silently:
+  // Clocks (see core/version.js). Each pairing below can drift silently:
   //   code  — index.html ?v= (module pin) ≡ REPORT_VERSION (iframe pin) ≡ CODE_VERSION
-  //   data  — UPDATE_MARKER ≡ the registry date shown on the homepage
-  //   cache — DATA_CACHE_KEY must not predate UPDATE_MARKER
+  //   data  — the registry date shown on the homepage ≡ market.meta.asOf
+  //   pill  — UPDATE_MARKER scopes the CSV's "本次更新" highlight and may legitimately lag
+  //           the report date (a company/market-only refresh leaves project rows untouched)
+  //   cache — DATA_CACHE_KEY must cover the newest data it is busting
   if (assetVersion && assetVersion !== CODE_VERSION) {
     fail(`code version mismatch: index.html ?v=${assetVersion} vs CODE_VERSION ${CODE_VERSION}`);
   }
   if (reportVersion && reportVersion !== CODE_VERSION) {
     fail(`code version mismatch: REPORT_VERSION ${reportVersion} vs CODE_VERSION ${CODE_VERSION}`);
   }
-  if (registryDate && UPDATE_MARKER !== registryDate) {
-    fail(`data version mismatch: UPDATE_MARKER ${UPDATE_MARKER} vs registry date ${registryDate}`);
+
+  const reportAsOf = market?.meta?.asOf;
+  if (registryDate && reportAsOf && registryDate !== reportAsOf) {
+    fail(`report date mismatch: src/reports/index.js date ${registryDate} vs `
+      + `market.meta.asOf ${reportAsOf} — the homepage would advertise a different `
+      + `freshness than the page itself claims`);
   }
-  if (DATA_CACHE_KEY < UPDATE_MARKER) {
-    fail(`DATA_CACHE_KEY ${DATA_CACHE_KEY} predates UPDATE_MARKER ${UPDATE_MARKER} — `
-      + `a data change cannot be older than the data it describes`);
+  if (reportAsOf && UPDATE_MARKER > reportAsOf) {
+    fail(`UPDATE_MARKER ${UPDATE_MARKER} is newer than market.meta.asOf ${reportAsOf}`);
+  }
+  if (DATA_CACHE_KEY < UPDATE_MARKER || (reportAsOf && DATA_CACHE_KEY < reportAsOf)) {
+    fail(`DATA_CACHE_KEY ${DATA_CACHE_KEY} predates the data it busts `
+      + `(UPDATE_MARKER ${UPDATE_MARKER}, market.meta.asOf ${reportAsOf})`);
   }
 
   // The pill is opt-in per row: if no row carries the marker, the "本次更新" highlight is
