@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 // Bump on every report update so the iframe requests a fresh, version-pinned URL
 // (the embedded HTML is otherwise heuristically cached by the browser).
-const REPORT_VERSION = '2026-07-24';
+const REPORT_VERSION = '2026-07-27';
 const REPORT_URL = `/research-topics/global-lithium-projects-2026.html?v=${REPORT_VERSION}`;
 const MIN_FRAME_HEIGHT = 1400;
 const HEIGHT_MESSAGE_TYPE = 'instap-research-topic-height';

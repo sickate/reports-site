@@ -660,6 +660,17 @@
       overflow: auto;
     }
 
+    /* Hidden by default (the full 14-column table fits on desktop); the mobile media
+       query below turns it on. Declared HERE, before that query, so the cascade order
+       lets the media rule win — a later top-level rule would silently override it. */
+    .table-scroll-hint {
+      display: none;
+      padding: 0 6px 8px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
     .table-title {
       padding: 8px 6px 6px;
       display: flex;
@@ -781,6 +792,14 @@
       color: #ffb4c2;
     }
 
+    /* Shown only when the visible set contains rows without coordinates, so the
+       (legitimate) gap between table rows and map markers is stated rather than silent. */
+    .unmapped-note {
+      padding: 10px 16px 2px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
     @media (max-width: 1180px) {
       .stats {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -855,6 +874,46 @@
 
       .popup-grid {
         grid-template-columns: 1fr;
+      }
+
+      /* ---- Mobile table triage ----
+         The project table is ~2,238px wide (14 inline column widths) and the company
+         tables are 1,180-1,400px. The iframe is rendered with scrolling="no", so anything
+         that escapes an overflow container is *clipped*, not scrollable. Two measures:
+         (1) guarantee each table sits in a real horizontal scroller with a visible hint,
+         (2) drop the three long narrative columns so the remaining width is tractable.
+         Phase 6 replaces this with proper cards; this is triage, not the destination. */
+      .tablewrap,
+      .company-tablewrap {
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .table-scroll-hint {
+        display: block;
+      }
+
+      /* 11 地址 · 12 运输/出口路线 · 14 数据来源摘要 — the narrative columns.
+         Kept in the DOM (and in the search haystack), just not rendered at this width. */
+      #dataTable th:nth-child(11),
+      #dataTable td:nth-child(11),
+      #dataTable th:nth-child(12),
+      #dataTable td:nth-child(12),
+      #dataTable th:nth-child(14),
+      #dataTable td:nth-child(14) {
+        display: none;
+      }
+
+      #dataTable th {
+        width: auto !important;
+      }
+
+      #dataTable th:nth-child(6),
+      #dataTable td:nth-child(6),
+      #dataTable th:nth-child(13),
+      #dataTable td:nth-child(13) {
+        max-width: 190px;
       }
     }
 
@@ -932,7 +991,10 @@
     }
 
     /* ---- Changelog diff (this vs previous) ---- */
-    .changelog-diff { padding: 12px 18px 0; }
+    /* overflow-x here is load-bearing: the parent .changelog-card sets overflow:hidden for
+       its rounded corners, so without an inner scroller this ~400px table is CLIPPED rather
+       than scrollable on narrow screens, silently hiding the "this vs last" comparison. */
+    .changelog-diff { padding: 12px 18px 0; overflow-x: auto; }
     .changelog-diff-title { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
     .changelog-diff-table { border-collapse: collapse; font-size: 13px; width: auto; }
     .changelog-diff-table th, .changelog-diff-table td {
@@ -1170,6 +1232,7 @@
       <div class="mapbox">
         <div id="map"></div>
       </div>
+      <div id="unmappedNote" class="unmapped-note" hidden></div>
     </div>
 
     <div class="card tablewrap" id="projectDatabaseSection">
@@ -1177,6 +1240,7 @@
         <h2 id="tableTitle"></h2>
         <p id="tableSubtitle"></p>
       </div>
+      <p class="table-scroll-hint" id="tableScrollHint"></p>
       <table id="dataTable">
         <thead>
           <tr id="dataTableHead"></tr>
@@ -1197,6 +1261,10 @@
     const HEIGHT_MESSAGE_TYPE = 'instap-research-topic-height';
     // Bump DATA_VERSION on every weekly update so browsers/CDN never serve stale
     // /data/*.csv / *.jsonl (nginx sends no cache-control on these static files).
+    // NOTE: this constant does double duty — it cache-busts /data/*.csv|jsonl AND marks which
+    // rows render the "本次更新" pill (item.updated === DATA_VERSION). Only bump it when the
+    // *data* changes; bumping it for a code-only release would silently clear every pill.
+    // Phase 4 splits these two roles apart (core/version.js).
     const DATA_VERSION = '2026-07-24';
     const DATA_URL = '/data/global-lithium-database-2026.csv';
     const COMPANY_FINANCIALS_URL = '/data/company-financials.jsonl';
@@ -1209,7 +1277,9 @@
       Development: '#22d3ee',
       'On hold / stalled': '#fb7185',
       Cluster: '#94a3b8',
-      Other: '#94a3b8',
+      // Warm stone, deliberately distinct from Cluster's cool slate: these two are
+      // the only muted swatches, so sharing a hex made them indistinguishable on the map.
+      Other: '#a8a29e',
     };
 
     const numericFields = new Set([
@@ -1420,11 +1490,12 @@
           Development: '开发 / 待开工',
           'On hold / stalled': '停摆 / 政治性卡点',
           Cluster: '项目群 / 集群',
-          Other: '其他',
+          Other: '资源阶段 / 未归类',
         },
         loading: '正在从项目仓库加载锂资源数据库…',
         tableTitle: '项目数据库',
         tableSubtitle: '优先展示容量、储量/资源、成本、运输路线与扰动因素，适合快速做供给曲线和兑现率筛查。数据更新时间 2026-07-24 · 高亮行为本次更新。',
+        tableScrollHint: '← 左右滑动查看更多列。小屏下已隐藏「地址 / 运输出口路线 / 数据来源摘要」三列（仍可被搜索命中），横屏或桌面端可看到完整 14 列。',
         tableHeaders: [
           '项目',
           '国家',
@@ -1658,11 +1729,12 @@
           Development: 'Development / pre-start',
           'On hold / stalled': 'On hold / stalled',
           Cluster: 'Cluster',
-          Other: 'Other',
+          Other: 'Resource stage / unclassified',
         },
         loading: 'Loading the lithium project database from the repository…',
         tableTitle: 'Project Database',
         tableSubtitle: 'Capacity, resource base, cost, logistics and execution risks are shown first so the table can be used directly for supply-curve and delivery analysis. Data updated 2026-07-24; highlighted rows changed in this update.',
+        tableScrollHint: '← Swipe horizontally for more columns. Address / export route / source columns are hidden at this width (they remain searchable); rotate or use a desktop browser for all 14.',
         tableHeaders: [
           'Project',
           'Country',
@@ -2088,7 +2160,7 @@
         Development: '开发中',
         'On hold / stalled': '停摆 / 搁置',
         Cluster: '项目群 / 集群',
-        Other: '其他',
+        Other: '资源阶段 / 未归类',
       },
       depositType: {
         'Hard-rock pegmatite (spodumene)': '硬岩伟晶岩（锂辉石）',
@@ -2643,11 +2715,13 @@
     const errorNote = document.getElementById('errorNote');
     const appRoot = document.getElementById('app');
     const legend = document.getElementById('legend');
+    const unmappedNote = document.getElementById('unmappedNote');
     const heroBadges = document.getElementById('heroBadges');
     const findingsList = document.getElementById('findingsList');
     const riskGrid = document.getElementById('riskGrid');
     const updatesGrid = document.getElementById('updatesGrid');
     const dataTableHead = document.getElementById('dataTableHead');
+    const tableScrollHint = document.getElementById('tableScrollHint');
     const langZhBtn = document.getElementById('langZhBtn');
     const langEnBtn = document.getElementById('langEnBtn');
     const pageNav = document.getElementById('pageNav');
@@ -2707,7 +2781,14 @@
     let currentLang = window.localStorage.getItem(LANG_STORAGE_KEY) === 'en' ? 'en' : 'zh';
     let lastErrorMessage = '';
     let companyFinanceIndex = new Map();
-    const statusLegendItems = ['Operating', 'Ramp-up', 'Construction', 'Development', 'On hold / stalled', 'Cluster'];
+    // The six lifecycle buckets normalizeStatusGroup() aims for.
+    const CORE_STATUS_GROUPS = ['Operating', 'Ramp-up', 'Construction', 'Development', 'On hold / stalled', 'Cluster'];
+    // 'Other' is normalizeStatusGroup's fallback and MUST be a first-class legend bucket:
+    // it was previously absent here, so any row falling back to it failed the
+    // activeStatusGroups.has() test in filteredData() and was silently dropped from BOTH
+    // the table and the map while updateStats() still counted it (the 44 / 43 / 43 drift).
+    // A bucket that can hold rows must always be renderable.
+    const statusLegendItems = [...CORE_STATUS_GROUPS, 'Other'];
     const activeStatusGroups = new Set(statusLegendItems);
 
     function notifyParentHeight() {
@@ -2982,8 +3063,27 @@
       );
     }
 
+    let lastFacetSignature = '';
+
     function renderFilters() {
       const t = locales[currentLang];
+
+      // rerender() calls this on every pass (including every search keystroke). Rebuilding the
+      // <option> lists unconditionally would be wasteful and would collapse an open native
+      // select mid-interaction, so only rebuild when the option set or its labels actually
+      // changed. currentLang is in the signature because it changes the labels.
+      const facetSignature = JSON.stringify([
+        currentLang,
+        uniqueVals('status_group'),
+        uniqueVals('country'),
+      ]);
+
+      if (facetSignature === lastFacetSignature) {
+        return;
+      }
+
+      lastFacetSignature = facetSignature;
+
       const selectedStatus = statusFilter.value || 'all';
       const selectedCountry = countryFilter.value || 'all';
       const selectedSort = sortFilter.value || 'capacity_desc';
@@ -3030,7 +3130,12 @@
 
     function renderLegend() {
       const t = locales[currentLang];
+      // Core buckets always render (stable legend); the 'Other' fallback only renders when
+      // something actually lands in it, so a healthy dataset shows no empty chip and an
+      // unmapped status becomes immediately visible instead of disappearing.
+      const presentGroups = new Set(rawData.map((item) => item.status_group));
       legend.innerHTML = statusLegendItems
+        .filter((key) => CORE_STATUS_GROUPS.includes(key) || presentGroups.has(key))
         .map(
           (key) =>
             `<button class="legend-filter ${activeStatusGroups.has(key) ? '' : 'is-inactive'}" data-status-group="${escapeHtml(key)}" type="button"><span class="dot" style="background:${colorMap[key]}"></span>${escapeHtml(t.legend[key])}</button>`
@@ -3407,6 +3512,7 @@
       searchBox.placeholder = t.searchPlaceholder;
       document.getElementById('tableTitle').textContent = t.tableTitle;
       document.getElementById('tableSubtitle').textContent = t.tableSubtitle;
+      tableScrollHint.textContent = t.tableScrollHint;
       footnoteEl.innerHTML = t.footnote;
       loadingNote.textContent = t.loading;
 
@@ -3578,6 +3684,7 @@
 
       if (!data.length) {
         const tr = document.createElement('tr');
+        tr.className = 'is-empty-state';
         tr.innerHTML = `<td colspan="14" class="empty-state">${escapeHtml(t.emptyState)}</td>`;
         tbody.appendChild(tr);
         return;
@@ -3653,11 +3760,58 @@
 
     function rerender() {
       const data = sortData(filteredData());
+
+      // Facet options derive from rawData, which only exists after the CSV fetch.
+      // renderFilters() used to be reachable only via renderStaticText(), which runs inside
+      // init() BEFORE that fetch — so the status/country dropdowns were built from an empty
+      // array and never rebuilt, leaving them permanently stuck on "全部" / "All".
+      // It is self-guarded (see renderFilters), so calling it every pass is cheap.
+      renderFilters();
+
       renderTable(data);
       renderMap(data);
+
+      // KPIs must describe what the user can actually see. Passing the *unfiltered* rawData
+      // here is what made the hero read 44 while the map and table showed 43.
+      updateStats(data);
+
       resultSummary.textContent = locales[currentLang].resultSummary(data.length, rawData.length);
       loadingNote.hidden = true;
+
+      assertViewConsistency(data);
+
       notifyParentHeight();
+    }
+
+    // Cheap standing guarantee that the three surfaces never disagree again. Markers are
+    // compared against coordinate-bearing rows only — a row without lat/lon is legitimately
+    // unmapped, and that difference is surfaced in the map footer rather than hidden.
+    function assertViewConsistency(data) {
+      const mappable = data.filter((item) => Number.isFinite(item.lat) && Number.isFinite(item.lon));
+      const tableRows = tbody.querySelectorAll('tr:not(.is-empty-state)').length;
+      const markers = markerLayer.getLayers().length;
+      const kpi = Number(document.getElementById('statProjectCount').textContent.replace(/[^0-9]/g, ''));
+
+      unmappedNote.textContent = mappable.length === data.length
+        ? ''
+        : (currentLang === 'zh'
+          ? `${data.length - mappable.length} 个项目缺少坐标，未在地图上显示。`
+          : `${data.length - mappable.length} project(s) lack coordinates and are not shown on the map.`);
+      unmappedNote.hidden = mappable.length === data.length;
+
+      if (!data.length) {
+        return;
+      }
+
+      if (kpi !== data.length || tableRows !== data.length || markers !== mappable.length) {
+        console.error('[global-lithium] view inconsistency', {
+          kpi,
+          tableRows,
+          markers,
+          visible: data.length,
+          mappable: mappable.length,
+        });
+      }
     }
 
     function applyLanguage(nextLang) {
@@ -3666,7 +3820,7 @@
       renderStaticText();
 
       if (rawData.length) {
-        updateStats(rawData);
+        // rerender() now owns updateStats() so the KPIs always describe the visible set.
         rerender();
       } else if (lastErrorMessage) {
         errorNote.textContent = `${locales[currentLang].errorPrefix}${lastErrorMessage}`;
@@ -3693,7 +3847,8 @@
 
         const text = await response.text();
         rawData = loadCsvData(text);
-        updateStats(rawData);
+        // Legend depends on which groups the freshly-loaded data actually populates.
+        renderLegend();
         rerender();
 
         errorNote.hidden = true;
