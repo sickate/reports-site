@@ -1,18 +1,44 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 // Bump on every CODE update so the iframe requests a fresh, version-pinned URL.
 // Must stay in sync with the ?v= on index.html's app.js script tag — enforced by
 // scripts/check-lithium-consistency.mjs, which fails the build if they diverge.
 // (The separate DATA clock lives in the report's data/config.js as DATA_VERSION.)
 const REPORT_VERSION = '2026-07-27';
-const REPORT_URL = `/research-topics/global-lithium/?v=${REPORT_VERSION}`;
+const REPORT_PATH = '/research-topics/global-lithium/';
 const MIN_FRAME_HEIGHT = 1400;
 const HEIGHT_MESSAGE_TYPE = 'instap-research-topic-height';
+const STATE_MESSAGE_TYPE = 'instap-research-topic-state';
+
+// Filter keys the embedded report owns. Mirrored onto this page's URL so a shared link
+// restores the reader's view; anything else in the query string is left untouched.
+const REPORT_STATE_KEYS = ['q', 'status', 'country', 'sort'];
 
 function GlobalLithiumReport() {
   const iframeRef = useRef(null);
   const [frameHeight, setFrameHeight] = useState(MIN_FRAME_HEIGHT);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Read once, on mount only: this seeds the iframe's src. Re-deriving it on every
+  // searchParams change would reload the iframe on every keystroke the reader types
+  // inside it — the mirror below writes the URL, so that would be a feedback loop.
+  const initialQuery = useRef(null);
+  if (initialQuery.current === null) {
+    const seed = new URLSearchParams();
+    for (const key of REPORT_STATE_KEYS) {
+      const value = searchParams.get(key);
+      if (value) seed.set(key, value);
+    }
+    initialQuery.current = seed.toString();
+  }
+
+  const reportUrl = useMemo(() => {
+    const params = new URLSearchParams(initialQuery.current);
+    params.set('v', REPORT_VERSION);
+    return `${REPORT_PATH}?${params.toString()}`;
+  }, []);
 
   useEffect(() => {
     const iframe = iframeRef.current;
@@ -45,6 +71,25 @@ function GlobalLithiumReport() {
         return;
       }
 
+      if (event.data?.type === STATE_MESSAGE_TYPE) {
+        // Mirror the report's filter state onto this page's URL so the address bar is
+        // shareable. Goes through React Router (replace: true) rather than a raw
+        // history.replaceState, so the router's own location never goes stale — and
+        // `replace` keeps the Back button pointing at the previous PAGE, not at a
+        // previous filter state.
+        const incoming = new URLSearchParams(String(event.data.search || '').replace(/^\?/, ''));
+        setSearchParams((current) => {
+          const next = new URLSearchParams(current);
+          for (const key of REPORT_STATE_KEYS) {
+            const value = incoming.get(key);
+            if (value) next.set(key, value);
+            else next.delete(key);
+          }
+          return next;
+        }, { replace: true });
+        return;
+      }
+
       if (event.data?.type !== HEIGHT_MESSAGE_TYPE) {
         return;
       }
@@ -70,7 +115,7 @@ function GlobalLithiumReport() {
       window.removeEventListener('message', handleMessage);
       iframe.removeEventListener('load', handleLoad);
     };
-  }, []);
+  }, [setSearchParams]);
 
   return (
     <section className="embedded-report-shell">
@@ -78,7 +123,7 @@ function GlobalLithiumReport() {
         <span className="embedded-report-label">Lithium Research</span>
         <a
           className="embedded-report-link"
-          href={REPORT_URL}
+          href={reportUrl}
           target="_blank"
           rel="noreferrer"
         >
@@ -94,7 +139,7 @@ function GlobalLithiumReport() {
         <iframe
           ref={iframeRef}
           className="embedded-report-frame"
-          src={REPORT_URL}
+          src={reportUrl}
           title="全球锂资源项目地图与数据库（2026）"
           scrolling="no"
           style={{ height: `${frameHeight}px`, opacity: isLoaded ? 1 : 0 }}

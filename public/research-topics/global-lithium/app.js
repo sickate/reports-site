@@ -13,6 +13,12 @@ import { companyResearchContent } from './data/company-research.js';
 import { dictionaries } from './data/dictionaries.js';
 import { fieldTranslationsZh } from './data/field-translations.js';
 import { listedOwners } from './data/listed-owners.js';
+import { createStore } from './core/store.js';
+import {
+  selectFacets, selectVisibleProjects, selectKpis, selectMappable, sortProjects,
+} from './core/selectors.js';
+import { createUrlSync, decodeState } from './core/url-state.js';
+import { assertViewConsistency } from './core/invariants.js';
 
 // The bilingual UI toggle was removed: the page is Chinese-only. The English strings stay
 // in ./data/ because they still feed the bilingual search haystack and the build-time
@@ -97,14 +103,24 @@ applyTileSource(0);
 const markerLayer = L.layerGroup().addTo(map);
 const lineLayer = L.layerGroup().addTo(map);
 
+// rawData is the loaded CSV; it is INPUT to the selectors, not view state, so it stays out
+// of the store. Everything the user can change lives in the store.
 let rawData = [];
 let lastErrorMessage = '';
 let companyFinanceIndex = new Map();
 
-// Mutable view state (the legend chips toggle these), so it lives here rather than in
-// data/schema.js, which stays pure and Node-importable. Seeded from the full bucket list
-// so every group — including the 'Other' fallback — starts visible.
-const activeStatusGroups = new Set(statusLegendItems);
+// Single source of truth for view state.
+//
+// `filters.statusGroups === null` means "all". The legend chips and the status dropdown are
+// two EDITORS of this one field, not two independent filters — previously the legend wrote
+// a module-level Set while the dropdown's value lived in the DOM, and the render path had
+// to AND them together. One field means they can never disagree.
+const store = createStore({
+  filters: { q: '', statusGroups: null, countries: [] },
+  sort: 'capacity_desc',
+});
+
+const syncUrl = createUrlSync();
 
 function notifyParentHeight() {
   if (window.parent === window || !appRoot) {
@@ -269,89 +285,80 @@ function getPairedValue(value, field) {
   return { primary, secondary };
 }
 
-function uniqueVals(key) {
-  return [...new Set(rawData.map((d) => d[key]).filter(Boolean))].sort((a, b) =>
-    String(a).localeCompare(String(b), 'en')
-  );
-}
-
+// Rebuilt only when the option set or its labels actually change: renderFilters() runs on
+// every commit (including every search keystroke), and rebuilding <option>s unconditionally
+// would collapse an open native select mid-interaction.
 let lastFacetSignature = '';
 
 function renderFilters() {
   const t = locales[currentLang];
+  const { filters, sort } = store.getState();
+  const facets = selectFacets(rawData);
 
-  // rerender() calls this on every pass (including every search keystroke). Rebuilding the
-  // <option> lists unconditionally would be wasteful and would collapse an open native
-  // select mid-interaction, so only rebuild when the option set or its labels actually
-  // changed. currentLang is in the signature because it changes the labels.
-  const facetSignature = JSON.stringify([
-    currentLang,
-    uniqueVals('status_group'),
-    uniqueVals('country'),
-  ]);
+  const facetSignature = JSON.stringify([facets.statusGroups, facets.countries]);
+  if (facetSignature !== lastFacetSignature) {
+    lastFacetSignature = facetSignature;
 
-  if (facetSignature === lastFacetSignature) {
-    return;
+    statusFilter.innerHTML = '';
+    countryFilter.innerHTML = '';
+    sortFilter.innerHTML = '';
+
+    const statusDefault = document.createElement('option');
+    statusDefault.value = 'all';
+    statusDefault.textContent = t.allStatuses;
+    statusFilter.appendChild(statusDefault);
+
+    const countryDefault = document.createElement('option');
+    countryDefault.value = 'all';
+    countryDefault.textContent = t.allCountries;
+    countryFilter.appendChild(countryDefault);
+
+    for (const value of facets.statusGroups) {
+      const opt = document.createElement('option');
+      opt.value = value;
+      opt.textContent = localizeValue(value, 'status_group', currentLang);
+      statusFilter.appendChild(opt);
+    }
+
+    for (const value of facets.countries) {
+      const opt = document.createElement('option');
+      opt.value = value;
+      opt.textContent = localizeValue(value, 'country', currentLang);
+      countryFilter.appendChild(opt);
+    }
+
+    for (const [value, label] of Object.entries(t.sortOptions)) {
+      const opt = document.createElement('option');
+      opt.value = value;
+      opt.textContent = label;
+      sortFilter.appendChild(opt);
+    }
   }
 
-  lastFacetSignature = facetSignature;
-
-  const selectedStatus = statusFilter.value || 'all';
-  const selectedCountry = countryFilter.value || 'all';
-  const selectedSort = sortFilter.value || 'capacity_desc';
-
-  statusFilter.innerHTML = '';
-  countryFilter.innerHTML = '';
-  sortFilter.innerHTML = '';
-
-  const statusDefault = document.createElement('option');
-  statusDefault.value = 'all';
-  statusDefault.textContent = t.allStatuses;
-  statusFilter.appendChild(statusDefault);
-
-  const countryDefault = document.createElement('option');
-  countryDefault.value = 'all';
-  countryDefault.textContent = t.allCountries;
-  countryFilter.appendChild(countryDefault);
-
-  for (const value of uniqueVals('status_group')) {
-    const opt = document.createElement('option');
-    opt.value = value;
-    opt.textContent = localizeValue(value, 'status_group', currentLang);
-    statusFilter.appendChild(opt);
-  }
-
-  for (const value of uniqueVals('country')) {
-    const opt = document.createElement('option');
-    opt.value = value;
-    opt.textContent = localizeValue(value, 'country', currentLang);
-    countryFilter.appendChild(opt);
-  }
-
-  for (const [value, label] of Object.entries(t.sortOptions)) {
-    const opt = document.createElement('option');
-    opt.value = value;
-    opt.textContent = label;
-    sortFilter.appendChild(opt);
-  }
-
-  statusFilter.value = selectedStatus;
-  countryFilter.value = selectedCountry;
-  sortFilter.value = selectedSort;
+  // Controlled inputs: the DOM reflects the store, never the other way round. The status
+  // dropdown can only express "all" or exactly one group, so a multi-group selection made
+  // via the legend shows as "all" here — the legend chips carry the detail.
+  const groups = filters.statusGroups;
+  statusFilter.value = groups && groups.length === 1 ? groups[0] : 'all';
+  countryFilter.value = filters.countries.length === 1 ? filters.countries[0] : 'all';
+  sortFilter.value = sort;
+  if (searchBox.value !== filters.q) searchBox.value = filters.q;
 }
 
 function renderLegend() {
   const t = locales[currentLang];
+  const { filters } = store.getState();
   // Core buckets always render (stable legend); the 'Other' fallback only renders when
   // something actually lands in it, so a healthy dataset shows no empty chip and an
   // unmapped status becomes immediately visible instead of disappearing.
   const presentGroups = new Set(rawData.map((item) => item.status_group));
+  const active = filters.statusGroups;
   legend.innerHTML = statusLegendItems
     .filter((key) => CORE_STATUS_GROUPS.includes(key) || presentGroups.has(key))
-    .map(
-      (key) =>
-        `<button class="legend-filter ${activeStatusGroups.has(key) ? '' : 'is-inactive'}" data-status-group="${escapeHtml(key)}" type="button"><span class="dot" style="background:${colorMap[key]}"></span>${escapeHtml(t.legend[key])}</button>`
-    )
+    .map((key) => {
+      const isOn = !active || active.includes(key);
+      return `<button class="legend-filter ${isOn ? '' : 'is-inactive'}" data-status-group="${escapeHtml(key)}" type="button" aria-pressed="${isOn}"><span class="dot" style="background:${colorMap[key]}"></span>${escapeHtml(t.legend[key])}</button>`;
+    })
     .join('');
 }
 
@@ -738,10 +745,8 @@ function renderStaticText() {
   renderCompanyResearch();
 }
 
-function renderHeroBadges(data) {
+function renderHeroBadges({ projectCount, countryCount }) {
   const t = locales[currentLang];
-  const projectCount = data.length;
-  const countryCount = new Set(data.map((d) => d.country)).size;
 
   heroBadges.innerHTML = [
     currentLang === 'zh'
@@ -755,24 +760,17 @@ function renderHeroBadges(data) {
   ].join('');
 }
 
-function updateStats(data) {
-  const projectCount = data.length;
-  const countryCount = new Set(data.map((d) => d.country)).size;
-  const operatingCount = data.filter((d) => d.status_group === 'Operating').length;
-  const pipelineCount = data.filter(
-    (d) => d.status_group === 'Construction' || d.status_group === 'Development'
-  ).length;
-  const currentCapacity = data.reduce((sum, d) => sum + Number(d.current_kta_lce || 0), 0);
-  const plannedCapacity = data.reduce((sum, d) => sum + Number(d.planned_kta_lce || 0), 0);
+// Takes the KPI object from selectKpis(visible) — it no longer computes its own subset,
+// which is what let it describe 44 projects while the table and map showed 43.
+function updateStats(kpis) {
+  document.getElementById('statProjectCount').textContent = formatCount(kpis.projectCount);
+  document.getElementById('statCountryCount').textContent = formatCount(kpis.countryCount);
+  document.getElementById('statOperatingCount').textContent = formatCount(kpis.operatingCount);
+  document.getElementById('statPipelineCount').textContent = formatCount(kpis.pipelineCount);
+  document.getElementById('statCurrentCapacity').textContent = formatMetric(kpis.currentCapacity);
+  document.getElementById('statPlannedCapacity').textContent = formatMetric(kpis.plannedCapacity);
 
-  document.getElementById('statProjectCount').textContent = formatCount(projectCount);
-  document.getElementById('statCountryCount').textContent = formatCount(countryCount);
-  document.getElementById('statOperatingCount').textContent = formatCount(operatingCount);
-  document.getElementById('statPipelineCount').textContent = formatCount(pipelineCount);
-  document.getElementById('statCurrentCapacity').textContent = formatMetric(currentCapacity);
-  document.getElementById('statPlannedCapacity').textContent = formatMetric(plannedCapacity);
-
-  renderHeroBadges(data);
+  renderHeroBadges(kpis);
 }
 
 function radius(capacity) {
@@ -823,23 +821,6 @@ function popupHtml(item) {
   `;
 }
 
-function sortData(data) {
-  const sortValue = sortFilter.value;
-  const arr = [...data];
-
-  if (sortValue === 'capacity_desc') {
-    arr.sort((a, b) => b.map_capacity_kta - a.map_capacity_kta);
-  } else if (sortValue === 'capacity_asc') {
-    arr.sort((a, b) => a.map_capacity_kta - b.map_capacity_kta);
-  } else if (sortValue === 'name_asc') {
-    arr.sort((a, b) => a.project.localeCompare(b.project, 'en'));
-  } else if (sortValue === 'country_asc') {
-    arr.sort((a, b) => `${a.country}${a.project}`.localeCompare(`${b.country}${b.project}`, 'en'));
-  }
-
-  return arr;
-}
-
 function buildSearchHaystack(item) {
   const values = [
     item.project,
@@ -871,21 +852,6 @@ function buildSearchHaystack(item) {
   ];
 
   return values.join(' ').toLowerCase();
-}
-
-function filteredData() {
-  const query = searchBox.value.trim().toLowerCase();
-  const selectedStatus = statusFilter.value;
-  const selectedCountry = countryFilter.value;
-
-  return rawData.filter((item) => {
-    const passLegend = activeStatusGroups.has(item.status_group);
-    const passStatus = selectedStatus === 'all' || item.status_group === selectedStatus;
-    const passCountry = selectedCountry === 'all' || item.country === selectedCountry;
-    const haystack = buildSearchHaystack(item);
-    const passSearch = !query || haystack.includes(query);
-    return passLegend && passStatus && passCountry && passSearch;
-  });
 }
 
 function renderTable(data) {
@@ -968,60 +934,40 @@ function renderMap(data) {
   }
 }
 
-function rerender() {
-  const data = sortData(filteredData());
+// The single render pass. Every surface derives from ONE computed `visible` list, so the
+// KPI tiles, the table and the map cannot describe different sets. Subscribed to the store;
+// never call it directly — commit to the store and let it fire.
+function render(state) {
+  const visible = sortProjects(
+    selectVisibleProjects(rawData, state.filters, buildSearchHaystack),
+    state.sort
+  );
+  const mappable = selectMappable(visible);
 
-  // Facet options derive from rawData, which only exists after the CSV fetch.
-  // renderFilters() used to be reachable only via renderStaticText(), which runs inside
-  // init() BEFORE that fetch — so the status/country dropdowns were built from an empty
-  // array and never rebuilt, leaving them permanently stuck on "全部" / "All".
-  // It is self-guarded (see renderFilters), so calling it every pass is cheap.
   renderFilters();
+  renderLegend();
+  renderTable(visible);
+  renderMap(visible);
+  updateStats(selectKpis(visible));
 
-  renderTable(data);
-  renderMap(data);
-
-  // KPIs must describe what the user can actually see. Passing the *unfiltered* rawData
-  // here is what made the hero read 44 while the map and table showed 43.
-  updateStats(data);
-
-  resultSummary.textContent = locales[currentLang].resultSummary(data.length, rawData.length);
+  resultSummary.textContent = locales[currentLang].resultSummary(visible.length, rawData.length);
   loadingNote.hidden = true;
 
-  assertViewConsistency(data);
+  const { unmapped } = assertViewConsistency({
+    visible,
+    mappable,
+    kpiCount: Number(document.getElementById('statProjectCount').textContent.replace(/[^0-9]/g, '')),
+    tableRows: tbody.querySelectorAll('tr:not(.is-empty-state)').length,
+    markerCount: markerLayer.getLayers().length,
+  });
 
-  notifyParentHeight();
-}
-
-// Cheap standing guarantee that the three surfaces never disagree again. Markers are
-// compared against coordinate-bearing rows only — a row without lat/lon is legitimately
-// unmapped, and that difference is surfaced in the map footer rather than hidden.
-function assertViewConsistency(data) {
-  const mappable = data.filter((item) => Number.isFinite(item.lat) && Number.isFinite(item.lon));
-  const tableRows = tbody.querySelectorAll('tr:not(.is-empty-state)').length;
-  const markers = markerLayer.getLayers().length;
-  const kpi = Number(document.getElementById('statProjectCount').textContent.replace(/[^0-9]/g, ''));
-
-  unmappedNote.textContent = mappable.length === data.length
+  unmappedNote.hidden = unmapped === 0;
+  unmappedNote.textContent = unmapped === 0
     ? ''
-    : (currentLang === 'zh'
-      ? `${data.length - mappable.length} 个项目缺少坐标，未在地图上显示。`
-      : `${data.length - mappable.length} project(s) lack coordinates and are not shown on the map.`);
-  unmappedNote.hidden = mappable.length === data.length;
+    : `${unmapped} 个项目缺少坐标，未在地图上显示。`;
 
-  if (!data.length) {
-    return;
-  }
-
-  if (kpi !== data.length || tableRows !== data.length || markers !== mappable.length) {
-    console.error('[global-lithium] view inconsistency', {
-      kpi,
-      tableRows,
-      markers,
-      visible: data.length,
-      mappable: mappable.length,
-    });
-  }
+  syncUrl(state);
+  notifyParentHeight();
 }
 
 async function init() {
@@ -1042,9 +988,19 @@ async function init() {
 
     const text = await response.text();
     rawData = loadCsvData(text);
-    // Legend depends on which groups the freshly-loaded data actually populates.
-    renderLegend();
-    rerender();
+
+    // Restore filters from the URL only AFTER the data is in: values are validated against
+    // the facets that actually exist, so a stale shared link degrades to "no filter"
+    // instead of silently showing zero results for a country that has since been renamed.
+    const facets = selectFacets(rawData);
+    const restored = decodeState(window.location.search, {
+      validGroups: facets.statusGroups,
+      validCountries: facets.countries,
+    });
+
+    // First commit triggers the first render via the subscription below.
+    store.commit(restored);
+    render(store.getState());
 
     errorNote.hidden = true;
     window.setTimeout(() => {
@@ -1061,30 +1017,56 @@ async function init() {
   }
 }
 
-[searchBox, statusFilter, countryFilter, sortFilter].forEach((element) => {
-  element.addEventListener('input', rerender);
-  element.addEventListener('change', rerender);
+// ---------------------------------------------------------------------------
+// Wiring: inputs commit to the store, the store drives the single render pass.
+// No handler renders anything directly — that is what let surfaces drift apart.
+// ---------------------------------------------------------------------------
+
+store.subscribe(render);
+
+const commitFilters = (patch) => store.commit((state) => ({
+  filters: { ...state.filters, ...patch },
+}));
+
+searchBox.addEventListener('input', () => commitFilters({ q: searchBox.value }));
+
+statusFilter.addEventListener('change', () => {
+  const value = statusFilter.value;
+  commitFilters({ statusGroups: value === 'all' ? null : [value] });
 });
+
+countryFilter.addEventListener('change', () => {
+  const value = countryFilter.value;
+  commitFilters({ countries: value === 'all' ? [] : [value] });
+});
+
+sortFilter.addEventListener('change', () => store.commit({ sort: sortFilter.value }));
 
 legend.addEventListener('click', (event) => {
   const button = event.target.closest('.legend-filter');
-  if (!button) {
-    return;
-  }
+  const statusGroup = button?.dataset.statusGroup;
+  if (!statusGroup) return;
 
-  const statusGroup = button.dataset.statusGroup;
-  if (!statusGroup) {
-    return;
-  }
+  store.commit((state) => {
+    // null ("all") is materialised into the full list on first toggle, so that turning one
+    // chip off means "all except this" rather than "only this".
+    const rendered = statusLegendItems.filter(
+      (key) => CORE_STATUS_GROUPS.includes(key) || rawData.some((d) => d.status_group === key)
+    );
+    const current = state.filters.statusGroups ?? rendered;
+    const next = current.includes(statusGroup)
+      ? current.filter((key) => key !== statusGroup)
+      : [...current, statusGroup];
 
-  if (activeStatusGroups.has(statusGroup)) {
-    activeStatusGroups.delete(statusGroup);
-  } else {
-    activeStatusGroups.add(statusGroup);
-  }
-
-  renderLegend();
-  rerender();
+    return {
+      filters: {
+        ...state.filters,
+        // Back to null when everything is on again, so the URL stays clean and the
+        // dropdown reads "全部" rather than an exhaustive list.
+        statusGroups: next.length === rendered.length ? null : next,
+      },
+    };
+  });
 });
 
 init();
