@@ -1157,6 +1157,106 @@
     .gap-pill.is-undisclosed { background: rgba(251, 113, 133, 0.16); color: #fda4af; }
     .gap-pill.is-gap { background: rgba(246, 196, 83, 0.16); color: #fcd34d; }
 
+    /* ---- Charts (charts/kit.js) ----
+       No chart measures its container. Each SVG is authored in a fixed viewBox and scaled
+       here by CSS alone, because charts render inside `hidden` view panels where every
+       element is 0 wide, and because #app carries a ResizeObserver that posts a new iframe
+       height to the parent — a width-derived height would feed back through the parent and
+       oscillate. `height:auto` on the SVG is therefore driven by the viewBox aspect ratio,
+       never by JS.
+
+       `axis-*` is NOT used as a prefix here: it is already taken by the status badges. */
+    :root {
+      --chart-grid: rgba(148, 163, 184, 0.16);
+      --chart-tick: #8f9dbd;
+      --chart-rowlabel: #c3cee6;
+      --chart-bar-track: rgba(148, 163, 184, 0.1);
+    }
+
+    .chart {
+      display: flex;
+      flex-direction: column;
+      margin: 0 0 18px;
+      padding: 18px 20px 16px;
+      background: var(--panel2);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+    }
+    .chart:last-child { margin-bottom: 0; }
+
+    .chart-head { margin-bottom: 10px; }
+    .chart-titlebar {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 12px; flex-wrap: wrap;
+    }
+    .chart-title { margin: 4px 0 0; font-size: 16px; color: var(--text); }
+    .chart-unit {
+      font-size: 11px; font-weight: 700; letter-spacing: .02em;
+      padding: 2px 9px; border-radius: 999px;
+      background: rgba(120, 167, 255, 0.14); color: #b9d0ff;
+    }
+    .chart-note { margin: 8px 0 0; font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+    .chart-plot { position: relative; margin: 6px 0 12px; }
+    .chart-svg { display: block; width: 100%; height: auto; font-variant-numeric: tabular-nums; }
+
+    /* x/y charts cannot compress below ~720px without the axis labels colliding. The iframe
+       is scrolling="no", so page-level overflow is CLIPPED, not scrollable — the chart gets
+       its own scroller, the same pattern .tablewrap uses for the wide project table. */
+    .chart-scroll {
+      position: relative; margin: 6px 0 4px;
+      overflow-x: auto; -webkit-overflow-scrolling: touch;
+    }
+    .chart-scroll .chart-svg { min-width: 660px; }
+
+    .chart-grid { stroke: var(--chart-grid); stroke-width: 1; }
+    .chart-tick { fill: var(--chart-tick); font-size: 12px; }
+    .chart-rowlabel { fill: var(--chart-rowlabel); font-size: 13px; }
+    .chart-value { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .chart-glyph { font-size: 12px; }
+    .chart-bar-track { fill: var(--chart-bar-track); }
+    .chart-refline { stroke: #a8b2cc; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .chart-reflabel { fill: #a8b2cc; font-size: 11px; }
+    .chart-series-line { fill: none; stroke-width: 2.5; stroke-linejoin: round; }
+
+    .chart-legend {
+      display: flex; flex-wrap: wrap; gap: 6px 18px;
+      margin: 2px 0 10px; font-size: 12px; color: var(--muted);
+    }
+    .chart-legend-item { display: inline-flex; align-items: center; gap: 7px; }
+    .chart-swatch { width: 12px; height: 12px; border-radius: 3px; }
+    /* The hatch is the same 45° pattern the empty states use, so "provisional / not yet
+       real" means one thing across the page. */
+    .chart-swatch[data-hatch] {
+      background-image: repeating-linear-gradient(45deg,
+        transparent 0 3px, rgba(255, 255, 255, .5) 3px 4px);
+    }
+
+    /* Empty chart: identical box, hatched plot area. Height comes from the chart it
+       replaces so switching between a drawn and an undrawn chart never moves the page. */
+    .chart-plot-empty {
+      display: grid; place-items: center;
+      min-height: var(--chart-empty-h, 300px);
+      border: 1px dashed var(--line); border-radius: 12px;
+      overflow: hidden;
+    }
+    .chart-empty-body {
+      position: relative; max-width: 60ch; padding: 20px 24px; text-align: center;
+    }
+    .chart-is-empty .chart-title { color: var(--muted); }
+
+    /* Screen-reader data mirror. role="img" + aria-label says what the chart IS; only the
+       table gives the numbers a sighted reader can already read off the bars. */
+    .chart-a11y {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+    }
+
+    @media (max-width: 640px) {
+      .chart { padding: 14px 12px 12px; }
+      .chart-title { font-size: 15px; }
+    }
+
     /* ---- Metric envelopes (components/metric.js) ----
        Every tile is the same height whether or not it has a number: a missing metric keeps
        its frame and states WHY it is missing. Collapsing empties would make the grid

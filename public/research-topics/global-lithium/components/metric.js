@@ -38,26 +38,67 @@ function renderNullBody(metric) {
 }
 
 /**
+ * The provenance footer, exported so the chart kit renders the SAME one.
+ *
+ * A chart is a second surface that puts sourced numbers on screen, so it needs the same
+ * 口径 / as-of / 来源 / 置信度 line. Exporting it — rather than letting charts/kit.js
+ * reproduce the markup — is what keeps the "one renderer" property in this file true
+ * rather than merely nominal: there is still exactly one implementation of how provenance
+ * reaches the reader, and a change to it cannot leave charts behind.
+ *
+ * @param {object} envelope  a Metric or SeriesEnvelope — both carry asOf/basis/source/
+ *   kind/confidence/unit with identical meaning; only the payload differs.
+ * @param {boolean} hasValue  whether the payload exists. A null payload gets 口径 only,
+ *   because kind/source/confidence are properties of a number that was never taken.
+ */
+export function renderProvenanceFooter(envelope, hasValue = true) {
+  const sourceLabel = escape(envelope.source?.label);
+  const sourceText = envelope.source?.url
+    ? `<a href="${escape(envelope.source.url)}" target="_blank" rel="noopener noreferrer">${sourceLabel}</a>`
+    : sourceLabel;
+
+  return `
+      <footer class="metric-foot">
+        <div class="metric-basis"><b>口径</b> ${escape(envelope.basis)}${
+          hasValue ? '' : `（${escape(envelope.unit)}）`
+        }</div>
+        ${hasValue ? `
+          <div class="metric-prov">
+            <span>${escape(envelope.asOf)}</span>
+            <span class="metric-dot" aria-hidden="true">·</span>
+            <span>${sourceText}</span>
+            <span class="metric-dot" aria-hidden="true">·</span>
+            <span>${escape(SOURCE_KINDS[envelope.source?.kind] || envelope.source?.kind)}</span>
+            <span class="metric-dot" aria-hidden="true">·</span>
+            <span>置信度 ${escape(CONFIDENCE_LABELS[envelope.confidence] || envelope.confidence)}</span>
+          </div>` : ''}
+      </footer>`;
+}
+
+/**
+ * The freshness chip, exported for the same reason as the footer.
+ *
+ * Renders nothing when the data IS fresh — a row of 「最新」 badges is visual noise that
+ * trains the reader to ignore the one badge that matters.
+ */
+export function renderFreshnessChip(envelope, reference) {
+  const freshness = classifyFreshness(envelope.asOf, reference, envelope.series);
+  if (freshness === 'fresh') return '';
+  const age = daysBetween(envelope.asOf, reference);
+  return `<span class="metric-chip metric-fresh-${freshness}"
+          title="${escape(envelope.asOf)} 距本次数据整理 ${age} 天">${FRESHNESS_LABELS[freshness]}</span>`;
+}
+
+/**
  * @param {object} metric   a Metric envelope (see data/market-schema.js)
  * @param {string} reference  the date freshness is measured against — the market file's
  *   own asOf, NOT the reader's clock. See classifyFreshness for why.
  */
 export function renderMetric(metric, reference) {
-  const freshness = classifyFreshness(metric.asOf, reference, metric.series);
-  const age = daysBetween(metric.asOf, reference);
   const hasValue = metric.value !== null && metric.value !== undefined;
 
-  const sourceLabel = escape(metric.source?.label);
-  const sourceText = metric.source?.url
-    ? `<a href="${escape(metric.source.url)}" target="_blank" rel="noopener noreferrer">${sourceLabel}</a>`
-    : sourceLabel;
-
-  // The freshness chip is only worth showing when it is NOT fresh: a row of "最新" badges
-  // is visual noise that trains the reader to ignore the one badge that matters.
   // A metric with no value has no age worth reporting either.
-  const freshnessChip = (!hasValue || freshness === 'fresh') ? '' : `
-    <span class="metric-chip metric-fresh-${freshness}"
-          title="${escape(metric.asOf)} 距本次数据整理 ${age} 天">${FRESHNESS_LABELS[freshness]}</span>`;
+  const freshnessChip = hasValue ? renderFreshnessChip(metric, reference) : '';
 
   // `kind`, `source` and `confidence` describe a number. Printing "观测值 · 置信度 低"
   // above a blank tile attaches properties to a value that does not exist, which is worse
@@ -81,22 +122,7 @@ export function renderMetric(metric, reference) {
         </div>` : renderNullBody(metric)}
 
       ${hasValue && metric.note ? `<p class="metric-note">${escape(metric.note)}</p>` : ''}
-
-      <footer class="metric-foot">
-        <div class="metric-basis"><b>口径</b> ${escape(metric.basis)}${
-          hasValue ? '' : `（${escape(metric.unit)}）`
-        }</div>
-        ${hasValue ? `
-          <div class="metric-prov">
-            <span>${escape(metric.asOf)}</span>
-            <span class="metric-dot" aria-hidden="true">·</span>
-            <span>${sourceText}</span>
-            <span class="metric-dot" aria-hidden="true">·</span>
-            <span>${escape(SOURCE_KINDS[metric.source?.kind] || metric.source?.kind)}</span>
-            <span class="metric-dot" aria-hidden="true">·</span>
-            <span>置信度 ${escape(CONFIDENCE_LABELS[metric.confidence] || metric.confidence)}</span>
-          </div>` : ''}
-      </footer>
+${renderProvenanceFooter(metric, hasValue)}
     </article>`;
 }
 
