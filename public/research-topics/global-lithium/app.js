@@ -27,6 +27,7 @@ import { assertViewConsistency } from './core/invariants.js';
 import { VIEWS, DEFAULT_VIEW, isValidView } from './views/registry.js';
 import { renderEmptyState, renderGapRegister } from './components/empty-state.js';
 import { renderMetricGrid } from './components/metric.js';
+import { escapeHtml } from './components/escape.js';
 import { GAPS, GAP_REGISTER_ORDER } from './data/gaps.js';
 
 // The bilingual UI toggle was removed: the page is Chinese-only. The English strings stay
@@ -168,19 +169,6 @@ window.addEventListener('load', () => {
     notifyParentHeight();
   }, 180);
 });
-
-function escapeHtml(value) {
-  if (value === null || value === undefined || value === '') {
-    return '—';
-  }
-
-  return String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
-}
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

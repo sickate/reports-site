@@ -11,16 +11,7 @@ import {
   METRIC_KINDS, SOURCE_KINDS, CONFIDENCE_LABELS, FRESHNESS_LABELS,
   classifyFreshness, daysBetween,
 } from '../data/market-schema.js';
-
-function escape(value) {
-  if (value === null || value === undefined || value === '') return '—';
-  return String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
-}
+import { escapeHtml as escape } from './escape.js';
 
 /** Thousands separators, but never invented precision: the stored value is shown as-is. */
 function formatValue(value) {
