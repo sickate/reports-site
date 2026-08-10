@@ -326,13 +326,13 @@
         {
           "company": "赣锋锂业",
           "low": 36.5,
-          "high": 46.0,
+          "high": 46,
           "announced": "2026-07-15"
         },
         {
           "company": "盐湖股份",
-          "low": 60.0,
-          "high": 63.0,
+          "low": 60,
+          "high": 63,
           "announced": "2026-07-03"
         },
         {
@@ -355,27 +355,110 @@
         },
         {
           "company": "盛新锂能",
-          "low": 10.0,
-          "high": 12.0,
+          "low": 10,
+          "high": 12,
           "announced": "2026-07-09"
         },
         {
           "company": "雅化集团",
-          "low": 11.0,
-          "high": 13.0,
+          "low": 11,
+          "high": 13,
           "announced": "2026-07-07"
         },
         {
           "company": "天华新能",
-          "low": 22.0,
-          "high": 24.0,
+          "low": 22,
+          "high": 24,
           "announced": "2026-07-10"
         },
         {
           "company": "融捷股份",
-          "low": 9.0,
-          "high": 11.0,
+          "low": 9,
+          "high": 11,
           "announced": "2026-07-11"
+        }
+      ]
+    },
+    "gfexTermStructure": {
+      "label": "广期所碳酸锂期限结构",
+      "unit": "元/吨",
+      "asOf": "2026-07-24",
+      "basis": "广期所碳酸锂各月合约 2026-07-24 结算价；远近价差 = 最远月 − 最近月",
+      "kind": "observed",
+      "confidence": "high",
+      "series": "price",
+      "source": {
+        "label": "广州期货交易所（经新浪财经日 K 线）",
+        "kind": "exchange",
+        "url": "https://finance.sina.com.cn/futures/quotes/LC0.shtml"
+      },
+      "note": "覆盖 11 个有公开日线历史的合约（2608–2706）。形态：backwardation（近高远低）。新浪不提供 2707 的日线历史，未纳入本曲线——「期限价差」指标的口径可能比本图更宽。",
+      "points": [
+        {
+          "contract": "2608",
+          "settlement": 143420,
+          "close": 144120,
+          "openInterest": 11194
+        },
+        {
+          "contract": "2609",
+          "settlement": 143780,
+          "close": 144280,
+          "openInterest": 354629
+        },
+        {
+          "contract": "2610",
+          "settlement": 142080,
+          "close": 142920,
+          "openInterest": 16624
+        },
+        {
+          "contract": "2611",
+          "settlement": 141120,
+          "close": 142200,
+          "openInterest": 61908
+        },
+        {
+          "contract": "2612",
+          "settlement": 140780,
+          "close": 141940,
+          "openInterest": 22742
+        },
+        {
+          "contract": "2701",
+          "settlement": 140980,
+          "close": 142040,
+          "openInterest": 140615
+        },
+        {
+          "contract": "2702",
+          "settlement": 139720,
+          "close": 140340,
+          "openInterest": 1050
+        },
+        {
+          "contract": "2703",
+          "settlement": 139080,
+          "close": 139120,
+          "openInterest": 1821
+        },
+        {
+          "contract": "2704",
+          "settlement": 138820,
+          "close": 139840,
+          "openInterest": 9173
+        },
+        {
+          "contract": "2705",
+          "settlement": 137060,
+          "close": 137980,
+          "openInterest": 20719
+        },
+        {
+          "contract": "2706",
+          "settlement": 136540,
+          "close": 136420,
+          "openInterest": 178
         }
       ]
     }
