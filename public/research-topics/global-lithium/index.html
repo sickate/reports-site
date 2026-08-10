@@ -1219,6 +1219,11 @@
     .chart-tick { fill: var(--chart-tick); font-size: 12px; }
     .chart-rowlabel { fill: var(--chart-rowlabel); font-size: 13px; }
     .chart-value { fill: var(--text); font-size: 13px; font-weight: 600; }
+    /* Text sitting ON a filled bar, not on the panel. The page's light-on-dark defaults
+       invert here: --text on a #38bdf8 fill is barely legible. Dark ink clears 7:1 against
+       every fill the charts use — which is also why 其他 is #94a3b8 and not #64748b. */
+    .chart-on-fill { fill: #0b1020; font-size: 13px; font-weight: 700; }
+    .chart-on-fill-dim { fill: rgba(11, 16, 32, 0.74); font-size: 12px; font-weight: 600; }
     .chart-glyph { font-size: 12px; }
     .chart-bar-track { fill: var(--chart-bar-track); }
     .chart-refline { stroke: #a8b2cc; stroke-width: 1.5; stroke-dasharray: 5 4; }
@@ -1667,6 +1672,6 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
   ></script>
-  <script type="module" src="./app.js?v=2026-07-27"></script>
+  <script type="module" src="./app.js?v=2026-08-10"></script>
 </body>
 </html>

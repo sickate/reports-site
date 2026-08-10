@@ -32,6 +32,10 @@ import { GAPS, GAP_REGISTER_ORDER } from './data/gaps.js';
 import { NARROW_QUERY } from './charts/kit.js';
 import { renderCapacityChart } from './charts/capacity.js';
 import { renderCoverageChart } from './charts/coverage.js';
+import { renderTermStructureChart } from './charts/term-structure.js';
+import { renderInventorySplitChart } from './charts/inventory-split.js';
+import { renderConsensusBandChart } from './charts/consensus-band.js';
+import { renderPolicyTimelineChart } from './charts/policy-timeline.js';
 
 // The bilingual UI toggle was removed: the page is Chinese-only. The English strings stay
 // in ./data/ because they still feed the bilingual search haystack and the build-time
@@ -448,6 +452,22 @@ function renderCharts() {
     const fy26e = new Map(rows.map((r) => [r[0], parseMetricValue(r[3])]));
     return renderCoverageChart(envelope, fy26e, market.meta.asOf);
   });
+
+  // Each chart is mounted separately rather than as one concatenated string, so a series
+  // missing from market.json costs its own chart and nothing else.
+  mountChart('costChartSlot', () => [
+    seriesChart('gfexTermStructure', renderTermStructureChart),
+    seriesChart('inventorySplit', renderInventorySplitChart),
+    seriesChart('consensusBand', renderConsensusBandChart),
+  ].join(''));
+
+  mountChart('catalystsChartSlot', () => seriesChart('policyTimeline', renderPolicyTimelineChart));
+}
+
+/** Render a market.json-backed chart, or nothing at all if its series is absent. */
+function seriesChart(key, render) {
+  const envelope = market?.charts?.[key];
+  return envelope ? render(envelope, market.meta.asOf) : '';
 }
 
 // Charts pick a wide or narrow viewBox from a media query (see charts/kit.js). The

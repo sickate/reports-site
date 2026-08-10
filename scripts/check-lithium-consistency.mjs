@@ -276,6 +276,9 @@ async function checkMarket() {
 const SERIES_POINT_KEYS = {
   h1Coverage: ['company', 'low', 'high'],
   gfexTermStructure: ['contract', 'settlement'],
+  inventorySplit: ['segment', 'value'],
+  consensusBand: ['label', 'low', 'high'],
+  policyTimeline: ['date', 'title', 'direction'],
 };
 
 function checkChartSeries(market, reference) {
@@ -308,6 +311,30 @@ function checkChartSeries(market, reference) {
   // The coverage chart divides by the FY26E cell of the company table. A name that does not
   // match a table row silently drops that company from the chart while the table still
   // lists it — the exact "two surfaces disagree" defect the runtime invariants exist for.
+  // The stacked segments must add to the total the metric tile publishes, or the chart and
+  // the tile describe different inventories.
+  const split = charts.inventorySplit;
+  const total = (market.keyMetrics || []).find((m) => m.id === 'inventory-spot-total');
+  if (split?.points && total?.value != null) {
+    const sum = split.points.reduce((acc, pt) => acc + (Number(pt.value) || 0), 0);
+    if (sum !== Number(total.value)) {
+      fail(`charts.inventorySplit segments sum to ${sum} but metric "inventory-spot-total" is `
+        + `${total.value} — the chart and the tile would describe different inventories`);
+    }
+  }
+
+  // A timeline entry must carry a direction the renderer knows, or it draws unmarked.
+  for (const pt of charts.policyTimeline?.points || []) {
+    if (!['positive', 'negative', 'neutral'].includes(pt.direction)) {
+      fail(`charts.policyTimeline: "${pt.title}" has direction "${pt.direction}" `
+        + '(expected positive | negative | neutral)');
+    }
+  }
+
+  for (const pt of charts.consensusBand?.points || []) {
+    if (!(pt.low <= pt.high)) fail(`charts.consensusBand: "${pt.label}" has low > high`);
+  }
+
   const h1 = charts.h1Coverage;
   if (h1?.points) {
     const tableNames = new Set(companyResearchContent.zh.domesticRows.map((r) => r[0]));

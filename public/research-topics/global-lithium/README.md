@@ -16,6 +16,10 @@
 | 静态页面文案（标签、表头、方法说明） | `data/copy.js`（`locales.zh`） |
 | Metric 信封契约、新鲜度阈值 | `data/market-schema.js` |
 | Metric 渲染（唯一入口） | `components/metric.js` |
+| 图表（6 张） | `charts/` — `kit.js` 是套件，其余一图一模块 |
+| 图表序列数据（SeriesEnvelope） | `public/data/global-lithium-market.json` 的 `charts` 块 |
+| 广期所期限结构取数 | `scripts/fetch-lithium-series.mjs`（手动跑，**不挂 prebuild**） |
+| 数据缺口登记 | `data/gaps.js` |
 | 项目 → 上市公司归属 | `data/listed-owners.js` |
 | 国家/状态/矿床类型等枚举中译 | `data/dictionaries.js` |
 | 储量/品位/成本/风险等长文本中译 | `data/field-translations.js` |
@@ -26,7 +30,7 @@
 | 渲染逻辑、地图、筛选、表格 | `app.js` |
 | 样式、页面骨架 | `index.html`（CSS 内联） |
 
-## 四个必须知道的坑
+## 五个必须知道的坑
 
 **1. 三个版本号是独立的时钟，别合并**（全部在 `core/version.js`）
 
@@ -48,7 +52,22 @@
 所以改 `status` 措辞是安全的；改它的**含义**而不同步改 `lifecycle` 会让构建失败
 （`STATUS_LIFECYCLE_EXPECTATION` 交叉校验）。历史教训见 `data/schema.js` 顶部。
 
-**3. 周更内容在 JSON 里，不在 .js 里**
+**3. 图表绝不测量容器**
+
+`charts/` 下每张图都是固定 `viewBox`，高度是行数的纯函数，缩放全交给 CSS，
+没有一处 `getBoundingClientRect`。两个理由都不是洁癖：
+
+- 图表渲染在 `hidden` 的视图面板里，那里所有元素宽度为 **0**；
+- `#app` 上挂着 ResizeObserver，会把新高度 post 给父页。一张由测量宽度推导高度的图
+  会通过父页反馈回自己，然后振荡。
+
+窄屏不是把宽图缩小——`viewBox` 会等比缩放文字，960 单位宽的图放进 315px 手机列
+渲染为 33%，13px 标签变成 3.9px。所以 `kit.js` 有 WIDE / NARROW 两套盒子，
+用 `matchMedia` 选（查的是**视口**不是元素，所以在 hidden 面板里也答得对）。
+
+推论：**空图必须与实图占同一个盒子**，否则数据缺失时页面高度会变。
+
+**4. 周更内容在 JSON 里，不在 .js 里**
 
 `public/data/global-lithium-market.json` 装的是每周都会变的东西：核心判断、更新
 日志、研报更新卡、关键指标。放在数据文件而不是代码模块里，是因为一个笔误的代价
@@ -69,7 +88,7 @@ null 的 metric 不带 `source`/`kind`/`confidence`——那些是「数字的�
 时间打开的人显示不同结论，且所有数字都会仅因为没人访问而漂成「过期」。以数据整理
 日为锚点，徽章回答的是一个稳定的问题——*这次更新里，哪些数字比这次更新本身更旧*。
 
-**4. 公司数字有一条构建期回流管道**
+**5. 公司数字有一条构建期回流管道**
 
 ```
 data/company-research.js  →  scripts/generate-company-financials-jsonl.mjs (npm prebuild)
