@@ -2,7 +2,7 @@
 
 `src/reports/2026-04-global-lithium/` + `public/research-topics/global-lithium/`
 
-最后更新：2026-08-11（Phase 5 完成，未合并未部署）
+最后更新：2026-08-11（Phase 5 已合并并部署；周更技能文档已重写）
 
 外部评审（2026-07-27）判定原页面「更像深度研究长页＋数据库，而不是投资驾驶舱」，
 由此展开 P0+P1+P2 全量重构，分 8 个阶段逐步上线。
@@ -11,67 +11,76 @@
 
 ## 一、当前状态一句话
 
-**Phase 0–4 已在 `main` 上并已部署；Phase 5 在分支 `phase-5-charts` 上，5 个 commit，
-尚未合并、尚未部署。Phase 6–7 未开始。**
+**Phase 0–5 全部已部署。Phase 6 未开始；Phase 7 只剩无障碍部分（其中最危险的
+「重写周更技能文档」已提前做掉）。**
 
-```
-main       a27129f …… Phase 0–4（已部署，2026-08-11 实测线上 CODE_VERSION = 2026-07-27）
-             │
-phase-5-charts
-             ├─ 3d1db6e  refactor: escape() 提取为共享模块
-             ├─ 9ead01d  feat: charts/kit.js — SVG 图表套件与 chart-* 样式
-             ├─ 93d8903  feat: 产能构成图与 26H1 兑现率图 + SeriesEnvelope 契约
-             ├─ 1ab75a8  data: 取回广期所 2026-07-24 期限结构 + 取数脚本
-             └─ ca732f8  feat: 其余四张图 + 缺口措辞同步
-```
-
-21 个文件，+2,080 / −112 行。每个 commit 都能独立构建、独立回滚。
+Phase 5 合并进 `main`（merge commit `1565e70`，6 个 commit，21 个文件，+2,080/−112），
+2026-08-11 部署并实测：线上 `CODE_VERSION = 2026-08-10`，6 张图全部渲染、
+出处齐全、无 NaN，`charts/*.js` 返回 `no-cache`。
 
 | Phase | 内容 | 状态 |
 |---|---|---|
-| 0 | 样本数一致性、筛选器失效、移动端裁切 | ✅ main，已部署 |
-| 0.5 | nginx 让 `/research-topics/**.js\|css` 走 no-cache | ✅ main + 服务器已改 |
-| 1 | 3,900 行单体 HTML 拆成模块化目录 | ✅ main，已部署 |
-| 2 | 单一 store + 纯选择器 + URL 状态 | ✅ main，已部署 |
-| 3 | 7 视图信息架构（14,418px → 3,572px） | ✅ main，已部署 |
-| 4 | 数据契约、正交状态字段、A 股数据刷新 | ✅ main，已部署 |
-| **5** | **图表** | ⏳ **分支就绪，待合并部署** |
+| 0 | 样本数一致性、筛选器失效、移动端裁切 | ✅ 已部署 |
+| 0.5 | nginx 让 `/research-topics/**.js\|css` 走 no-cache | ✅ 已部署 + 服务器已改 |
+| 1 | 3,900 行单体 HTML 拆成模块化目录 | ✅ 已部署 |
+| 2 | 单一 store + 纯选择器 + URL 状态 | ✅ 已部署 |
+| 3 | 7 视图信息架构（14,418px → 3,572px） | ✅ 已部署 |
+| 4 | 数据契约、正交状态字段、A 股数据刷新 | ✅ 已部署 |
+| **5** | **六张图 + SeriesEnvelope 契约** | ✅ **已部署（2026-08-11）** |
 | 6 | 表格与地图升级 | ⬜ 未开始 |
-| 7 | 无障碍 + 收尾 + 重写周更技能文档 | ⬜ 未开始 |
+| 7 | 无障碍 + 收尾 | 🟡 周更技能文档已重写；a11y 未开始 |
 
 原始全量计划：`~/.claude/plans/bubbly-napping-flute.md`
 Phase 5 计划：`~/.claude/plans/lithium-peppy-pancake.md`
 
 ---
 
-## 二、下次开工第一件事：合并并部署 Phase 5
+## 二、TODO — 下次开工按顺序做
 
-分支已通过完整验证（见 §四），但**没有部署过一次**。建议先把它上线再开 Phase 6，
-理由是分阶段上线是这个项目一开始就确认的交付方式，且 Phase 6 会大改表格与地图，
-两批改动叠在一起出问题时很难二分定位。
+### ✅ 已完成（2026-08-11）
+
+- [x] **合并并部署 Phase 5** —— `main` merge `1565e70`，线上已验证。
+- [x] **重写周更技能文档** `~/.claude/skills/report-weekly-update/references/lithium-report.md`
+      —— 提前从 Phase 7 拿出来做，因为它当时已经**过期到 Phase 4**（而 Phase 4 早已上线），
+      会把周更引去改 `data/copy.js` 里的 changelog / priceCall——那些内容 Phase 4 就搬到
+      `market.json` 了，改了能通过构建但页面纹丝不动。新版逐条与仓库核对过。
+
+### ⬜ 3. 跑一次真实周更（下一步做这个）
+
+**为什么排在 Phase 6 前面：**页面数据已经旧了（`meta.asOf = 2026-07-27`，
+homepage 也显示这个日期），本来就该刷；而且这一次周更同时是**对刚重写的技能文档的检验**
+——照着新文档走一遍，走不通的地方就是文档还差的地方，趁记忆新鲜立刻补。
+
+顺带白捡一个修复：推进 `meta.asOf` 后即可
 
 ```bash
-git checkout main && git merge phase-5-charts
-npm run build          # prebuild 会跑 check-lithium-consistency + 重生成 JSONL
-npm run deploy
+node scripts/fetch-lithium-series.mjs --as-of=<新的 meta.asOf>
 ```
 
-部署后确认一下缓存头（预期通过，见下）：
+把期限结构刷到当天。新浪现在有 LC2707 的日线，所以大概率能拿到完整 12 个合约，
+§5.2 那个 11/12 合约的口径差会自动消失。
 
-```bash
-curl -sI https://reports.instap.net/research-topics/global-lithium/charts/kit.js | grep -i cache
-# 期望 no-cache。
-```
+清单（详见技能文档）：
+- [ ] Caspian 刷 10 家 A 股市值 + ALB/SQM 报价，重算 forward PE
+- [ ] 研报库找 26E/27E 有无更新（预期大部分仍保持 4 月口径，注明原因）
+- [ ] 更新 `market.json`：`meta.asOf` / `priceCall` / `keyMetrics` / `researchUpdates`，
+      并在 `changelog` **最前面**插入新条目
+- [ ] 重跑取数脚本刷期限结构
+- [ ] CSV 有项目事实变化才动 `UPDATE_MARKER` 并给改过的行写 `updated`
+- [ ] 版本号：`DATA_CACHE_KEY` 必升；`src/reports/index.js` 的 `date` = 新的 `meta.asOf`
+- [ ] 若新数据让某个缺口部分补齐 → 改写 `data/gaps.js` 对应条目的 `have`（**别删条目**）
+- [ ] `npm run build` → `npx vite preview` 浏览器核对 → `npm run deploy`
 
-`charts/` 是新增的子目录，但 2026-08-11 实测线上**已有的嵌套路径**
-（`core/version.js`、`data/palette.js`、`components/metric.js`）全部返回 `no-cache`，
-说明 `location ~* ^/research-topics/.*\.(js|css)$` 确实匹配多级路径，`charts/` 会照样命中。
-所以这一条现在是「确认一下」而不是风险项。
+### ⬜ 4. Phase 6 — 表格与地图升级
 
-若真的返回 `immutable`：回到 `nginx/reports.instap.net.conf` 检查正则，
-并记住 **`deploy.sh` 只 rsync `dist/`，nginx 改动要手动 SSH 到 maru**
-（`sudo nginx -t && sudo systemctl reload nginx`，先备份线上 conf——它带着仓库副本
-没有的 certbot SSL 块）。
+最后做，因为它是剩下最大的一块，且会大改表格与地图；先把数据刷新和文档理顺，
+出问题时容易二分定位。详见 §六。
+
+### ⬜ 5. Phase 7 剩余部分 — 无障碍
+
+键盘遍历筛选/图例/表格/地图/抽屉、ARIA、focus-visible、对比度、色觉、
+`prefers-reduced-motion`。放在 Phase 6 之后，因为抽屉和聚类会引入新的可聚焦元素，
+先做 a11y 会返工。
 
 ---
 
@@ -165,7 +174,7 @@ node scripts/fetch-lithium-series.mjs --as-of=2026-07-24 --dry-run  # 只打印
 | 事项 | 说明 |
 |---|---|
 | **断点切换的重渲染** | `app.js` 监听 `matchMedia` 的 `change` 事件重渲图表，但这一条没能端到端验证：Chrome 对**后台标签页**挂起 rAF 与样式重算，media query 的 change 事件因此不触发，而扩展驱动的标签页始终是后台态（`document.visibilityState === 'hidden'`）。窄屏渲染路径本身已通过在 iframe 内手动重渲验证（420 单位盒子、标签 9px、无溢出），只有「转屏时自动切换」没跑过。**真机转屏即可验证。** |
-| ~~nginx 对 `charts/` 的缓存~~ | 2026-08-11 已排除，见 §二。 |
+| ~~nginx 对 `charts/` 的缓存~~ | **已解决**：2026-08-11 部署后实测 `charts/kit.js`、`charts/capacity.js`、`charts/term-structure.js`、`components/escape.js` 全部返回 `no-cache`。 |
 
 同一个后台标签页限制也影响高度验证：`notifyParentHeight()` 走 rAF，在后台标签里
 不发送。§四 的高度数据是通过**在 iframe 内注入等价的 postMessage** 测出来的，
@@ -241,10 +250,13 @@ inventoryTurnover / priceScenarios / catalystFeed），`costCurve` 与
 
 - 键盘遍历筛选 / 图例 / 表格 / 地图 / 抽屉；ARIA；focus-visible；对比度；
   `prefers-reduced-motion`。
-- **重写 `~/.claude/skills/report-weekly-update/references/lithium-report.md`（最重要）。**
-  它仍然逐行写死 Phase 1 之前的文件结构、内联数组位置与提取机制。不重写，下一次周更
-  会去改一批**已经不驱动页面的文件**，看起来成功了但什么都没变。
-  Phase 5 之后它还多欠一段：`charts` 块与 `fetch-lithium-series.mjs` 该怎么用。
+- ~~重写 `~/.claude/skills/report-weekly-update/references/lithium-report.md`~~
+  **✅ 已于 2026-08-11 完成**（提前从本阶段拿出来做）。当时它过期到 **Phase 4**——
+  不是原计划里说的「Phase 1 之前」，这个区别很重要，因为 Phase 4 早就上线了，
+  危险是**当时就存在**的：它会把周更引去改 `data/copy.js` 里的 changelog / priceCall，
+  而那些内容 Phase 4 已搬进 `market.json`，改了能通过构建但页面纹丝不动。
+  新版补上了三时钟、23 列 CSV、Metric/SeriesEnvelope 契约、`charts` 块、
+  `fetch-lithium-series.mjs`、以及「补齐缺口时要改写 `gaps.js` 而不是删条目」。
 
 Phase 5 已经补的一部分文档：`public/research-topics/global-lithium/README.md`
 新增了「图表绝不测量容器」一节与 `charts/` 的文件索引。
