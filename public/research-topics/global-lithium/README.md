@@ -13,7 +13,9 @@
 | 项目数据（44 个项目/集群） | `public/data/global-lithium-database-2026.csv`（**不在本目录**） |
 | **核心判断、更新日志、研报更新卡、关键指标** | `public/data/global-lithium-market.json`（**不在本目录**） |
 | 公司财务表（国内 10 / 国际 5 / 资源矩阵） | `data/company-research.js` |
-| 静态页面文案（标签、表头、方法说明） | `data/copy.js`（`locales.zh`） |
+| 静态页面文案（标签、方法说明） | `data/copy.js`（`locales.zh`） |
+| **项目表的列：顺序 / 表头 / 宽度 / 列组 / 渲染器** | `data/columns.js` —— **唯一声明处**，改这里就够 |
+| 地图区域快捷缩放的国家分组 | `data/regions.js` |
 | Metric 信封契约、新鲜度阈值 | `data/market-schema.js` |
 | Metric 渲染（唯一入口） | `components/metric.js` |
 | 图表（6 张） | `charts/` — `kit.js` 是套件，其余一图一模块 |
@@ -124,12 +126,31 @@ node scripts/check-lithium-consistency.mjs
 - `market.json` 解析失败、Metric 信封字段缺失/取值非法、metric id 重复
 - 更新日志不是按日期倒序（页头会把旧日期当成「最近更新」显示）
 - 研报更新卡缺 `impact`/`tone`/`horizon`（渲染出来没有徽章，读起来像「没有观点」）
+- `columns.js` 里某个非 `derived` 的列 key 在 CSV 里不存在（**重命名 CSV 列时最容易漏**
+  ——没有这条检查，那一列会永远渲染成一个破折号，页面不报任何错）
+- `columns.js` 的 `render` 名不在 `RENDER_KINDS` 内、列 key 或组 id 重复、
+  某个列组为空、或冻结列不是该组的首元素（`sticky left:0` 只在首格有意义）
+- CSV 里有重名项目（`selection`、抽屉、marker↔行匹配、`listed-owners` 全以它为键）
+- `regions.js` 提到 CSV 中不存在的国家，或某个 CSV 国家不属于任何区域
+  （后者是安静的那一半：那个项目的快捷缩放永远够不到它）
 
 ## 运行时不变量
 
 `app.js` 的 `assertViewConsistency()` 每次渲染后比对 KPI 数 / 表格行数 / 地图点数，
-不一致就 `console.error`。地图点只与**有坐标的**行比较，差额通过 `#unmappedNote`
-显式写出来。
+不一致就 `console.error`（`?debug` 或 localhost 下还会弹红色横幅）。
+地图点只与**有坐标的**行比较，差额通过 `#unmappedNote` 显式写出来。
+
+Phase 6 又加了三组：
+
+- **列**：`headerCells === bodyCells === columnsForGroup(cols).length`。
+  `data/columns.js` 按构造消除了表头/单元格漂移，这条断言证明构造确实成立——
+  它是三份平行位置数组的运行时替代品。
+- **选中**：`selection === null || visible.some(p => p.project === selection)`，
+  且 `drawerOpen === (selection !== null)`。钳制发生在 `commitFilters` 的**同一次
+  commit** 里而不是在渲染时修补，所以这条断言是在**检查**而不是在描述刚做过的修复。
+- **空集**：`visible` 为空时此前无条件返回 `ok: true`，于是「空结果集却还有地图点／
+  抽屉还开着」是一个不被检查的 bug。现在空集分支同样要求 markers 为 0、
+  selection 为 null、列数正确。
 
 ## nginx
 

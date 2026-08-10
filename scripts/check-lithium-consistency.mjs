@@ -31,6 +31,7 @@ import {
 import {
   COLUMNS, COLUMN_GROUPS, RENDER_KINDS, DEFAULT_COLUMN_GROUP, columnsForGroup, groupWidth,
 } from '../public/research-topics/global-lithium/data/columns.js';
+import { MAP_REGIONS, REGION_COUNTRIES } from '../public/research-topics/global-lithium/data/regions.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -355,6 +356,7 @@ function checkChartSeries(market, reference) {
 const projects = await checkCsv();
 const market = await checkMarket();
 checkColumns(projects);
+checkRegions(projects);
 checkCompanyRows();
 await checkVersions();
 
@@ -417,6 +419,33 @@ function checkColumns(projects) {
     const names = projects.map((p) => p.project);
     const dupes = names.filter((n, i) => names.indexOf(n) !== i);
     if (dupes.length) fail(`duplicate project name(s) in CSV: ${[...new Set(dupes)].join(', ')}`);
+  }
+}
+
+/**
+ * Map regions must stay in step with the CSV in BOTH directions. A region naming a country
+ * that no longer exists is a dead chip; a CSV country in no region is a project the
+ * quick-zoom can never frame — the silent half, and the reason this runs at build time.
+ */
+function checkRegions(projects) {
+  if (!projects) return;
+  const csvCountries = new Set(projects.map((p) => p.country));
+
+  for (const country of REGION_COUNTRIES) {
+    if (!csvCountries.has(country)) {
+      fail(`data/regions.js names country "${country}", which no CSV project uses`);
+    }
+  }
+  for (const country of csvCountries) {
+    const covered = MAP_REGIONS.some((r) => r.countries && r.countries.includes(country));
+    if (!covered) fail(`CSV country "${country}" belongs to no map region — add it to data/regions.js`);
+  }
+
+  const ids = MAP_REGIONS.map((r) => r.id);
+  const dupes = ids.filter((id, i) => ids.indexOf(id) !== i);
+  if (dupes.length) fail(`duplicate map region id(s): ${[...new Set(dupes)].join(', ')}`);
+  if (!MAP_REGIONS.some((r) => r.countries === null)) {
+    fail('data/regions.js has no catch-all region (countries: null)');
   }
 }
 

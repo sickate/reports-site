@@ -18,6 +18,7 @@ import { companyResearchContent } from './data/company-research.js';
 import { dictionaries } from './data/dictionaries.js';
 import { fieldTranslationsZh } from './data/field-translations.js';
 import { listedOwners } from './data/listed-owners.js';
+import { MAP_REGIONS, projectsInRegion } from './data/regions.js';
 import {
   COLUMN_GROUPS, COLUMN_GROUP_IDS, DEFAULT_COLUMN_GROUP, TABLE_ROW_BUDGET,
   columnsForGroup, groupWidth,
@@ -73,6 +74,8 @@ const updatesGrid = document.getElementById('updatesGrid');
 const dataTableHead = document.getElementById('dataTableHead');
 const dataTable = document.getElementById('dataTable');
 const columnGroups = document.getElementById('columnGroups');
+const projectDrawer = document.getElementById('projectDrawer');
+const mapRegions = document.getElementById('mapRegions');
 const tableScrollHint = document.getElementById('tableScrollHint');
 const companySubnav = document.getElementById('companySubnav');
 const quickTakeGrid = document.getElementById('quickTakeGrid');
@@ -153,6 +156,7 @@ const store = createStore({
   filters: { q: '', statusGroups: null, countries: [], structures: [] },
   sort: 'capacity_desc',
   cols: DEFAULT_COLUMN_GROUP,
+  selection: null,
 });
 
 const syncUrl = createUrlSync();
@@ -1074,7 +1078,10 @@ const CELL_RENDERERS = {
     const pill = isUpdated
       ? `<span class="db-updated-pill">🔄 ${currentLang === 'zh' ? '本次更新' : 'Updated'}</span>`
       : '';
-    return `${escapeHtml(localizeValue(item.project, 'project', currentLang))}${pill}`;
+    // A real <button>, not a clickable cell: keyboard reachable, correct semantics and a
+    // focus ring for free, without inventing row-level key handling. The row-wide click
+    // delegation below is only a mouse affordance on top of it.
+    return `<button type="button" class="row-open">${escapeHtml(localizeValue(item.project, 'project', currentLang))}</button>${pill}`;
   },
   countryPill: (item) => renderCountryPill(item.country),
   statusPill: (item) => renderStatusPill(item),
@@ -1093,9 +1100,14 @@ const CELL_RENDERERS = {
  */
 let lastRenderedColumnGroup = null;
 let lastHeightNotifiedColumnGroup = null;
+let lastHeightNotifiedSelection = null;
 
 function renderTableHead(cols, groupId) {
-  dataTable.style.minWidth = `${groupWidth(groupId)}px`;
+  // A custom property, NOT `style.minWidth`. An inline min-width beats any stylesheet
+  // rule, so the ≤640px card layout could not reset it and the page overflowed to the
+  // group's full declared width (2,572px at 375px). Handing CSS a variable keeps both
+  // rules in the cascade where the media query can win.
+  dataTable.style.setProperty('--table-min-width', `${groupWidth(groupId)}px`);
   if (groupId === lastRenderedColumnGroup) return;
   lastRenderedColumnGroup = groupId;
 
@@ -1104,7 +1116,7 @@ function renderTableHead(cols, groupId) {
     .join('');
 }
 
-function renderTable(data, groupId) {
+function renderTable(data, groupId, selection) {
   const t = locales[currentLang];
   const cols = columnsForGroup(groupId);
   renderTableHead(cols, groupId);
@@ -1120,9 +1132,14 @@ function renderTable(data, groupId) {
 
   for (const item of data) {
     const tr = document.createElement('tr');
-    if (item.updated && item.updated === UPDATE_MARKER) {
-      tr.className = 'row-updated';
-    }
+    const classes = [];
+    if (item.updated && item.updated === UPDATE_MARKER) classes.push('row-updated');
+    if (item.project === selection) classes.push('is-selected');
+    if (classes.length) tr.className = classes.join(' ');
+    tr.dataset.project = item.project;
+    // The row highlight is the guaranteed local feedback: a row click can happen while
+    // the map is scrolled off-screen, so the marker highlight alone would be invisible.
+    if (item.project === selection) tr.setAttribute('aria-selected', 'true');
     // data-label is what turns each cell into a labelled line in the ≤640px card layout,
     // so the mobile view needs no second render path and the row stays a <tr> the
     // invariant can count. escapeRaw, not escapeHtml — the latter turns '' into an em
@@ -1138,7 +1155,128 @@ function renderTable(data, groupId) {
   }
 }
 
-function renderMap(data) {
+
+// ---- Project detail drawer --------------------------------------------------------
+//
+// popupHtml()'s replacement. Covers ALL 23 CSV columns — the table shows at most 15, and
+// region / lifecycle / structure / activity / coordinates / port coordinates / updated
+// have never been directly visible anywhere. This is the honest answer to "the table
+// renders a subset".
+//
+// Its own CSS classes, NOT the .popup-* ones: those were coloured for Leaflet's WHITE
+// popup (.popup-value-primary is #1f2937), so reusing them on the dark card renders
+// near-invisible text.
+const DRAWER_SECTIONS = [
+  { title: '身份', rows: [['项目', 'project'], ['国家', 'country'], ['地区', 'region'], ['所属上市公司', '@owner']] },
+  { title: '状态', rows: [['状态', 'status'], ['生命周期', '@lifecycle'], ['结构', '@structure'], ['扩产活动', '@activity'], ['最近更新', 'updated']] },
+  { title: '地质', rows: [['类型', 'deposit_type'], ['储量/资源', 'reserve_resource'], ['品位', 'grade']] },
+  { title: '产能', rows: [['当前产能', 'current_kta_lce'], ['规划产能', 'planned_kta_lce'], ['地图口径产能', 'map_capacity_kta'], ['成本', 'cost']] },
+  { title: '物流', rows: [['地址', 'address'], ['运输/出口路线', 'route'], ['矿区坐标', '@coords'], ['港口坐标', '@portCoords']] },
+  { title: '风险与来源', rows: [['产能扰动因素', 'risks'], ['数据来源摘要', 'source_note']] },
+];
+
+function drawerValue(item, key) {
+  switch (key) {
+    case '@owner': return escapeHtml(listedOwnerLabel(item.project, currentLang));
+    case '@lifecycle': return escapeHtml(LIFECYCLE_LABELS[item.lifecycle] || item.lifecycle || '');
+    case '@structure': return escapeHtml(STRUCTURE_LABELS[item.structure] || item.structure || '');
+    case '@activity': return escapeHtml(ACTIVITY_LABELS[item.activity] || item.activity || '');
+    case '@coords': return Number.isFinite(item.lat) && Number.isFinite(item.lon)
+      ? escapeHtml(`${item.lat.toFixed(4)}, ${item.lon.toFixed(4)}`) : '—';
+    case '@portCoords': return Number.isFinite(item.port_lat) && Number.isFinite(item.port_lon)
+      ? escapeHtml(`${item.port_lat.toFixed(4)}, ${item.port_lon.toFixed(4)}`) : '—';
+    default: return escapeHtml(localizeValue(item[key], key, currentLang));
+  }
+}
+
+function renderDrawer(selection, visible) {
+  const item = selection ? visible.find((p) => p.project === selection) : null;
+  if (!item) {
+    projectDrawer.hidden = true;
+    projectDrawer.innerHTML = '';
+    return;
+  }
+
+  projectDrawer.hidden = false;
+  projectDrawer.innerHTML = `
+    <div class="drawer-head">
+      <h3 id="drawerTitle">${escapeHtml(localizeValue(item.project, 'project', currentLang))}</h3>
+      <button type="button" class="drawer-close" id="drawerClose" aria-label="关闭详情">×</button>
+    </div>
+    <div class="drawer-body">
+      ${DRAWER_SECTIONS.map((sec) => `
+        <section class="drawer-section">
+          <h4>${escapeHtml(sec.title)}</h4>
+          <dl>
+            ${sec.rows.map(([label, key]) => `
+              <dt>${escapeHtml(label)}</dt><dd>${drawerValue(item, key) || '—'}</dd>`).join('')}
+          </dl>
+        </section>`).join('')}
+    </div>`;
+}
+
+
+// ---- Map size legend ---------------------------------------------------------------
+//
+// Built ONCE at init, next to radius(), deliberately outside render(): it is a function of
+// the radius formula, not of the filter, exactly like the charts.
+//
+// The circle sizes come from calling radius() — never from restating the formula. A
+// duplicated `4 + sqrt(x) * 1.25` would drift the moment either copy is tuned, and a size
+// legend that disagrees with the markers is worse than none. radius() is absolute rather
+// than data-scaled, so fixed stops are meaningful; these bracket the real 10–300 range.
+// Neutral grey fill so it cannot be mistaken for a status colour.
+const LEGEND_STOPS = [25, 100, 250];
+
+function addSizeLegend() {
+  const control = L.control({ position: 'bottomleft' });
+  control.onAdd = () => {
+    const box = L.DomUtil.create('div', 'map-size-legend');
+    const maxR = radius(LEGEND_STOPS[LEGEND_STOPS.length - 1]);
+    const w = Math.ceil(maxR * 2) + 8;
+    box.innerHTML = `
+      <div class="map-size-legend-title">产能（kt LCE/年）</div>
+      <div class="map-size-legend-rows">
+        ${LEGEND_STOPS.map((stop) => {
+          const r = radius(stop);
+          return `<div class="map-size-legend-row">
+            <svg width="${w}" height="${Math.ceil(r * 2) + 2}" aria-hidden="true">
+              <circle cx="${w / 2}" cy="${r + 1}" r="${r}" fill="#94a3b8" fill-opacity="0.5"
+                      stroke="#94a3b8" stroke-width="1.2" />
+            </svg>
+            <span>${stop}</span>
+          </div>`;
+        }).join('')}
+      </div>`;
+    L.DomEvent.disableClickPropagation(box);
+    return box;
+  };
+  control.addTo(map);
+}
+
+// ---- Region quick-zoom -------------------------------------------------------------
+//
+// The camera is NOT store state (see flyToSelection), so these handlers call fitBounds
+// directly — the one justified exception to "handlers only commit, never render".
+function renderMapRegions(mappable) {
+  mapRegions.innerHTML = MAP_REGIONS.map((r) => {
+    const n = projectsInRegion(r, mappable).length;
+    return `<button type="button" class="map-region-btn" data-region="${escapeRaw(r.id)}"
+                    ${n === 0 ? 'disabled' : ''} title="${n} 个可见项目">
+      ${escapeHtml(r.label)}<span class="map-region-count">${n}</span>
+    </button>`;
+  }).join('');
+}
+
+function zoomToRegion(regionId, mappable) {
+  const region = MAP_REGIONS.find((r) => r.id === regionId);
+  const rows = projectsInRegion(region, mappable);
+  if (!rows.length) return;
+  const bounds = L.latLngBounds(rows.map((p) => [p.lat, p.lon]));
+  map.fitBounds(bounds, { padding: [28, 28], maxZoom: 6, animate: !prefersReducedMotion });
+}
+
+function renderMap(data, selection) {
   markerLayer.clearLayers();
   lineLayer.clearLayers();
 
@@ -1161,15 +1299,25 @@ function renderMap(data) {
 
     const color = colorMap[item.status_group] || '#94a3b8';
     const markerRadius = radius(item.map_capacity_kta);
+    const isSelected = item.project === selection;
+    // bindPopup is gone on purpose. A popup AND a drawer would be two editors of "the
+    // detail surface" — the exact pattern core/store.js was written against, and the one
+    // that would let the map show one project while the drawer showed another. The
+    // tooltip keeps the hover affordance without owning any state.
     const marker = L.circleMarker([item.lat, item.lon], {
       radius: markerRadius,
-      color,
-      weight: 1.2,
+      color: isSelected ? '#ffffff' : color,
+      weight: isSelected ? 3 : 1.2,
       fillColor: color,
-      fillOpacity: 0.65,
-    }).bindPopup(popupHtml(item));
+      fillOpacity: isSelected ? 0.9 : 0.65,
+    }).bindTooltip(escapeHtml(localizeValue(item.project, 'project', currentLang)), { direction: 'top' });
+
+    marker.on('click', () => store.commit((state) => ({
+      selection: state.selection === item.project ? null : item.project,
+    })));
 
     marker.addTo(markerLayer);
+    if (isSelected) marker.bringToFront();
 
     if (Number.isFinite(item.port_lat) && Number.isFinite(item.port_lon)) {
       const line = L.polyline(
@@ -1221,8 +1369,11 @@ function render(state) {
   renderFilters();
   renderLegend();
   renderColumnGroups(state.cols);
-  renderTable(visible, state.cols);
-  renderMap(visible);
+  renderTable(visible, state.cols, state.selection);
+  renderMap(visible, state.selection);
+  renderDrawer(state.selection, visible);
+  renderMapRegions(mappable);
+  flyToSelection(state, visible);
   updateStats(selectKpis(visible));
 
   resultSummary.textContent = locales[currentLang].resultSummary(visible.length, rawData.length);
@@ -1237,6 +1388,8 @@ function render(state) {
     headerCells: dataTableHead.children.length,
     bodyCells: firstBodyRowCellCount(),
     expectedColumns: columnsForGroup(state.cols).length,
+    selection: state.selection,
+    drawerOpen: !projectDrawer.hidden,
   });
 
   unmappedNote.hidden = unmapped === 0;
@@ -1248,8 +1401,12 @@ function render(state) {
 
   // A column-group change alters every row's height, so one post is not enough — the
   // layout is not final until after this tick. Same three-shot as a view switch.
-  if (state.cols !== lastHeightNotifiedColumnGroup) {
+  // On ≤640px the drawer is in normal flow, so opening or closing it changes the
+  // document height; on desktop it is absolutely positioned inside .mapbox and costs
+  // nothing. Firing the triple on either change is cheap and covers both.
+  if (state.cols !== lastHeightNotifiedColumnGroup || state.selection !== lastHeightNotifiedSelection) {
     lastHeightNotifiedColumnGroup = state.cols;
+    lastHeightNotifiedSelection = state.selection;
     notifyHeightTriple();
   } else {
     notifyParentHeight();
@@ -1335,9 +1492,19 @@ async function init() {
 
 store.subscribe(render);
 
-const commitFilters = (patch) => store.commit((state) => ({
-  filters: { ...state.filters, ...patch },
-}));
+// Filtering the selected project out of view must clear the selection, and it must happen
+// in the SAME commit — not repaired during render. Repairing in the renderer would mean
+// committing during a notify (the re-entrancy case core/store.js guards), and it would
+// leave assertViewConsistency asserting a property the renderer had just patched up.
+// Doing it here lets the invariant genuinely CHECK that selection ⊆ visible.
+// The extra 44-row pass only runs when something is actually selected.
+const commitFilters = (patch) => store.commit((state) => {
+  const filters = { ...state.filters, ...patch };
+  const stillVisible = state.selection
+    && selectVisibleProjects(rawData, filters, buildSearchHaystack)
+      .some((p) => p.project === state.selection);
+  return { filters, selection: stillVisible ? state.selection : null };
+});
 
 searchBox.addEventListener('input', () => commitFilters({ q: searchBox.value }));
 
@@ -1409,9 +1576,70 @@ legend.addEventListener('click', (event) => {
 // lot), so the parent frame needs re-measuring — but only AFTER the render the commit
 // triggers, which is why the triple fires from the subscriber rather than from here.
 // Handlers commit; they never render.
+mapRegions.addEventListener('click', (event) => {
+  const id = event.target.closest('.map-region-btn')?.dataset.region;
+  if (!id) return;
+  // Reads the CURRENT visible set so the frame respects the active filter.
+  const state = store.getState();
+  const visible = sortProjects(selectVisibleProjects(rawData, state.filters, buildSearchHaystack), state.sort);
+  zoomToRegion(id, selectMappable(visible));
+});
+
 columnGroups.addEventListener('click', (event) => {
   const id = event.target.closest('.column-group-btn')?.dataset.cols;
   if (id) store.commit({ cols: id });
 });
 
+// The camera is Leaflet-owned transient view state and deliberately NOT in the store: it
+// is not shareable, it survives clearLayers() on its own, and putting it there would make
+// render() re-aim the map on every search keystroke. The latch mirrors `lastRenderedView`
+// so a re-render with an unchanged selection does not fight a user pan.
+let lastFlownSelection = null;
+let lastFlownView = null;
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function flyToSelection(state, visible) {
+  const changed = state.selection !== lastFlownSelection || state.view !== lastFlownView;
+  lastFlownSelection = state.selection;
+  lastFlownView = state.view;
+  if (!changed || !state.selection || state.view !== 'atlas') return;
+
+  const item = visible.find((p) => p.project === state.selection);
+  if (!item || !Number.isFinite(item.lat) || !Number.isFinite(item.lon)) return;
+  // setView, not flyTo: a long animation can be interrupted by a user pan and leave the
+  // camera somewhere neither of them chose.
+  map.setView([item.lat, item.lon], Math.max(map.getZoom(), 5), { animate: !prefersReducedMotion });
+}
+
+// A DOM reference is not state: it is not serializable and would break shallowEqual, so
+// the element to restore focus to lives in a module-level variable, not in the store.
+let lastSelectionTrigger = null;
+
+function selectProject(project, trigger) {
+  lastSelectionTrigger = trigger || null;
+  store.commit((state) => ({ selection: state.selection === project ? null : project }));
+}
+
+tbody.addEventListener('click', (event) => {
+  const row = event.target.closest('tr[data-project]');
+  if (!row) return;
+  selectProject(row.dataset.project, event.target.closest('.row-open') || row);
+});
+
+projectDrawer.addEventListener('click', (event) => {
+  if (!event.target.closest('.drawer-close')) return;
+  store.commit({ selection: null });
+  if (lastSelectionTrigger && lastSelectionTrigger.isConnected) lastSelectionTrigger.focus();
+  lastSelectionTrigger = null;
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key !== 'Escape' || !store.getState().selection) return;
+  store.commit({ selection: null });
+  if (lastSelectionTrigger && lastSelectionTrigger.isConnected) lastSelectionTrigger.focus();
+  lastSelectionTrigger = null;
+});
+
+
+addSizeLegend();
 init();

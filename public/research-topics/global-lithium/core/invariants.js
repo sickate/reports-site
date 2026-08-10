@@ -30,6 +30,7 @@ const DEBUG = (() => {
 export function assertViewConsistency({
   visible, mappable, kpiCount, tableRows, markerCount,
   headerCells, bodyCells, expectedColumns,
+  selection = null, drawerOpen = false,
 }) {
   const unmapped = visible.length - mappable.length;
 
@@ -39,11 +40,19 @@ export function assertViewConsistency({
   const columnsOk = headerCells === expectedColumns
     && (bodyCells === null || bodyCells === expectedColumns);
 
+  // The drawer must never describe a project the table and map are not showing. The
+  // clamp in commitFilters makes this true; asserting it proves no later commit path
+  // bypassed the clamp. And the drawer's open/closed state must agree with the store —
+  // two surfaces disagreeing about "is anything selected" is the original defect, one
+  // level down.
+  const selectionOk = selection === null || visible.some((p) => p.project === selection);
+  const drawerOk = drawerOpen === (selection !== null);
+
   // An empty result set renders an "empty state" row, so ROW counting is not comparable.
   // Everything else still is, and used to go unchecked: an empty result with markers left
   // on the map was a bug this function returned `ok: true` for.
   if (!visible.length) {
-    const emptyOk = markerCount === 0 && columnsOk;
+    const emptyOk = markerCount === 0 && columnsOk && selection === null && !drawerOpen;
     if (!emptyOk) {
       const detail = { kpiCount, tableRows, markerCount, visible: 0, mappable: 0, headerCells, bodyCells, expectedColumns };
       console.error('[global-lithium] view inconsistency — empty result set is not clean', detail);
@@ -55,12 +64,14 @@ export function assertViewConsistency({
   const ok = kpiCount === visible.length
     && tableRows === visible.length
     && markerCount === mappable.length
-    && columnsOk;
+    && columnsOk
+    && selectionOk
+    && drawerOk;
 
   if (!ok) {
     const detail = {
       kpiCount, tableRows, markerCount, visible: visible.length, mappable: mappable.length,
-      headerCells, bodyCells, expectedColumns,
+      headerCells, bodyCells, expectedColumns, selection, drawerOpen,
     };
     console.error('[global-lithium] view inconsistency — KPI / table / map / columns disagree', detail);
     if (DEBUG) showBanner(detail);
