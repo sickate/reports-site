@@ -14,6 +14,26 @@ export const colorMap = {
   'Resource stage': '#94a3b8',
 };
 
+// Chart series colours.
+//
+// Only SEMANTIC pairs live here — the ones a chart module must pick between in JS. Purely
+// structural chart colours (grid lines, axis text, plot background) are CSS custom
+// properties in index.html instead, because they are theme concerns that should change
+// with the theme, not data concerns that must stay pinned to a legend.
+//
+// `capacityNow` / `capacityPlanned` deliberately are NOT two arbitrary hues: planned
+// capacity is the same green as Operating at reduced weight plus a hatch pattern, so the
+// pair reads as "this much exists, this much is promised" rather than as two categories.
+export const chartColors = {
+  capacityNow: '#4ade80',
+  capacityPlanned: '#1e6b45',
+  // Coverage: over/under 100% of the full-year consensus. Colour is the SECONDARY
+  // encoding — the number and the ▲/▬/▼ glyph carry it first (see charts/kit.js).
+  coverageOver: '#f59e0b',
+  coverageNormal: '#38bdf8',
+  reference: '#a8b2cc',
+};
+
 export const countryPillColors = {
   Australia: '#38bdf8',
   Chile: '#fb923c',

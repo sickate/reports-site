@@ -27,7 +27,15 @@ import { assertViewConsistency } from './core/invariants.js';
 import { VIEWS, DEFAULT_VIEW, isValidView } from './views/registry.js';
 import { renderEmptyState, renderGapRegister } from './components/empty-state.js';
 import { renderMetricGrid } from './components/metric.js';
+import { escapeHtml } from './components/escape.js';
 import { GAPS, GAP_REGISTER_ORDER } from './data/gaps.js';
+import { NARROW_QUERY } from './charts/kit.js';
+import { renderCapacityChart } from './charts/capacity.js';
+import { renderCoverageChart } from './charts/coverage.js';
+import { renderTermStructureChart } from './charts/term-structure.js';
+import { renderInventorySplitChart } from './charts/inventory-split.js';
+import { renderConsensusBandChart } from './charts/consensus-band.js';
+import { renderPolicyTimelineChart } from './charts/policy-timeline.js';
 
 // The bilingual UI toggle was removed: the page is Chinese-only. The English strings stay
 // in ./data/ because they still feed the bilingual search haystack and the build-time
@@ -168,19 +176,6 @@ window.addEventListener('load', () => {
     notifyParentHeight();
   }, 180);
 });
-
-function escapeHtml(value) {
-  if (value === null || value === undefined || value === '') {
-    return '—';
-  }
-
-  return String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
-}
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -433,20 +428,87 @@ function applyView(activeView) {
   window.setTimeout(notifyParentHeight, 120);
 }
 
+// Charts. Rendered ONCE, deliberately outside render().
+//
+// render() is the store subscriber and reruns on every search keystroke; none of these six
+// charts depends on the filter state, so putting them in that path would rebuild six SVGs
+// per character typed for no change in output. The capacity chart in particular is fixed to
+// all 44 projects by design — see charts/capacity.js for why a chart on one tab must not
+// silently follow filters set on another.
+//
+// Each chart degrades on its own: a missing market.json leaves the others untouched, and a
+// throw inside one is caught so it cannot take the rest of the page down with it.
+function renderCharts() {
+  mountChart('supplyChartSlot', () => renderCapacityChart(rawData, market?.meta?.asOf));
+
+  mountChart('coverageChartSlot', () => {
+    const envelope = market?.charts?.h1Coverage;
+    if (!envelope) return '';
+
+    // FY26E comes from the company table, not from market.json, so the ratio follows any
+    // sell-side revision instead of going stale in a second copy. buildFinanceTableRows
+    // applies the JSONL overrides first, which are authoritative over the module.
+    const rows = buildFinanceTableRows(companyResearchContent[currentLang].domesticRows);
+    const fy26e = new Map(rows.map((r) => [r[0], parseMetricValue(r[3])]));
+    return renderCoverageChart(envelope, fy26e, market.meta.asOf);
+  });
+
+  // Each chart is mounted separately rather than as one concatenated string, so a series
+  // missing from market.json costs its own chart and nothing else.
+  mountChart('costChartSlot', () => [
+    seriesChart('gfexTermStructure', renderTermStructureChart),
+    seriesChart('inventorySplit', renderInventorySplitChart),
+    seriesChart('consensusBand', renderConsensusBandChart),
+  ].join(''));
+
+  mountChart('catalystsChartSlot', () => seriesChart('policyTimeline', renderPolicyTimelineChart));
+}
+
+/** Render a market.json-backed chart, or nothing at all if its series is absent. */
+function seriesChart(key, render) {
+  const envelope = market?.charts?.[key];
+  return envelope ? render(envelope, market.meta.asOf) : '';
+}
+
+// Charts pick a wide or narrow viewBox from a media query (see charts/kit.js). The
+// breakpoint is discrete and viewport-driven, so re-rendering on it cannot feed back into
+// the height contract the way a width measurement would — but it does have to be wired up,
+// or a reader who rotates a phone keeps the layout chosen for the other orientation.
+if (window.matchMedia) {
+  const mq = window.matchMedia(NARROW_QUERY);
+  const onBreakpointChange = () => {
+    renderCharts();
+    notifyParentHeight();
+  };
+  if (mq.addEventListener) mq.addEventListener('change', onBreakpointChange);
+  else if (mq.addListener) mq.addListener(onBreakpointChange);
+}
+
+function mountChart(elementId, build) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+
+  try {
+    const html = build();
+    if (html) el.innerHTML = html;
+  } catch (error) {
+    console.error(`[global-lithium] chart "${elementId}" failed to render`, error);
+    el.innerHTML = '<p class="market-unavailable">图表渲染失败，其余内容不受影响。</p>';
+  }
+}
+
 // The three views whose data we could not source. Rendered once — the content is static
 // until the underlying gap is filled, at which point its entry leaves data/gaps.js.
 function renderGapViews() {
-  document.getElementById('supplySection').innerHTML =
-    `<div class="section-kicker">未来供给</div>` + renderEmptyState(GAPS.supplyBridge);
+  // The kickers now live in index.html so these slots can sit alongside the chart slots.
+  document.getElementById('supplyGapSlot').innerHTML = renderEmptyState(GAPS.supplyBridge);
 
-  document.getElementById('costSection').innerHTML =
-    `<div class="section-kicker">成本曲线与价格敏感性</div>`
-    + renderEmptyState(GAPS.costCurve)
+  document.getElementById('costGapSlot').innerHTML =
+    renderEmptyState(GAPS.costCurve)
     + renderEmptyState(GAPS.supplyDemandBalance)
     + renderEmptyState(GAPS.priceScenarios);
 
-  document.getElementById('catalystsSection').innerHTML =
-    `<div class="section-kicker">催化剂与预警</div>` + renderEmptyState(GAPS.catalystFeed);
+  document.getElementById('catalystsGapSlot').innerHTML = renderEmptyState(GAPS.catalystFeed);
 
   document.getElementById('gapRegisterSection').innerHTML =
     `<div class="section-kicker">数据缺口登记</div>`
@@ -1149,6 +1211,10 @@ async function init() {
     // First commit triggers the first render via the subscription below.
     store.commit(restored);
     render(store.getState());
+
+    // After the CSV, because the capacity chart aggregates it — and after render(), so the
+    // one height post that follows already accounts for the charts being in the DOM.
+    renderCharts();
 
     errorNote.hidden = true;
     window.setTimeout(() => {

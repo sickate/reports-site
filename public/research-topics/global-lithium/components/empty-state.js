@@ -17,6 +17,8 @@
  * @param {string} [spec.needs]  what would fill it
  * @param {string[]} [spec.have] related things we DO have, so the view is not empty-handed
  */
+import { escapeHtml as escape } from './escape.js';
+
 export function renderEmptyState({ kind, title, why, needs, have = [] }) {
   const label = kind === 'undisclosed' ? '未披露' : '数据缺口';
   const tone = kind === 'undisclosed' ? 'is-undisclosed' : 'is-gap';
@@ -59,14 +61,4 @@ export function renderGapRegister(specs) {
       </tbody>
     </table>
   `;
-}
-
-function escape(value) {
-  if (value === null || value === undefined || value === '') return '—';
-  return String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
 }

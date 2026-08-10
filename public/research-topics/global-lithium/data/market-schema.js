@@ -142,3 +142,71 @@ export function validateMetric(metric, path = 'metric') {
 
   return problems;
 }
+
+/**
+ * Validate a SeriesEnvelope — a Metric whose payload is an array instead of a scalar.
+ *
+ * Charts are the second surface that puts sourced numbers on screen, and a chart is the
+ * easier place to lose provenance: a line has no obvious slot to print its 口径 in, so the
+ * temptation is to ship the points alone. Requiring the same envelope means a series cannot
+ * be plotted without an as-of, a 口径 and a source, exactly like a metric tile.
+ *
+ * NOTE ON THE FIELD NAMED `series`: it is the FRESHNESS BUCKET (price / inventory / demand /
+ * forecast / fact), not "this is a series". That name predates charts; the top-level block
+ * in global-lithium-market.json is therefore called `charts`, not `series`, so the two
+ * cannot be confused for each other.
+ *
+ * @param {object} envelope
+ * @param {string} path                 for the error message
+ * @param {object} [opts]
+ * @param {string[]} [opts.requiredPointKeys]  keys every point must carry
+ */
+export function validateSeries(envelope, path = 'series', opts = {}) {
+  const problems = [];
+  const bad = (msg) => problems.push(`${path}: ${msg}`);
+
+  if (!envelope || typeof envelope !== 'object') {
+    bad('is not an object');
+    return problems;
+  }
+  if (!envelope.label) bad('missing label');
+  if (!ISO_DATE.test(envelope.asOf || '')) bad(`asOf "${envelope.asOf}" is not YYYY-MM-DD`);
+  if (!envelope.basis) bad('missing basis — a series without a 口径 is not comparable to anything');
+  if (!envelope.unit) bad('missing unit');
+  if (!FRESHNESS_THRESHOLDS[envelope.series]) {
+    bad(`series "${envelope.series}" not one of: ${Object.keys(FRESHNESS_THRESHOLDS).join(' | ')}`);
+  }
+  if (!METRIC_KINDS[envelope.kind]) bad(`kind "${envelope.kind}" not one of: ${Object.keys(METRIC_KINDS).join(' | ')}`);
+  if (!CONFIDENCE_LABELS[envelope.confidence]) bad(`confidence "${envelope.confidence}" not one of: high | medium | low`);
+
+  const src = envelope.source;
+  if (!src || typeof src !== 'object') {
+    bad('missing source');
+  } else {
+    if (!src.label) bad('source.label missing');
+    if (!SOURCE_KINDS[src.kind]) bad(`source.kind "${src.kind}" not one of: ${Object.keys(SOURCE_KINDS).join(' | ')}`);
+  }
+
+  // An empty series is NOT the same as a null metric. A null metric says "we looked and
+  // there is nothing"; an empty points array says nothing at all and would render as a
+  // blank plot area with a confident-looking title and footer. Use data/gaps.js instead.
+  if (!Array.isArray(envelope.points)) {
+    bad('missing points array');
+  } else if (!envelope.points.length) {
+    bad('points is empty — an unsourceable series belongs in data/gaps.js as an empty state, '
+      + 'not here as a chart with no marks');
+  } else {
+    const required = opts.requiredPointKeys || [];
+    envelope.points.forEach((pt, i) => {
+      if (!pt || typeof pt !== 'object') {
+        problems.push(`${path}.points[${i}]: is not an object`);
+        return;
+      }
+      for (const key of required) {
+        if (!(key in pt)) problems.push(`${path}.points[${i}]: missing "${key}"`);
+      }
+    });
+  }
+
+  return problems;
+}
