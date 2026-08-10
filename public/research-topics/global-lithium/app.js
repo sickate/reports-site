@@ -18,6 +18,10 @@ import { companyResearchContent } from './data/company-research.js';
 import { dictionaries } from './data/dictionaries.js';
 import { fieldTranslationsZh } from './data/field-translations.js';
 import { listedOwners } from './data/listed-owners.js';
+import {
+  COLUMN_GROUPS, COLUMN_GROUP_IDS, DEFAULT_COLUMN_GROUP, TABLE_ROW_BUDGET,
+  columnsForGroup, groupWidth,
+} from './data/columns.js';
 import { createStore } from './core/store.js';
 import {
   selectFacets, selectVisibleProjects, selectKpis, selectMappable, sortProjects,
@@ -27,7 +31,7 @@ import { assertViewConsistency } from './core/invariants.js';
 import { VIEWS, DEFAULT_VIEW, isValidView } from './views/registry.js';
 import { renderEmptyState, renderGapRegister } from './components/empty-state.js';
 import { renderMetricGrid } from './components/metric.js';
-import { escapeHtml } from './components/escape.js';
+import { escapeHtml, escapeRaw } from './components/escape.js';
 import { GAPS, GAP_REGISTER_ORDER } from './data/gaps.js';
 import { NARROW_QUERY } from './charts/kit.js';
 import { renderCapacityChart } from './charts/capacity.js';
@@ -67,6 +71,8 @@ const findingsList = document.getElementById('findingsList');
 const riskGrid = document.getElementById('riskGrid');
 const updatesGrid = document.getElementById('updatesGrid');
 const dataTableHead = document.getElementById('dataTableHead');
+const dataTable = document.getElementById('dataTable');
+const columnGroups = document.getElementById('columnGroups');
 const tableScrollHint = document.getElementById('tableScrollHint');
 const companySubnav = document.getElementById('companySubnav');
 const quickTakeGrid = document.getElementById('quickTakeGrid');
@@ -137,10 +143,16 @@ let market = null;
 // two EDITORS of this one field, not two independent filters — previously the legend wrote
 // a module-level Set while the dropdown's value lived in the DOM, and the render path had
 // to AND them together. One field means they can never disagree.
+// `cols` and `selection` are deliberately TOP-LEVEL primitives, not nested under
+// `filters` or a `table: {}` object. core/store.js's valueEqual is one level deep, and
+// `filters` already sits at that limit — a third level of nesting would compare unequal on
+// every commit, defeat the no-op dedupe, and turn every keystroke into an unconditional
+// full table + map rebuild plus a height post to the parent.
 const store = createStore({
   view: DEFAULT_VIEW,
   filters: { q: '', statusGroups: null, countries: [], structures: [] },
   sort: 'capacity_desc',
+  cols: DEFAULT_COLUMN_GROUP,
 });
 
 const syncUrl = createUrlSync();
@@ -163,6 +175,23 @@ function notifyParentHeight() {
 
     window.parent.postMessage({ type: HEIGHT_MESSAGE_TYPE, height: nextHeight }, '*');
   });
+}
+
+/**
+ * Post the height three times: now, after the next frame, and again after 120ms.
+ *
+ * One post is not enough because the caller usually just changed what is displayed, and
+ * the panel's own layout is not final until after this tick; the 120ms tail covers
+ * late work (web fonts, Leaflet's own reflow) that lands after the first frame.
+ *
+ * Every interaction that changes the document height must call this — view switching,
+ * column-group switching, and the mobile drawer all do. Extracted from applyView() so
+ * there is one definition rather than three copies drifting apart.
+ */
+function notifyHeightTriple() {
+  notifyParentHeight();
+  window.requestAnimationFrame(notifyParentHeight);
+  window.setTimeout(notifyParentHeight, 120);
 }
 
 if ('ResizeObserver' in window) {
@@ -423,9 +452,7 @@ function applyView(activeView) {
 
   // Switching views changes the document height dramatically. One post now and one after
   // layout settles, or the parent iframe keeps the previous view's height.
-  notifyParentHeight();
-  window.requestAnimationFrame(notifyParentHeight);
-  window.setTimeout(notifyParentHeight, 120);
+  notifyHeightTriple();
 }
 
 // Charts. Rendered ONCE, deliberately outside render().
@@ -908,13 +935,6 @@ function renderStaticText() {
   footnoteEl.innerHTML = t.footnote;
   loadingNote.textContent = t.loading;
 
-  dataTableHead.innerHTML = t.tableHeaders
-    .map((label, index) => {
-      const widths = ['150px', '110px', '210px', '130px', '120px', '220px', '100px', '84px', '84px', '210px', '190px', '200px', '240px', '190px'];
-      return `<th style="width:${widths[index]};">${escapeHtml(label)}</th>`;
-    })
-    .join('');
-
   renderLegend();
   renderFilters();
   renderCompanyResearch();
@@ -1041,43 +1061,79 @@ function buildSearchHaystack(item) {
   return values.join(' ').toLowerCase();
 }
 
-function renderTable(data) {
+/**
+ * Cell renderers, keyed by the `render` name in data/columns.js.
+ *
+ * They live here rather than in that module because they need currentLang, the localize
+ * helpers and the pill builders — pulling those into a module Node imports would drag DOM
+ * and locale concerns into the build check. Anything unrecognised falls back to `text`.
+ */
+const CELL_RENDERERS = {
+  projectName: (item) => {
+    const isUpdated = item.updated && item.updated === UPDATE_MARKER;
+    const pill = isUpdated
+      ? `<span class="db-updated-pill">🔄 ${currentLang === 'zh' ? '本次更新' : 'Updated'}</span>`
+      : '';
+    return `${escapeHtml(localizeValue(item.project, 'project', currentLang))}${pill}`;
+  },
+  countryPill: (item) => renderCountryPill(item.country),
+  statusPill: (item) => renderStatusPill(item),
+  listedOwner: (item) => escapeHtml(listedOwnerLabel(item.project, currentLang)),
+  number: (item, col) => escapeHtml(item[col.key]),
+  text: (item, col) => escapeHtml(localizeValue(item[col.field || col.key], col.field || col.key, currentLang)),
+};
+
+/**
+ * The <thead>.
+ *
+ * Latched on the column group because this moved OFF renderStaticText() and onto the
+ * commit path when groups became switchable — without the latch, every search keystroke
+ * would rebuild the header row and the frozen column's layout would visibly thrash.
+ * Same idea as `lastFacetSignature` for the filter dropdowns.
+ */
+let lastRenderedColumnGroup = null;
+let lastHeightNotifiedColumnGroup = null;
+
+function renderTableHead(cols, groupId) {
+  dataTable.style.minWidth = `${groupWidth(groupId)}px`;
+  if (groupId === lastRenderedColumnGroup) return;
+  lastRenderedColumnGroup = groupId;
+
+  dataTableHead.innerHTML = cols
+    .map((c) => `<th style="width:${c.width}px;" data-col="${escapeRaw(c.key)}">${escapeHtml(c.label)}</th>`)
+    .join('');
+}
+
+function renderTable(data, groupId) {
   const t = locales[currentLang];
+  const cols = columnsForGroup(groupId);
+  renderTableHead(cols, groupId);
   tbody.innerHTML = '';
 
   if (!data.length) {
     const tr = document.createElement('tr');
     tr.className = 'is-empty-state';
-    tr.innerHTML = `<td colspan="14" class="empty-state">${escapeHtml(t.emptyState)}</td>`;
+    tr.innerHTML = `<td colspan="${cols.length}" class="empty-state">${escapeHtml(t.emptyState)}</td>`;
     tbody.appendChild(tr);
     return;
   }
 
   for (const item of data) {
     const tr = document.createElement('tr');
-    const isUpdated = item.updated && item.updated === UPDATE_MARKER;
-    if (isUpdated) {
+    if (item.updated && item.updated === UPDATE_MARKER) {
       tr.className = 'row-updated';
     }
-    const updatedPill = isUpdated
-      ? `<span class="db-updated-pill">🔄 ${currentLang === 'zh' ? '本次更新' : 'Updated'}</span>`
-      : '';
-    tr.innerHTML = `
-      <td>${escapeHtml(localizeValue(item.project, 'project', currentLang))}${updatedPill}</td>
-      <td>${renderCountryPill(item.country)}</td>
-      <td>${escapeHtml(listedOwnerLabel(item.project, currentLang))}</td>
-      <td>${renderStatusPill(item)}</td>
-      <td>${escapeHtml(localizeValue(item.deposit_type, 'deposit_type', currentLang))}</td>
-      <td>${escapeHtml(localizeValue(item.reserve_resource, 'reserve_resource', currentLang))}</td>
-      <td>${escapeHtml(localizeValue(item.grade, 'grade', currentLang))}</td>
-      <td>${escapeHtml(item.current_kta_lce)}</td>
-      <td>${escapeHtml(item.planned_kta_lce)}</td>
-      <td>${escapeHtml(localizeValue(item.cost, 'cost', currentLang))}</td>
-      <td>${escapeHtml(localizeValue(item.address, 'address', currentLang))}</td>
-      <td>${escapeHtml(localizeValue(item.route, 'route', currentLang))}</td>
-      <td>${escapeHtml(localizeValue(item.risks, 'risks', currentLang))}</td>
-      <td>${escapeHtml(localizeValue(item.source_note, 'source_note', currentLang))}</td>
-    `;
+    // data-label is what turns each cell into a labelled line in the ≤640px card layout,
+    // so the mobile view needs no second render path and the row stays a <tr> the
+    // invariant can count. escapeRaw, not escapeHtml — the latter turns '' into an em
+    // dash, which would be a visible bogus label.
+    tr.innerHTML = cols
+      .map((c) => {
+        const render = CELL_RENDERERS[c.render] || CELL_RENDERERS.text;
+        const cls = c.align === 'right' ? ' class="num"' : '';
+        return `<td${cls} data-label="${escapeRaw(c.label)}">${render(item, c)}</td>`;
+      })
+      .join('');
     tbody.appendChild(tr);
   }
 }
@@ -1086,7 +1142,19 @@ function renderMap(data) {
   markerLayer.clearLayers();
   lineLayer.clearLayers();
 
-  for (const item of data) {
+  // Draw biggest-first so the smallest circles land on TOP.
+  //
+  // `data` arrives in the TABLE's sort order, which means the paint order of the map used
+  // to depend on a control that has nothing to do with the map: under sort=name_asc a
+  // 300 kt circle could be drawn last and completely bury a 10 kt one. Sorting a copy by
+  // capacity descending makes overlap resolution deterministic and always favours the
+  // marker that would otherwise be impossible to hit. Copy, don't sort in place — `data`
+  // is the shared `visible` array the table and the KPI tiles also read.
+  const byCapacityDesc = [...data].sort(
+    (a, b) => (Number(b.map_capacity_kta) || 0) - (Number(a.map_capacity_kta) || 0)
+  );
+
+  for (const item of byCapacityDesc) {
     if (!Number.isFinite(item.lat) || !Number.isFinite(item.lon)) {
       continue;
     }
@@ -1124,6 +1192,22 @@ function renderMap(data) {
 // The single render pass. Every surface derives from ONE computed `visible` list, so the
 // KPI tiles, the table and the map cannot describe different sets. Subscribed to the store;
 // never call it directly — commit to the store and let it fire.
+function renderColumnGroups(activeId) {
+  columnGroups.innerHTML = COLUMN_GROUPS.map((g) => `
+    <button class="column-group-btn" type="button" role="radio"
+            data-cols="${escapeRaw(g.id)}" aria-checked="${g.id === activeId}"
+            tabindex="${g.id === activeId ? 0 : -1}">
+      ${escapeHtml(g.label)}
+      <span class="column-group-hint">${escapeHtml(g.hint)}</span>
+    </button>`).join('');
+}
+
+/** Cell count of the first real row, or null when the table is showing its empty state. */
+function firstBodyRowCellCount() {
+  const row = tbody.querySelector('tr:not(.is-empty-state)');
+  return row ? row.children.length : null;
+}
+
 function render(state) {
   const visible = sortProjects(
     selectVisibleProjects(rawData, state.filters, buildSearchHaystack),
@@ -1136,7 +1220,8 @@ function render(state) {
 
   renderFilters();
   renderLegend();
-  renderTable(visible);
+  renderColumnGroups(state.cols);
+  renderTable(visible, state.cols);
   renderMap(visible);
   updateStats(selectKpis(visible));
 
@@ -1149,6 +1234,9 @@ function render(state) {
     kpiCount: Number(document.getElementById('statProjectCount').textContent.replace(/[^0-9]/g, '')),
     tableRows: tbody.querySelectorAll('tr:not(.is-empty-state)').length,
     markerCount: markerLayer.getLayers().length,
+    headerCells: dataTableHead.children.length,
+    bodyCells: firstBodyRowCellCount(),
+    expectedColumns: columnsForGroup(state.cols).length,
   });
 
   unmappedNote.hidden = unmapped === 0;
@@ -1157,7 +1245,15 @@ function render(state) {
     : `${unmapped} 个项目缺少坐标，未在地图上显示。`;
 
   syncUrl(state);
-  notifyParentHeight();
+
+  // A column-group change alters every row's height, so one post is not enough — the
+  // layout is not final until after this tick. Same three-shot as a view switch.
+  if (state.cols !== lastHeightNotifiedColumnGroup) {
+    lastHeightNotifiedColumnGroup = state.cols;
+    notifyHeightTriple();
+  } else {
+    notifyParentHeight();
+  }
 }
 
 async function loadMarket() {
@@ -1206,6 +1302,7 @@ async function init() {
       validCountries: facets.countries,
       validStructures: facets.structures,
       validViews: VIEWS.map((v) => v.id),
+      validCols: COLUMN_GROUP_IDS,
     });
 
     // First commit triggers the first render via the subscription below.
@@ -1306,6 +1403,15 @@ legend.addEventListener('click', (event) => {
       },
     };
   });
+});
+
+// Switching column groups changes every row's height (dropping 风险/来源 shortens them a
+// lot), so the parent frame needs re-measuring — but only AFTER the render the commit
+// triggers, which is why the triple fires from the subscriber rather than from here.
+// Handlers commit; they never render.
+columnGroups.addEventListener('click', (event) => {
+  const id = event.target.closest('.column-group-btn')?.dataset.cols;
+  if (id) store.commit({ cols: id });
 });
 
 init();

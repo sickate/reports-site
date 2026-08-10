@@ -16,7 +16,10 @@ const STATE_MESSAGE_TYPE = 'instap-research-topic-state';
 
 // Filter keys the embedded report owns. Mirrored onto this page's URL so a shared link
 // restores the reader's view; anything else in the query string is left untouched.
-const REPORT_STATE_KEYS = ['view', 'q', 'status', 'country', 'sort'];
+// `structure` was missing here while core/url-state.js encoded it, so the structure filter
+// never survived a host-level shared link in either direction. Any key added to
+// encodeState() must be added here too, or it only ever reaches the iframe's own URL.
+const REPORT_STATE_KEYS = ['view', 'q', 'status', 'country', 'structure', 'sort', 'cols'];
 
 function GlobalLithiumReport() {
   const iframeRef = useRef(null);

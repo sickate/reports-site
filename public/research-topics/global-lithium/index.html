@@ -625,7 +625,68 @@
     .tablewrap {
       margin-top: 16px;
       padding: 10px 12px 16px;
+      overflow: visible;
+    }
+
+    /* The table's scrollport, and it must contain the table and NOTHING else.
+       Three things depend on that:
+
+       1. `th { position: sticky; top: 0 }` is measured against the nearest scrollport.
+          This used to be `.tablewrap`, which has `overflow: auto` but no height cap — so
+          it never scrolled, the sticky offset never engaged, and the header quietly
+          scrolled away with the page. It looked implemented and was not.
+       2. `.tablewrap` carries `padding: 10px 12px 16px`; a `position: sticky; left: 0`
+          cell cannot sit flush against a padded scrollport.
+       3. `.table-title` and the scroll hint live in `.tablewrap`. With scrolling there,
+          dragging the table sideways dragged the heading out of view too.
+
+       The cap is `min(72vh, 820px)`: tall enough that the whole 44-row table is one or
+       two flicks away, short enough that the header has something to stick to. */
+    .table-scroll {
       overflow: auto;
+      max-height: min(72vh, 820px);
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      border-top: 1px solid var(--line);
+    }
+
+    .column-groups {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 2px 6px 10px;
+    }
+
+    .column-group-btn {
+      cursor: pointer;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font: inherit;
+      font-size: 12px;
+      line-height: 1.4;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+    }
+
+    .column-group-btn:hover {
+      border-color: rgba(120, 167, 255, 0.38);
+      transform: translateY(-1px);
+    }
+
+    .column-group-btn[aria-checked='true'] {
+      background: rgba(120, 167, 255, 0.16);
+      border-color: rgba(120, 167, 255, 0.55);
+      color: #dbe6ff;
+      font-weight: 600;
+    }
+
+    .column-group-btn .column-group-hint {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 400;
     }
 
     /* Hidden by default (the full 14-column table fits on desktop); the mobile media
@@ -680,6 +741,45 @@
     tr:hover td {
       background: rgba(255, 255, 255, 0.03);
     }
+
+    /* ---- Frozen first column -------------------------------------------------------
+       `left: 0` here and `top: 0` on th are two INDEPENDENT axes of the same sticky
+       positioning. The corner cell needs both plus a z-index above each, or whichever
+       axis is currently scrolling paints over it. Layers: 1 = header row, 2 = frozen
+       column, 3 = the corner where they meet.
+
+       The background MUST be opaque. A sticky cell composites over the content sliding
+       underneath it; a transparent one shows both at once and reads as a rendering bug.
+
+       Kept on `border-collapse: collapse` — the existing th rule already proves sticky
+       works with it. The one artefact is that collapsed VERTICAL borders are painted by
+       the table rather than the cell, so the frozen column's right edge can vanish while
+       scrolled; hence `inset` box-shadow instead of `border-right`. Do NOT switch to
+       `border-collapse: separate` to "fix" that — it would change every border on both
+       company tables and reintroduce cell spacing. */
+    #dataTable th:first-child,
+    #dataTable td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      background: #101833;
+      box-shadow:
+        inset -1px 0 0 var(--line),
+        8px 0 10px -8px rgba(0, 0, 0, 0.55);
+    }
+
+    #dataTable thead th:first-child {
+      z-index: 3;
+      background: #0f1731;
+    }
+
+    /* The row tints elsewhere are rgba OVERLAYS on a transparent cell. On an opaque
+       sticky cell they have to be pre-composited, or the frozen cell reads as
+       un-highlighted next to the highlighted rest of its own row. These are those
+       overlays flattened onto #101833. */
+    #dataTable tbody tr:hover td:first-child { background: #161e37; }
+    #dataTable tbody tr.row-updated td:first-child { background: #1a2546; }
+    #dataTable tbody tr.row-updated:hover td:first-child { background: #1e2a4d; }
 
     .empty-state {
       padding: 22px 12px;
@@ -1640,13 +1740,18 @@
         <h2 id="tableTitle"></h2>
         <p id="tableSubtitle"></p>
       </div>
+      <!-- role=radiogroup, not a row of toggle buttons: picking a column group is a
+           single choice, and aria-checked says so in a way aria-pressed cannot. -->
+      <div class="column-groups" id="columnGroups" role="radiogroup" aria-label="表格列组"></div>
       <p class="table-scroll-hint" id="tableScrollHint"></p>
-      <table id="dataTable">
-        <thead>
-          <tr id="dataTableHead"></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      <div class="table-scroll">
+        <table id="dataTable">
+          <thead>
+            <tr id="dataTableHead"></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
 
       </section>
