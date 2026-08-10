@@ -23,18 +23,42 @@ import { escapeHtml, escapeRaw } from '../components/escape.js';
 import { renderProvenanceFooter, renderFreshnessChip } from '../components/metric.js';
 
 /**
- * Chart geometry, in viewBox units. Width is fixed; height is computed per chart.
- * `left` is generous because the row labels are Chinese project / company names.
+ * Chart geometry, in viewBox units. Height is computed per chart; width is one of two
+ * fixed values.
+ *
+ * WHY TWO. A viewBox scales EVERYTHING uniformly, text included. A 960-unit-wide chart in
+ * a 315px phone column renders at 33%, which turns a 13px label into 4px — the horizontal-
+ * bar layout survives the narrow column but its typography does not. So the narrow variant
+ * is not the wide one shrunk: it is a squarer box with a shorter label gutter and taller
+ * rows, chosen so the same type lands around 10px after scaling.
+ *
+ * This does NOT violate the no-measurement rule at the top of this file. matchMedia queries
+ * the VIEWPORT, not the element, so it answers correctly inside a `hidden` panel where
+ * getBoundingClientRect returns 0, and it cannot participate in the resize feedback loop
+ * because the breakpoint is discrete — it changes on a real viewport change, never in
+ * response to a height this page itself applied.
  */
-export const GEOM = {
-  w: 960,
-  rowH: 34,
-  pad: { top: 20, right: 104, bottom: 42, left: 168 },
-};
+const WIDE = { w: 960, rowH: 34, pad: { top: 20, right: 104, bottom: 42, left: 168 } };
+const NARROW = { w: 420, rowH: 46, pad: { top: 22, right: 58, bottom: 46, left: 104 } };
+
+export const NARROW_QUERY = '(max-width: 640px)';
+
+export function isNarrow() {
+  try {
+    return window.matchMedia(NARROW_QUERY).matches;
+  } catch (error) {
+    return false;
+  }
+}
+
+/** @param {boolean} narrow @returns the layout box for that breakpoint. */
+export function geom(narrow) {
+  return narrow ? NARROW : WIDE;
+}
 
 /** Height of a horizontal-bar chart with `rowCount` rows. Pure arithmetic, never measured. */
-export function hbarHeight(rowCount) {
-  return GEOM.pad.top + Math.max(rowCount, 1) * GEOM.rowH + GEOM.pad.bottom;
+export function hbarHeight(rowCount, g = WIDE) {
+  return g.pad.top + Math.max(rowCount, 1) * g.rowH + g.pad.bottom;
 }
 
 /** Height of an x/y chart. Fixed, so the empty state can match it exactly. */
@@ -94,7 +118,7 @@ function niceTicks(min, max, count) {
 // ---------------------------------------------------------------------------- axes
 
 /** Vertical grid lines + bottom tick labels, for horizontal-bar charts. */
-export function gridX({ scale, y0, y1, count = 5, format = fmt.num }) {
+export function gridX({ scale, y0, y1, count = 4, format = fmt.num }) {
   return scale.ticks(count).map((t) => `
     <line class="chart-grid" x1="${scale(t)}" x2="${scale(t)}" y1="${y0}" y2="${y1}" />
     <text class="chart-tick" x="${scale(t)}" y="${y1 + 22}" text-anchor="middle">${escapeRaw(format(t))}</text>`
@@ -119,9 +143,9 @@ export function ticksLeft({ scale, x, x1, count = 5, format = fmt.num }) {
 }
 
 /** Row label at the left of a horizontal bar. */
-export function rowLabel({ text, y, title }) {
-  return `<text class="chart-rowlabel" x="${GEOM.pad.left - 12}" y="${y}" text-anchor="end"
-    >${escapeRaw(truncate(text, 14))}<title>${escapeRaw(title || text)}</title></text>`;
+export function rowLabel({ text, y, title, g = WIDE, max = 14 }) {
+  return `<text class="chart-rowlabel" x="${g.pad.left - 12}" y="${y}" text-anchor="end"
+    >${escapeRaw(truncate(text, max))}<title>${escapeRaw(title || text)}</title></text>`;
 }
 
 function truncate(text, max) {
@@ -141,15 +165,29 @@ export const fmt = {
 };
 
 /**
- * Direction glyph. This is the PRIMARY encoding of direction, not decoration — the house
- * rule is that colour is secondary, so every coloured mark carries a glyph and a number
- * that survive greyscale printing and all three forms of colour-vision deficiency.
+ * Direction glyph, for genuinely directional quantities (a change, a spread, a slope).
+ *
+ * This is the PRIMARY encoding, not decoration — the house rule is that colour is
+ * secondary, so every coloured mark carries a glyph and a number that survive greyscale
+ * printing and all three forms of colour-vision deficiency.
  */
 export function glyph(value, { high = 0, low = 0 } = {}) {
   if (!Number.isFinite(value)) return '';
   if (value > high) return '▲';
   if (value < low) return '▼';
   return '▬';
+}
+
+/**
+ * Category marker, for when the colour split is a CLASSIFICATION rather than a direction.
+ *
+ * Deliberately not ▲/▼. Those imply a comparison, and a reader seeing ▲ next to a drawn
+ * reference line will read it as "above that line" — which is wrong whenever the glyph's
+ * threshold and the drawn line are different numbers. Filled vs hollow carries the same
+ * redundancy against colour-vision deficiency while asserting nothing about direction.
+ */
+export function marker(isFlagged) {
+  return isFlagged ? '●' : '○';
 }
 
 // ---------------------------------------------------------------------------- frames
@@ -175,7 +213,7 @@ export function glyph(value, { high = 0, low = 0 } = {}) {
 export function chartFrame(spec) {
   const {
     id, kicker, title, note, height, svgBody, envelope,
-    reference, a11yLabel, table = '', scroll = false,
+    reference, a11yLabel, table = '', scroll = false, width,
   } = spec;
 
   return `
@@ -193,7 +231,7 @@ export function chartFrame(spec) {
       </figcaption>
 
       <div class="${scroll ? 'chart-scroll' : 'chart-plot'}">
-        <svg class="chart-svg" viewBox="0 0 ${GEOM.w} ${height}"
+        <svg class="chart-svg" viewBox="0 0 ${width || WIDE.w} ${height}"
              preserveAspectRatio="xMidYMid meet"
              role="img" aria-label="${escapeRaw(a11yLabel)}">
           ${svgBody}

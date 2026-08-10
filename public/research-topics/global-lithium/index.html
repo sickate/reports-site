@@ -1173,6 +1173,12 @@
       --chart-bar-track: rgba(148, 163, 184, 0.1);
     }
 
+    /* .card carries no padding of its own; each variant supplies it. The supply / cost /
+       catalysts cards used to rely on .empty-state-block's padding, which stops working the
+       moment they also hold a kicker and a chart. */
+    .view-card { padding: 20px 22px 22px; }
+    .view-card > .section-kicker { margin-bottom: 14px; }
+
     .chart {
       display: flex;
       flex-direction: column;
@@ -1490,12 +1496,23 @@
 
       </section>
 
+      <!-- Charts and gap placeholders are siblings by design: each view shows what we CAN
+           draw first, then states what is still missing underneath. Separate slots so the
+           two renderers (renderCharts / renderGapViews) never overwrite one another. -->
       <section class="view" data-view="supply" id="view-supply" role="tabpanel" aria-labelledby="tab-supply" hidden>
-        <div class="card" id="supplySection"></div>
+        <div class="card view-card" id="supplySection">
+          <div class="section-kicker">未来供给</div>
+          <div id="supplyChartSlot"></div>
+          <div id="supplyGapSlot"></div>
+        </div>
       </section>
 
       <section class="view" data-view="cost" id="view-cost" role="tabpanel" aria-labelledby="tab-cost" hidden>
-        <div class="card" id="costSection"></div>
+        <div class="card view-card" id="costSection">
+          <div class="section-kicker">成本曲线与价格敏感性</div>
+          <div id="costChartSlot"></div>
+          <div id="costGapSlot"></div>
+        </div>
       </section>
 
       <section class="view" data-view="equities" id="view-equities" role="tabpanel" aria-labelledby="tab-equities" hidden>
@@ -1522,6 +1539,10 @@
           <h2 id="domesticTitle"></h2>
           <p id="domesticSubtitle"></p>
         </div>
+        <!-- Sits ABOVE the table on purpose: the 26E PE column below is computed from an
+             April consensus that five of these ten names have already invalidated, so the
+             coverage chart has to be read first for the table to be read correctly. -->
+        <div id="coverageChartSlot"></div>
         <div class="company-tablewrap">
           <table class="company-table" id="domesticTable">
             <thead>
@@ -1626,7 +1647,11 @@
       </section>
 
       <section class="view" data-view="catalysts" id="view-catalysts" role="tabpanel" aria-labelledby="tab-catalysts" hidden>
-        <div class="card" id="catalystsSection"></div>
+        <div class="card view-card" id="catalystsSection">
+          <div class="section-kicker">催化剂与预警</div>
+          <div id="catalystsChartSlot"></div>
+          <div id="catalystsGapSlot"></div>
+        </div>
       </section>
 
       <section class="view" data-view="method" id="view-method" role="tabpanel" aria-labelledby="tab-method" hidden>

@@ -10,14 +10,12 @@
     "is a legitimate state meaning 'could not be sourced' — see data/gaps.js for the register.",
     "Never fill a null by estimating: the empty state is the honest answer."
   ],
-
   "meta": {
     "asOf": "2026-07-27",
     "quotesAsOf": "2026-07-27",
     "researchWindow": "2026-05 至 2026-07",
     "note": "meta.asOf is the reference date every metric's freshness badge is measured against."
   },
-
   "priceCall": {
     "directionLabel": "中性偏多",
     "tone": "neutral-bull",
@@ -41,7 +39,6 @@
     },
     "delta": "较上次下调：4 月\"澳洲柴油挤压→供给收缩→上行\"未兑现，澳矿已集中到港、供给反而放量；但去库 + 旺季 + 见底支撑，维持中性偏多而非转空。"
   },
-
   "keyMetricsTitle": "关键指标",
   "keyMetricsNote": "每个数字都带自己的 as-of、口径与出处；标注「未披露」的是免费公开源确实不提供的，不做估算填充。",
   "keyMetrics": [
@@ -55,7 +52,11 @@
       "kind": "observed",
       "confidence": "high",
       "series": "price",
-      "source": { "label": "生意社", "kind": "press", "url": "https://www.100ppi.com/" }
+      "source": {
+        "label": "生意社",
+        "kind": "press",
+        "url": "https://www.100ppi.com/"
+      }
     },
     {
       "id": "spot-industrial-carbonate",
@@ -67,7 +68,11 @@
       "kind": "observed",
       "confidence": "high",
       "series": "price",
-      "source": { "label": "生意社", "kind": "press", "url": "https://www.100ppi.com/" }
+      "source": {
+        "label": "生意社",
+        "kind": "press",
+        "url": "https://www.100ppi.com/"
+      }
     },
     {
       "id": "gfex-term-spread",
@@ -79,7 +84,11 @@
       "kind": "observed",
       "confidence": "high",
       "series": "price",
-      "source": { "label": "广州期货交易所", "kind": "exchange", "url": "https://www.gfex.com.cn/" },
+      "source": {
+        "label": "广州期货交易所",
+        "kind": "exchange",
+        "url": "https://www.gfex.com.cn/"
+      },
       "note": "约 −5.0%。近月贴水远月，通常读作现货偏紧。"
     },
     {
@@ -92,7 +101,10 @@
       "kind": "observed",
       "confidence": "medium",
       "series": "price",
-      "source": { "label": "研报库（卖方汇总）", "kind": "broker" },
+      "source": {
+        "label": "研报库（卖方汇总）",
+        "kind": "broker"
+      },
       "note": "在没有现金成本曲线的情况下，这是硬岩成本端唯一可得的间接锚点。"
     },
     {
@@ -105,7 +117,11 @@
       "kind": "observed",
       "confidence": "high",
       "series": "inventory",
-      "source": { "label": "SMM 上海有色网", "kind": "press", "url": "https://www.smm.cn/" }
+      "source": {
+        "label": "SMM 上海有色网",
+        "kind": "press",
+        "url": "https://www.smm.cn/"
+      }
     },
     {
       "id": "inventory-broad-weekly",
@@ -117,7 +133,11 @@
       "kind": "observed",
       "confidence": "high",
       "series": "inventory",
-      "source": { "label": "SMM 上海有色网", "kind": "press", "url": "https://www.smm.cn/" },
+      "source": {
+        "label": "SMM 上海有色网",
+        "kind": "press",
+        "url": "https://www.smm.cn/"
+      },
       "note": "周环比 −5,341 吨，去库延续。"
     },
     {
@@ -130,7 +150,10 @@
       "kind": "observed",
       "confidence": "medium",
       "series": "demand",
-      "source": { "label": "研报库（卖方汇总）", "kind": "broker" },
+      "source": {
+        "label": "研报库（卖方汇总）",
+        "kind": "broker"
+      },
       "note": "全球口径约 317GWh（环比 +7.1%），高于月初 3–5% 的预期。"
     },
     {
@@ -164,10 +187,8 @@
       "note": "未披露：需 Wood Mackenzie / Benchmark / Fastmarkets，均为付费；免费源零现金成本数字。"
     }
   ],
-
   "updatesTitle": "从柴油牛论到再平衡：2026 年年中的最新判断",
   "updatesSubtitle": "前两条为 2026-07-24 基于 Caspian 行情 / 研报与公开信息的现状刷新；其后为 4 月以来的供给扰动、澳洲柴油、需求上修、库存与权益弹性判断脉络。",
-
   "researchUpdates": [
     {
       "impact": "中性",
@@ -281,19 +302,126 @@
       "note": "本质上，当前权益端隐含着一个与锂价和全球新能源定价体系重估相关的看涨期权。"
     }
   ],
-
+  "charts": {
+    "h1Coverage": {
+      "label": "10 家 A 股 26H1 业绩预告区间",
+      "unit": "亿元（归母净利）",
+      "asOf": "2026-07-15",
+      "basis": "各公司自行披露的 26H1 业绩预告归母净利区间（公告日 2026-07-03 至 07-15）；覆盖率 = 区间中值 ÷ 公司表内 26E 一致预期",
+      "kind": "company_guidance",
+      "confidence": "high",
+      "series": "forecast",
+      "source": {
+        "label": "各公司 2026 年半年度业绩预告",
+        "kind": "company"
+      },
+      "note": "区间是公司给的，覆盖率是我们算的。融捷股份无全年一致预期（26E 为 N.A.），因此只有预告区间没有覆盖率——不用 H1 外推填充。",
+      "points": [
+        {
+          "company": "天齐锂业",
+          "low": 28.5,
+          "high": 42.5,
+          "announced": "2026-07-15"
+        },
+        {
+          "company": "赣锋锂业",
+          "low": 36.5,
+          "high": 46.0,
+          "announced": "2026-07-15"
+        },
+        {
+          "company": "盐湖股份",
+          "low": 60.0,
+          "high": 63.0,
+          "announced": "2026-07-03"
+        },
+        {
+          "company": "藏格矿业",
+          "low": 35.5,
+          "high": 37.5,
+          "announced": "2026-07-07"
+        },
+        {
+          "company": "中矿资源",
+          "low": 10.5,
+          "high": 12.5,
+          "announced": "2026-07-11"
+        },
+        {
+          "company": "永兴材料",
+          "low": 9.5,
+          "high": 11.5,
+          "announced": "2026-07-14"
+        },
+        {
+          "company": "盛新锂能",
+          "low": 10.0,
+          "high": 12.0,
+          "announced": "2026-07-09"
+        },
+        {
+          "company": "雅化集团",
+          "low": 11.0,
+          "high": 13.0,
+          "announced": "2026-07-07"
+        },
+        {
+          "company": "天华新能",
+          "low": 22.0,
+          "high": 24.0,
+          "announced": "2026-07-10"
+        },
+        {
+          "company": "融捷股份",
+          "low": 9.0,
+          "high": 11.0,
+          "announced": "2026-07-11"
+        }
+      ]
+    }
+  },
   "changelog": [
     {
       "date": "2026-07-27",
       "prevDate": "2026-07-24",
       "asOf": "行情 07-27 · 研报 5–7 月",
       "diffs": [
-        { "label": "在产样本", "old": "17", "now": "26", "change": "+9（修正）" },
-        { "label": "状态字段", "old": "单一 status 自由文本", "now": "lifecycle × structure × activity", "change": "拆成正交三列" },
-        { "label": "关键指标出处", "old": "散落在正文项目符号里", "now": "10 项 Metric（含 3 项未披露）", "change": "结构化" },
-        { "label": "26H1 业绩预告覆盖", "old": "2 / 10 家", "now": "10 / 10 家", "change": "全覆盖" },
-        { "label": "天华新能 26E PE", "old": "108.8x", "now": "105.7x", "change": "口径失效（H1 已达 26E 的 499%）" },
-        { "label": "雅化集团 26E PE", "old": "6.8x", "now": "6.7x", "change": "-1%" }
+        {
+          "label": "在产样本",
+          "old": "17",
+          "now": "26",
+          "change": "+9（修正）"
+        },
+        {
+          "label": "状态字段",
+          "old": "单一 status 自由文本",
+          "now": "lifecycle × structure × activity",
+          "change": "拆成正交三列"
+        },
+        {
+          "label": "关键指标出处",
+          "old": "散落在正文项目符号里",
+          "now": "10 项 Metric（含 3 项未披露）",
+          "change": "结构化"
+        },
+        {
+          "label": "26H1 业绩预告覆盖",
+          "old": "2 / 10 家",
+          "now": "10 / 10 家",
+          "change": "全覆盖"
+        },
+        {
+          "label": "天华新能 26E PE",
+          "old": "108.8x",
+          "now": "105.7x",
+          "change": "口径失效（H1 已达 26E 的 499%）"
+        },
+        {
+          "label": "雅化集团 26E PE",
+          "old": "6.8x",
+          "now": "6.7x",
+          "change": "-1%"
+        }
       ],
       "items": [
         "修正在产样本口径：原先由单一 status 字段的字符串启发式归类，6 个在产项目被误判为开发/建设/集群，KPI 显示 17；改为 lifecycle/structure/activity 三个正交列后为 26（含爬坡 4）。这是口径修正，不是产能变化。",
@@ -309,11 +437,36 @@
       "prevDate": "2026-04-15",
       "asOf": "行情 07-23/24 · 研报 5–7 月",
       "diffs": [
-        { "label": "碳酸锂基准(万元/吨)", "old": "~16", "now": "14.5–15", "change": "-9%" },
-        { "label": "中矿资源 26E PE", "old": "20.8x", "now": "13.1x", "change": "-37%" },
-        { "label": "盐湖股份 26E PE", "old": "16.5x", "now": "12.3x", "change": "-25%" },
-        { "label": "雅化集团 26E 净利(亿)", "old": "14.2", "now": "30.3", "change": "+114%" },
-        { "label": "锂价判断", "old": "看涨 · 70%", "now": "中性偏多 · 60%", "change": "下调" }
+        {
+          "label": "碳酸锂基准(万元/吨)",
+          "old": "~16",
+          "now": "14.5–15",
+          "change": "-9%"
+        },
+        {
+          "label": "中矿资源 26E PE",
+          "old": "20.8x",
+          "now": "13.1x",
+          "change": "-37%"
+        },
+        {
+          "label": "盐湖股份 26E PE",
+          "old": "16.5x",
+          "now": "12.3x",
+          "change": "-25%"
+        },
+        {
+          "label": "雅化集团 26E 净利(亿)",
+          "old": "14.2",
+          "now": "30.3",
+          "change": "+114%"
+        },
+        {
+          "label": "锂价判断",
+          "old": "看涨 · 70%",
+          "now": "中性偏多 · 60%",
+          "change": "下调"
+        }
       ],
       "items": [
         "基准锂价 16 万 → 14.5–15 万元/吨；研报更新区新增两条（柴油牛论证伪 + 见底信号；需求上修 + 宜春环保 / 津巴 2027 / 消费税）。",

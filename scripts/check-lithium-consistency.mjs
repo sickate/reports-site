@@ -26,7 +26,7 @@ import {
   CODE_VERSION, DATA_CACHE_KEY, UPDATE_MARKER,
 } from '../public/research-topics/global-lithium/core/version.js';
 import {
-  validateMetric, classifyFreshness,
+  validateMetric, validateSeries, classifyFreshness,
 } from '../public/research-topics/global-lithium/data/market-schema.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -266,7 +266,60 @@ async function checkMarket() {
     }
   });
 
+  checkChartSeries(market, reference);
+
   return market;
+}
+
+/** Per-chart required point keys. A chart module reading a key nobody validates is how a
+ *  series silently renders as a flat line at zero. */
+const SERIES_POINT_KEYS = {
+  h1Coverage: ['company', 'low', 'high'],
+  gfexTermStructure: ['contract', 'settlement'],
+};
+
+function checkChartSeries(market, reference) {
+  const charts = market.charts || {};
+
+  for (const [key, envelope] of Object.entries(charts)) {
+    for (const problem of validateSeries(envelope, `charts.${key}`, {
+      requiredPointKeys: SERIES_POINT_KEYS[key] || [],
+    })) {
+      fail(problem);
+    }
+
+    // A series dated AFTER the file's own reference date is the signature of a partial
+    // refresh: someone pulled a fresh quote into a file whose meta.asOf, changelog and
+    // homepage date all still describe the previous week. Every freshness badge on the page
+    // is measured against meta.asOf, so such a point would score as "fresh" by being in the
+    // future. Refresh the whole file or pin the series to the date it belongs to.
+    if (envelope?.asOf && envelope.asOf > reference) {
+      fail(`charts.${key}.asOf ${envelope.asOf} is later than market.meta.asOf ${reference} — `
+        + 'either advance meta.asOf (and the changelog + registry date with it) or pin the '
+        + 'series to the as-of it was sourced for');
+    }
+
+    if (envelope?.asOf && envelope.series
+      && classifyFreshness(envelope.asOf, reference, envelope.series) === 'stale') {
+      warn(`charts.${key} is stale (asOf ${envelope.asOf} vs ${reference})`);
+    }
+  }
+
+  // The coverage chart divides by the FY26E cell of the company table. A name that does not
+  // match a table row silently drops that company from the chart while the table still
+  // lists it — the exact "two surfaces disagree" defect the runtime invariants exist for.
+  const h1 = charts.h1Coverage;
+  if (h1?.points) {
+    const tableNames = new Set(companyResearchContent.zh.domesticRows.map((r) => r[0]));
+    for (const pt of h1.points) {
+      if (!tableNames.has(pt.company)) {
+        fail(`charts.h1Coverage: "${pt.company}" is not a row in companyResearchContent.zh.domesticRows`);
+      }
+      if (!(pt.low <= pt.high)) {
+        fail(`charts.h1Coverage: "${pt.company}" has low ${pt.low} > high ${pt.high}`);
+      }
+    }
+  }
 }
 
 const projects = await checkCsv();
