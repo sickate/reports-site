@@ -15,12 +15,13 @@ const DEFAULTS = {
   countries: [],        // [] = all
   structures: [],       // [] = all
   sort: 'capacity_desc',
+  cols: 'overview',     // must match DEFAULT_COLUMN_GROUP in data/columns.js
 };
 
 const STATE_MESSAGE_TYPE = 'instap-research-topic-state';
 
 /** State -> "?q=pil&status=Operating,Ramp-up&country=Australia&sort=name_asc" */
-export function encodeState({ view, filters, sort }) {
+export function encodeState({ view, filters, sort, cols }) {
   const params = new URLSearchParams();
   if (view && view !== DEFAULT_VIEW_ID) params.set('view', view);
   if (filters.q && filters.q !== DEFAULTS.q) params.set('q', filters.q);
@@ -34,6 +35,7 @@ export function encodeState({ view, filters, sort }) {
     params.set('structure', filters.structures.join(','));
   }
   if (sort && sort !== DEFAULTS.sort) params.set('sort', sort);
+  if (cols && cols !== DEFAULTS.cols) params.set('cols', cols);
   const qs = params.toString();
   return qs ? `?${qs}` : '';
 }
@@ -45,6 +47,7 @@ export function encodeState({ view, filters, sort }) {
  */
 export function decodeState(search, {
   validGroups = null, validCountries = null, validStructures = null, validViews = null,
+  validCols = null,
 } = {}) {
   const params = new URLSearchParams(search || '');
   const split = (key, valid) => {
@@ -57,6 +60,7 @@ export function decodeState(search, {
 
   const sort = params.get('sort');
   const view = params.get('view');
+  const cols = params.get('cols');
   return {
     view: (validViews && validViews.includes(view)) ? view : DEFAULT_VIEW_ID,
     filters: {
@@ -68,6 +72,7 @@ export function decodeState(search, {
     sort: ['capacity_desc', 'capacity_asc', 'name_asc', 'country_asc'].includes(sort)
       ? sort
       : DEFAULTS.sort,
+    cols: (validCols && validCols.includes(cols)) ? cols : DEFAULTS.cols,
   };
 }
 

@@ -20,22 +20,60 @@ const DEBUG = (() => {
 })();
 
 /**
+ * @param {object} a
+ * @param {number} a.headerCells    live <th> count
+ * @param {number|null} a.bodyCells cell count of the first real row; null when empty
+ * @param {number} a.expectedColumns columnsForGroup(state.cols).length
  * @returns {{ok: boolean, unmapped: number}} `unmapped` is how many visible rows have no
  *   coordinates — the caller surfaces it in the map footer.
  */
-export function assertViewConsistency({ visible, mappable, kpiCount, tableRows, markerCount }) {
+export function assertViewConsistency({
+  visible, mappable, kpiCount, tableRows, markerCount,
+  headerCells, bodyCells, expectedColumns,
+  selection = null, drawerOpen = false,
+}) {
   const unmapped = visible.length - mappable.length;
 
-  // An empty result set renders an "empty state" row, so row counting is not comparable.
-  if (!visible.length) return { ok: true, unmapped: 0 };
+  // The column contract is checked in BOTH branches. data/columns.js removes header/body
+  // drift by construction; this asserts the construction actually held, which is this
+  // codebase's habit — and it is the runtime replacement for the three parallel arrays.
+  const columnsOk = headerCells === expectedColumns
+    && (bodyCells === null || bodyCells === expectedColumns);
+
+  // The drawer must never describe a project the table and map are not showing. The
+  // clamp in commitFilters makes this true; asserting it proves no later commit path
+  // bypassed the clamp. And the drawer's open/closed state must agree with the store —
+  // two surfaces disagreeing about "is anything selected" is the original defect, one
+  // level down.
+  const selectionOk = selection === null || visible.some((p) => p.project === selection);
+  const drawerOk = drawerOpen === (selection !== null);
+
+  // An empty result set renders an "empty state" row, so ROW counting is not comparable.
+  // Everything else still is, and used to go unchecked: an empty result with markers left
+  // on the map was a bug this function returned `ok: true` for.
+  if (!visible.length) {
+    const emptyOk = markerCount === 0 && columnsOk && selection === null && !drawerOpen;
+    if (!emptyOk) {
+      const detail = { kpiCount, tableRows, markerCount, visible: 0, mappable: 0, headerCells, bodyCells, expectedColumns };
+      console.error('[global-lithium] view inconsistency — empty result set is not clean', detail);
+      if (DEBUG) showBanner(detail);
+    }
+    return { ok: emptyOk, unmapped: 0 };
+  }
 
   const ok = kpiCount === visible.length
     && tableRows === visible.length
-    && markerCount === mappable.length;
+    && markerCount === mappable.length
+    && columnsOk
+    && selectionOk
+    && drawerOk;
 
   if (!ok) {
-    const detail = { kpiCount, tableRows, markerCount, visible: visible.length, mappable: mappable.length };
-    console.error('[global-lithium] view inconsistency — KPI / table / map disagree', detail);
+    const detail = {
+      kpiCount, tableRows, markerCount, visible: visible.length, mappable: mappable.length,
+      headerCells, bodyCells, expectedColumns, selection, drawerOpen,
+    };
+    console.error('[global-lithium] view inconsistency — KPI / table / map / columns disagree', detail);
     if (DEBUG) showBanner(detail);
   }
 
@@ -55,5 +93,6 @@ function showBanner(detail) {
     document.body.appendChild(el);
   }
   el.textContent = `视图不一致：KPI ${detail.kpiCount} · 表格 ${detail.tableRows} 行 · `
-    + `地图 ${detail.markerCount} 点（可见 ${detail.visible}，有坐标 ${detail.mappable}）`;
+    + `地图 ${detail.markerCount} 点（可见 ${detail.visible}，有坐标 ${detail.mappable}）`
+    + ` · 列 表头 ${detail.headerCells} / 单元格 ${detail.bodyCells} / 应为 ${detail.expectedColumns}`;
 }

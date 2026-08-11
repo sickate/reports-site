@@ -28,6 +28,10 @@ import {
 import {
   validateMetric, validateSeries, classifyFreshness,
 } from '../public/research-topics/global-lithium/data/market-schema.js';
+import {
+  COLUMNS, COLUMN_GROUPS, RENDER_KINDS, DEFAULT_COLUMN_GROUP, columnsForGroup, groupWidth,
+} from '../public/research-topics/global-lithium/data/columns.js';
+import { MAP_REGIONS, REGION_COUNTRIES } from '../public/research-topics/global-lithium/data/regions.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -351,10 +355,99 @@ function checkChartSeries(market, reference) {
 
 const projects = await checkCsv();
 const market = await checkMarket();
+checkColumns(projects);
+checkRegions(projects);
 checkCompanyRows();
 await checkVersions();
 
 for (const w of warnings) console.warn(`  warn  ${w}`);
+
+/**
+ * Column config invariants.
+ *
+ * The load-bearing one is #1: it makes renaming a CSV column a BUILD failure rather than a
+ * cell that renders an em dash forever. The rest keep the group/frozen/render contracts
+ * that data/columns.js promises to app.js.
+ */
+function checkColumns(projects) {
+  const groupIds = COLUMN_GROUPS.map((g) => g.id);
+
+  for (const col of COLUMNS) {
+    if (!col.derived && !EXPECTED_COLUMNS.includes(col.key)) {
+      fail(`column "${col.key}" is not a CSV column (and is not marked derived) — rename or mark it`);
+    }
+    if (!RENDER_KINDS.includes(col.render)) {
+      fail(`column "${col.key}" has render "${col.render}", not one of ${RENDER_KINDS.join('|')}`);
+    }
+    if (col.groups !== '*') {
+      for (const g of col.groups) {
+        if (!groupIds.includes(g)) fail(`column "${col.key}" references unknown group "${g}"`);
+      }
+    }
+    if (!Number.isFinite(col.width) || col.width <= 0) {
+      fail(`column "${col.key}" has a non-positive width`);
+    }
+  }
+
+  const keys = COLUMNS.map((c) => c.key);
+  const dupKeys = keys.filter((k, i) => keys.indexOf(k) !== i);
+  if (dupKeys.length) fail(`duplicate column key(s): ${[...new Set(dupKeys)].join(', ')}`);
+
+  const dupGroups = groupIds.filter((g, i) => groupIds.indexOf(g) !== i);
+  if (dupGroups.length) fail(`duplicate column group id(s): ${[...new Set(dupGroups)].join(', ')}`);
+
+  if (!groupIds.includes(DEFAULT_COLUMN_GROUP)) {
+    fail(`DEFAULT_COLUMN_GROUP "${DEFAULT_COLUMN_GROUP}" is not a declared group`);
+  }
+
+  const frozen = COLUMNS.filter((c) => c.frozen);
+  if (frozen.length !== 1) {
+    fail(`expected exactly 1 frozen column, found ${frozen.length}`);
+  }
+
+  for (const id of groupIds) {
+    const cols = columnsForGroup(id);
+    if (!cols.length) { fail(`column group "${id}" is empty`); continue; }
+    // The frozen column is `position: sticky; left: 0`, which only makes sense on the
+    // FIRST cell of the row — so it has to lead every group, not just exist in it.
+    if (!cols[0].frozen) fail(`column group "${id}" does not start with the frozen column`);
+  }
+
+  // `project` is the key for row -> marker matching, listedOwners lookup and the URL's
+  // selection param. Nothing asserted it was unique before.
+  if (projects) {
+    const names = projects.map((p) => p.project);
+    const dupes = names.filter((n, i) => names.indexOf(n) !== i);
+    if (dupes.length) fail(`duplicate project name(s) in CSV: ${[...new Set(dupes)].join(', ')}`);
+  }
+}
+
+/**
+ * Map regions must stay in step with the CSV in BOTH directions. A region naming a country
+ * that no longer exists is a dead chip; a CSV country in no region is a project the
+ * quick-zoom can never frame — the silent half, and the reason this runs at build time.
+ */
+function checkRegions(projects) {
+  if (!projects) return;
+  const csvCountries = new Set(projects.map((p) => p.country));
+
+  for (const country of REGION_COUNTRIES) {
+    if (!csvCountries.has(country)) {
+      fail(`data/regions.js names country "${country}", which no CSV project uses`);
+    }
+  }
+  for (const country of csvCountries) {
+    const covered = MAP_REGIONS.some((r) => r.countries && r.countries.includes(country));
+    if (!covered) fail(`CSV country "${country}" belongs to no map region — add it to data/regions.js`);
+  }
+
+  const ids = MAP_REGIONS.map((r) => r.id);
+  const dupes = ids.filter((id, i) => ids.indexOf(id) !== i);
+  if (dupes.length) fail(`duplicate map region id(s): ${[...new Set(dupes)].join(', ')}`);
+  if (!MAP_REGIONS.some((r) => r.countries === null)) {
+    fail('data/regions.js has no catch-all region (countries: null)');
+  }
+}
 
 if (errors.length) {
   console.error(`\n✗ global-lithium consistency: ${errors.length} error(s)\n`);
@@ -366,6 +459,7 @@ if (errors.length) {
 console.log(
   `✓ global-lithium consistency: ${projects?.length ?? 0} projects, `
   + `${companyResearchContent.zh.domesticRows.length + companyResearchContent.zh.globalRows.length} company rows, `
-  + `${market?.keyMetrics?.length ?? 0} metrics`
+  + `${market?.keyMetrics?.length ?? 0} metrics, `
+  + `columns ${COLUMN_GROUPS.map((g) => `${g.id}=${columnsForGroup(g.id).length}@${groupWidth(g.id)}px`).join(' ')}`
   + (warnings.length ? `, ${warnings.length} warning(s)` : '')
 );

@@ -6,7 +6,7 @@ import { useSearchParams } from 'react-router-dom';
 // scripts/check-lithium-consistency.mjs, which fails the build if they diverge.
 // (The two separate DATA clocks — DATA_CACHE_KEY and UPDATE_MARKER — live alongside
 // CODE_VERSION in the report's core/version.js; see that file for why there are three.)
-const REPORT_VERSION = '2026-08-10';
+const REPORT_VERSION = '2026-08-11';
 const REPORT_PATH = '/research-topics/global-lithium/';
 // Was 1400 when the report was one long page. Now that it is split into views, the
 // shortest (catalysts) is under 800px, and a 1400px floor would leave visible dead space.
@@ -16,7 +16,10 @@ const STATE_MESSAGE_TYPE = 'instap-research-topic-state';
 
 // Filter keys the embedded report owns. Mirrored onto this page's URL so a shared link
 // restores the reader's view; anything else in the query string is left untouched.
-const REPORT_STATE_KEYS = ['view', 'q', 'status', 'country', 'sort'];
+// `structure` was missing here while core/url-state.js encoded it, so the structure filter
+// never survived a host-level shared link in either direction. Any key added to
+// encodeState() must be added here too, or it only ever reaches the iframe's own URL.
+const REPORT_STATE_KEYS = ['view', 'q', 'status', 'country', 'structure', 'sort', 'cols'];
 
 function GlobalLithiumReport() {
   const iframeRef = useRef(null);

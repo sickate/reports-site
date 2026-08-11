@@ -30,6 +30,6 @@
 //
 // scripts/check-lithium-consistency.mjs enforces all of the above and fails the build.
 
-export const CODE_VERSION = '2026-08-10';
-export const DATA_CACHE_KEY = '2026-08-10';
-export const UPDATE_MARKER = '2026-07-24';
+export const CODE_VERSION = '2026-08-11';
+export const DATA_CACHE_KEY = '2026-08-11';
+export const UPDATE_MARKER = '2026-08-11';

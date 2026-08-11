@@ -620,19 +620,263 @@
 
     .mapbox {
       padding: 10px;
+      position: relative;
+    }
+
+    .map-regions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 0 10px 10px;
+    }
+
+    .map-region-btn {
+      cursor: pointer;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font: inherit;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+    }
+
+    .map-region-btn:hover:not(:disabled) {
+      border-color: rgba(120, 167, 255, 0.38);
+      transform: translateY(-1px);
+    }
+
+    /* Disabled when the region has no visible projects, which makes this chip row double
+       as a live geographic facet rather than a static set of shortcuts. */
+    .map-region-btn:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+
+    .map-region-count {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .map-size-legend {
+      background: rgba(11, 16, 32, 0.9);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 8px 10px;
+      color: var(--text);
+      backdrop-filter: blur(6px);
+    }
+
+    .map-size-legend-title {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .map-size-legend-rows {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+    }
+
+    .map-size-legend-row {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* ---- Project detail drawer ------------------------------------------------------
+       `position: absolute`, NOT fixed. The React wrapper sizes this iframe to its full
+       content height and sets scrolling="no", so the iframe's viewport IS the whole
+       ~6,000px document — `position: fixed; top: 0` would pin the panel to the top of a
+       document the reader is scrolled 4,000px into, i.e. nowhere they can see.
+
+       Sitting inside .mapbox also means it contributes nothing to appRoot.scrollHeight,
+       so on desktop it needs no height re-post at all. */
+    .project-drawer {
+      position: absolute;
+      inset: 12px 12px 12px auto;
+      width: min(400px, 62%);
+      z-index: 900; /* above Leaflet panes (400-700), below its controls (1000) */
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(11, 16, 32, 0.96);
+      backdrop-filter: blur(8px);
+      box-shadow: var(--shadow);
+      padding: 14px 16px 16px;
+    }
+
+    .drawer-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .drawer-head h3 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.25;
+    }
+
+    .drawer-close {
+      cursor: pointer;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      border-radius: 8px;
+      width: 28px;
+      height: 28px;
+      font-size: 16px;
+      line-height: 1;
+      flex: none;
+    }
+
+    .drawer-close:hover {
+      border-color: rgba(120, 167, 255, 0.45);
+    }
+
+    .drawer-section + .drawer-section {
+      margin-top: 12px;
+    }
+
+    .drawer-section h4 {
+      margin: 0 0 6px;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #8fb0ff;
+    }
+
+    .drawer-section dl {
+      margin: 0;
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 4px 10px;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .drawer-section dt {
+      color: var(--muted);
+    }
+
+    .drawer-section dd {
+      margin: 0;
+      color: var(--text);
+      overflow-wrap: anywhere;
+    }
+
+    /* Selected row highlight. The frozen first cell is opaque, so its tint has to be
+       pre-composited like the hover/updated ones above. */
+    #dataTable tbody tr.is-selected td {
+      background: rgba(120, 167, 255, 0.14);
+    }
+
+    #dataTable tbody tr.is-selected td:first-child {
+      background: #1d2a52;
+    }
+
+    .row-open {
+      cursor: pointer;
+      border: 0;
+      background: none;
+      padding: 0;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      text-decoration: underline;
+      text-decoration-color: rgba(120, 167, 255, 0.4);
+      text-underline-offset: 3px;
+    }
+
+    .row-open:hover {
+      color: #dbe7ff;
+      text-decoration-color: rgba(120, 167, 255, 0.9);
     }
 
     .tablewrap {
       margin-top: 16px;
       padding: 10px 12px 16px;
-      overflow: auto;
+      overflow: visible;
     }
 
-    /* Hidden by default (the full 14-column table fits on desktop); the mobile media
-       query below turns it on. Declared HERE, before that query, so the cascade order
-       lets the media rule win — a later top-level rule would silently override it. */
+    /* The table's scrollport, and it must contain the table and NOTHING else.
+       Three things depend on that:
+
+       1. `th { position: sticky; top: 0 }` is measured against the nearest scrollport.
+          This used to be `.tablewrap`, which has `overflow: auto` but no height cap — so
+          it never scrolled, the sticky offset never engaged, and the header quietly
+          scrolled away with the page. It looked implemented and was not.
+       2. `.tablewrap` carries `padding: 10px 12px 16px`; a `position: sticky; left: 0`
+          cell cannot sit flush against a padded scrollport.
+       3. `.table-title` and the scroll hint live in `.tablewrap`. With scrolling there,
+          dragging the table sideways dragged the heading out of view too.
+
+       The cap is `min(72vh, 820px)`: tall enough that the whole 44-row table is one or
+       two flicks away, short enough that the header has something to stick to. */
+    .table-scroll {
+      overflow: auto;
+      max-height: min(72vh, 820px);
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      border-top: 1px solid var(--line);
+    }
+
+    .column-groups {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 2px 6px 10px;
+    }
+
+    .column-group-btn {
+      cursor: pointer;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font: inherit;
+      font-size: 12px;
+      line-height: 1.4;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+    }
+
+    .column-group-btn:hover {
+      border-color: rgba(120, 167, 255, 0.38);
+      transform: translateY(-1px);
+    }
+
+    .column-group-btn[aria-checked='true'] {
+      background: rgba(120, 167, 255, 0.16);
+      border-color: rgba(120, 167, 255, 0.55);
+      color: #dbe6ff;
+      font-weight: 600;
+    }
+
+    .column-group-btn .column-group-hint {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 400;
+    }
+
+    /* Was hidden by default and switched on only under 640px, back when it warned about
+       a horizontal scroll. It now explains the column-group switcher and the frozen
+       column, which is useful at every width, so it is always shown. */
     .table-scroll-hint {
-      display: none;
+      display: block;
       padding: 0 6px 8px;
       color: var(--muted);
       font-size: 12px;
@@ -660,6 +904,14 @@
       font-size: 13px;
     }
 
+    /* app.js sets --table-min-width from the active column group's declared widths.
+       With `width: 100%; table-layout: fixed` this gives the right behaviour both ways:
+       a narrow group on a wide viewport stretches proportionally and never scrolls, a
+       wide group or narrow viewport pins the declared px and scrolls horizontally. */
+    #dataTable {
+      min-width: var(--table-min-width, 0);
+    }
+
     th,
     td {
       border-bottom: 1px solid var(--line);
@@ -680,6 +932,45 @@
     tr:hover td {
       background: rgba(255, 255, 255, 0.03);
     }
+
+    /* ---- Frozen first column -------------------------------------------------------
+       `left: 0` here and `top: 0` on th are two INDEPENDENT axes of the same sticky
+       positioning. The corner cell needs both plus a z-index above each, or whichever
+       axis is currently scrolling paints over it. Layers: 1 = header row, 2 = frozen
+       column, 3 = the corner where they meet.
+
+       The background MUST be opaque. A sticky cell composites over the content sliding
+       underneath it; a transparent one shows both at once and reads as a rendering bug.
+
+       Kept on `border-collapse: collapse` — the existing th rule already proves sticky
+       works with it. The one artefact is that collapsed VERTICAL borders are painted by
+       the table rather than the cell, so the frozen column's right edge can vanish while
+       scrolled; hence `inset` box-shadow instead of `border-right`. Do NOT switch to
+       `border-collapse: separate` to "fix" that — it would change every border on both
+       company tables and reintroduce cell spacing. */
+    #dataTable th:first-child,
+    #dataTable td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      background: #101833;
+      box-shadow:
+        inset -1px 0 0 var(--line),
+        8px 0 10px -8px rgba(0, 0, 0, 0.55);
+    }
+
+    #dataTable thead th:first-child {
+      z-index: 3;
+      background: #0f1731;
+    }
+
+    /* The row tints elsewhere are rgba OVERLAYS on a transparent cell. On an opaque
+       sticky cell they have to be pre-composited, or the frozen cell reads as
+       un-highlighted next to the highlighted rest of its own row. These are those
+       overlays flattened onto #101833. */
+    #dataTable tbody tr:hover td:first-child { background: #161e37; }
+    #dataTable tbody tr.row-updated td:first-child { background: #1a2546; }
+    #dataTable tbody tr.row-updated:hover td:first-child { background: #1e2a4d; }
 
     .empty-state {
       padding: 22px 12px;
@@ -879,44 +1170,116 @@
         grid-template-columns: 1fr;
       }
 
-      /* ---- Mobile table triage ----
-         The project table is ~2,238px wide (14 inline column widths) and the company
-         tables are 1,180-1,400px. The iframe is rendered with scrolling="no", so anything
-         that escapes an overflow container is *clipped*, not scrollable. Two measures:
-         (1) guarantee each table sits in a real horizontal scroller with a visible hint,
-         (2) drop the three long narrative columns so the remaining width is tractable.
-         Phase 6 replaces this with proper cards; this is triage, not the destination. */
-      .tablewrap,
+      /* In the card layout the drawer leaves the map overlay and joins normal flow
+         under it, because a 400px floating panel over a 560px map on a 375px screen
+         covers the thing it is describing. Unlike the desktop variant this DOES change
+         the document height, so the height triple has to fire — see notifyHeightTriple()
+         in app.js, called from render() when the selection changes. */
+      .project-drawer {
+        position: static;
+        inset: auto;
+        width: auto;
+        margin-top: 10px;
+        max-height: none;
+      }
+
+      /* The company tables keep the old triage — they are still wide fixed tables and
+         are not part of the project-table card treatment below. */
       .company-tablewrap {
         overflow-x: auto;
         overscroll-behavior-x: contain;
         -webkit-overflow-scrolling: touch;
       }
 
-      .table-scroll-hint {
-        display: block;
+      /* ---- Project table becomes cards (Phase 6) ------------------------------------
+         Replaces the old triage, which horizontally scrolled the table and hid three
+         narrative columns at this width. Now nothing is hidden: every cell becomes a
+         labelled line, using the `data-label` renderTable() already writes on each <td>.
+
+         CSS-only, deliberately. Keeping one <tr> per project means
+         `tbody tr:not(.is-empty-state)` still counts rows, so assertViewConsistency needs
+         no mobile branch and there is no second render path to keep in step. A separate
+         <article> renderer would double the renderer, need a resize listener to swap
+         between them, and force the invariant to know which one ran.
+
+         This does NOT violate "never squeeze the column widths". The 41,478px disaster
+         came from eleven columns DIVIDING 375px inside a table layout; `display: block`
+         removes table layout entirely, so each cell is a full-width block and a row is
+         ~8 short labelled lines. Nothing is squeezed because nothing is being divided. */
+      .table-scroll {
+        max-height: none;
+        overflow: visible;
+        border-top: 0;
       }
 
-      /* 11 地址 · 12 运输/出口路线 · 14 数据来源摘要 — the narrative columns.
-         Kept in the DOM (and in the search haystack), just not rendered at this width. */
-      #dataTable th:nth-child(11),
-      #dataTable td:nth-child(11),
-      #dataTable th:nth-child(12),
-      #dataTable td:nth-child(12),
-      #dataTable th:nth-child(14),
-      #dataTable td:nth-child(14) {
+      #dataTable {
+        display: block;
+        table-layout: auto;
+        min-width: 0;
+        font-size: 13px;
+      }
+
+      /* Takes the inline per-column th widths out of the layout with it. */
+      #dataTable thead {
         display: none;
       }
 
-      /* Deliberately NOT `width: auto`. Letting 11 columns share 375px squeezes each to
-         ~34px, so every cell wraps into a tall stack and the table grows to ~41,000px —
-         far worse than scrolling. Keeping the declared widths gives normal ~2-line rows
-         and a horizontal scroll the hint above already advertises. */
-      #dataTable th:nth-child(6),
-      #dataTable td:nth-child(6),
-      #dataTable th:nth-child(13),
-      #dataTable td:nth-child(13) {
-        max-width: 190px;
+      #dataTable tbody {
+        display: block;
+      }
+
+      #dataTable tbody tr {
+        display: block;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        margin-bottom: 10px;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      #dataTable td {
+        display: grid;
+        grid-template-columns: 92px 1fr;
+        gap: 10px;
+        align-items: start;
+        border: 0;
+        padding: 6px 0;
+      }
+
+      #dataTable td::before {
+        content: attr(data-label);
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      /* The frozen column is meaningless without a horizontal scroller — and an opaque
+         sticky background inside a card reads as a stray filled box. Reset all of it. */
+      #dataTable th:first-child,
+      #dataTable td:first-child,
+      #dataTable tbody tr:hover td:first-child,
+      #dataTable tbody tr.row-updated td:first-child,
+      #dataTable tbody tr.row-updated:hover td:first-child {
+        position: static;
+        box-shadow: none;
+        background: transparent;
+      }
+
+      #dataTable td.num {
+        text-align: left;
+      }
+
+      /* The empty-state cell spans a column count that no longer exists in this layout. */
+      #dataTable tbody tr.is-empty-state {
+        padding: 0;
+      }
+
+      #dataTable tbody tr.is-empty-state td {
+        display: block;
+      }
+
+      #dataTable tbody tr.is-empty-state td::before {
+        content: none;
       }
     }
 
@@ -1629,8 +1992,13 @@
       <div class="legend" id="legend"></div>
       <div id="loadingNote" class="loading-note"></div>
       <div id="errorNote" class="error-note" hidden></div>
+      <div class="map-regions" id="mapRegions"></div>
       <div class="mapbox">
         <div id="map"></div>
+        <!-- aria-modal="false" on purpose: this is a non-blocking side panel. Claiming
+             true would oblige a focus trap and an inert background, which is Phase 7. -->
+        <aside id="projectDrawer" class="project-drawer" role="dialog" aria-modal="false"
+               aria-labelledby="drawerTitle" hidden></aside>
       </div>
       <div id="unmappedNote" class="unmapped-note" hidden></div>
     </div>
@@ -1640,13 +2008,18 @@
         <h2 id="tableTitle"></h2>
         <p id="tableSubtitle"></p>
       </div>
+      <!-- role=radiogroup, not a row of toggle buttons: picking a column group is a
+           single choice, and aria-checked says so in a way aria-pressed cannot. -->
+      <div class="column-groups" id="columnGroups" role="radiogroup" aria-label="表格列组"></div>
       <p class="table-scroll-hint" id="tableScrollHint"></p>
-      <table id="dataTable">
-        <thead>
-          <tr id="dataTableHead"></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      <div class="table-scroll">
+        <table id="dataTable">
+          <thead>
+            <tr id="dataTableHead"></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
 
       </section>
@@ -1672,6 +2045,6 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
   ></script>
-  <script type="module" src="./app.js?v=2026-08-10"></script>
+  <script type="module" src="./app.js?v=2026-08-11"></script>
 </body>
 </html>
