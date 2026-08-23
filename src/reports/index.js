@@ -146,9 +146,9 @@ export const reports = [
   },
   {
     slug: '2026-04-cosco-shipping-energy',
-    title: '中远海能 H 股 (1138.HK) 深度投研 v3.1',
-    description: '霍尔木兹危机下的 VLCC 结构性牛市分析: 可比估值、红队测试、交易指引, 含 VLCC 订单与船价比值的实时监控仪表盘。',
-    date: '2026-04-11',
+    title: '中远海能 H 股 (1138.HK) 深度投研 v4.0',
+    description: '油运高盈利与供给拐点并存：结合集运纪要、VLCC/LNG 订单簿、最新 TCE 与公司业绩，重估空仓策略及再入场条件。',
+    date: '2026-08-23',
     type: 'visualization',
     category: 'company',
     tags: ['投资分析', '航运', 'VLCC', 'LNG', '地缘政治'],

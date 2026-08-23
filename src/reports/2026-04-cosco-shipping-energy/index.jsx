@@ -4,6 +4,7 @@ import { LineChart, Line, ResponsiveContainer, Tooltip } from 'recharts';
 import {
   reportMeta,
   backgroundNarrative,
+  executiveSummary,
   metricOrder,
   structuralInsights,
   valuationTable,
@@ -12,6 +13,7 @@ import {
   weakAssumptions,
   coreLogicChains,
   tradeGuidance,
+  sourceLinks,
   disclaimer,
 } from './content.js';
 
@@ -403,7 +405,7 @@ const CoscoShippingEnergyReport = () => {
       <header className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <span className="text-xs font-mono text-amber-400 uppercase tracking-widest">
-            投研分析 · v3.1
+            投研分析 · v4.0
           </span>
           <span className="text-xs text-slate-500">更新于 {reportMeta.updatedAt}</span>
         </div>
@@ -427,6 +429,18 @@ const CoscoShippingEnergyReport = () => {
         </div>
       </header>
 
+      {/* Executive summary */}
+      <section className="mb-8 rounded-2xl border border-amber-500/30 bg-amber-500/5 p-6">
+        <h2 className="text-xl font-bold text-slate-100 mb-4">Executive Summary</h2>
+        <ul className="space-y-3 ml-4">
+          {executiveSummary.map((item, index) => (
+            <li key={index} className="text-sm md:text-base text-slate-300 leading-relaxed list-disc">
+              {item}
+            </li>
+          ))}
+        </ul>
+      </section>
+
       {/* Dashboard */}
       <MetricsDashboard
         data={data}
@@ -436,24 +450,24 @@ const CoscoShippingEnergyReport = () => {
       />
 
       {/* Background narrative */}
-      <SectionTitle number="一" subtitle="霍尔木兹危机背景">
-        关键数据仪表盘说明
+      <SectionTitle number="一" subtitle="截至 2026-08-23 的市场快照">
+        当前市场状态
       </SectionTitle>
       <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-6 text-slate-300 leading-relaxed text-sm md:text-base">
         {backgroundNarrative}
       </div>
 
       {/* Structural insights */}
-      <SectionTitle number="二" subtitle="独立于地缘事件的中期逻辑">
-        结构性洞察
+      <SectionTitle number="二" subtitle="油运、LNG 与集运纪要的交叉验证">
+        高运价背后的晚周期信号
       </SectionTitle>
       {structuralInsights.map((ins) => (
         <InsightBlock key={ins.id} insight={ins} />
       ))}
 
       {/* Valuation */}
-      <SectionTitle number="三" subtitle="vs. Frontline / DHT / INSW / 招商轮船">
-        可比估值分析
+      <SectionTitle number="三" subtitle="价格、盈利、订单簿与安全边际">
+        当前估值与决策快照
       </SectionTitle>
       <ValuationTable />
       <div className="mt-4 space-y-3">
@@ -465,7 +479,7 @@ const CoscoShippingEnergyReport = () => {
       </div>
 
       {/* Red team */}
-      <SectionTitle number="四" subtitle="v3.1 修正版 · 5 个反对观点逐一测试">
+      <SectionTitle number="四" subtitle="v4.0 · 5 个反对观点逐一测试">
         红队测试: 多空对决
       </SectionTitle>
       <div className="space-y-4">
@@ -527,6 +541,33 @@ const CoscoShippingEnergyReport = () => {
         交易指引
       </SectionTitle>
       <TradeGuidanceTable />
+
+      {/* Sources */}
+      <SectionTitle number="八" subtitle="关键数据的可核查出处">
+        证据与来源
+      </SectionTitle>
+      <div className="space-y-3">
+        {sourceLinks.map((source) => (
+          <div
+            key={source.label}
+            className="rounded-xl border border-slate-700/50 bg-slate-800/30 p-4"
+          >
+            {source.href ? (
+              <a
+                href={source.href}
+                target="_blank"
+                rel="noreferrer"
+                className="text-sm font-semibold text-amber-300 hover:text-amber-200"
+              >
+                {source.label} ↗
+              </a>
+            ) : (
+              <div className="text-sm font-semibold text-slate-200">{source.label}</div>
+            )}
+            <p className="mt-1 text-xs text-slate-500 leading-relaxed">{source.note}</p>
+          </div>
+        ))}
+      </div>
 
       {/* Disclaimer */}
       <div className="mt-12 pt-6 border-t border-slate-800 text-xs text-slate-600 italic leading-relaxed">
