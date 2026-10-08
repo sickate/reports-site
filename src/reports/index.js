@@ -8,7 +8,7 @@ export const reports = [
   {
     slug: '2026-10-model-lab-network',
     title: 'Model lab关系图',
-    description: '六家模型组织的资本、算力与全球基础设施网络；新增 Anthropic–TeraWulf、Hut 8、Lambda、Nscale、Akamai 关系及完整研究稿，区分合同金额、建设容量和已投运资产。',
+    description: '六家模型组织的资本、算力与全球基础设施网络；整合 OpenAI 与 Anthropic 研究，新增存储、融资、媒体授权、科研及收购关联，区分合同金额、建设容量和已投运资产。',
     date: '2026-10-08',
     type: 'visualization',
     category: 'viz',

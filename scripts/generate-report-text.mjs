@@ -71,6 +71,7 @@ try {
     let failure = null;
     if (report.slug === '2026-10-model-lab-network') {
       body = await readFile(path.join(publicRoot, 'research-topics/model-lab-network/research.md'), 'utf8');
+      body = await readFile(path.join(publicRoot, 'research-topics/model-lab-network/openai-research.md'), 'utf8') + '\n\n' + body;
       const data = JSON.parse(await readFile(path.join(publicRoot, 'data/model-lab-network.json'), 'utf8'));
       body += '\n\n## Existing network and integration policy\n\n' + Object.entries(data.meta).map(([k,v]) => `${k}: ${typeof v === 'string' ? v : JSON.stringify(v)}`).join('\n');
       body += '\n\nThe supplied draft’s SpaceX assessment is limited to its own search scope. Existing official Anthropic–SpaceX evidence is preserved separately in the network.\n';

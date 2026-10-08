@@ -50,6 +50,31 @@ test('all reports export existing content; network references are valid', async 
     for (const s of r.sources) assert.ok(sources.has(s), r.id + ':' + s);
   }
 });
+test('OpenAI integration separates shared amounts, cancellations and negative findings', async () => {
+  const data = JSON.parse(await readFile(new URL('../public/data/model-lab-network.json', import.meta.url)));
+  const records = JSON.parse(await readFile(new URL('../public/research-topics/model-lab-network/openai-research-records.json', import.meta.url)));
+  const covered = new Set(data.relations.map(r => r.researchRecord));
+  records.forEach((record, index) => {
+    if (record.relationship_type !== 'other') assert.ok(covered.has(index), 'Missing supplied record ' + index);
+  });
+  assert.equal(data.meta.openaiFundingRound.committedCapitalB, 122);
+  assert.equal(data.meta.openaiCreditFacility.drawnAtCloseB, 0);
+  for (const relation of data.relations) {
+    if (relation.facilityId || (relation.roundId && relation.id.startsWith('openai-research-'))) {
+      assert.equal(relation.amountB, null, 'Shared amount allocated to ' + relation.id);
+    }
+  }
+  for (const id of ['oai-no-nscale', 'oai-no-aker', 'oai-uk']) {
+    const relation = data.relations.find(r => r.id === id);
+    assert.equal(relation.status, 'cancelled');
+    assert.equal(relation.attribution, 'historical');
+  }
+  for (const finding of data.meta.openaiNegativeFindings) {
+    assert.ok(!data.relations.some(r =>
+      (r.source === 'openai' && r.target === finding.counterparty) ||
+      (r.target === 'openai' && r.source === finding.counterparty)), finding.counterparty);
+  }
+});
 test('real MCP stdio client: discovery, full pagination, assets, errors and resources', async () => {
   const client = new Client({name:'instap-test',version:'1.0.0'});
   const transport = new StdioClientTransport({command:process.execPath,args:[fileURLToPath(new URL('./server.mjs',import.meta.url))]});

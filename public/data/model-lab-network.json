@@ -2,7 +2,7 @@
   "meta": {
     "title": "Model lab关系图",
     "researchedAt": "2026-10-08",
-    "version": "1.2",
+    "version": "1.3",
     "coverage": "六家模型组织及公开披露的主要资本、算力和企业合作；非全量交易数据库。",
     "statusPolicy": "状态为最后一条官方证据所确认，不会按预计交付日期自动升级为投运。坐标为公开城市/县级示意，不代表精确机房入口。",
     "capacityPolicy": "MW/GW是公告中的功率或容量口径，不是FLOPS；规划、协议、园区和IT负载不可直接相加。同一容量可被多个合同覆盖，故不展示跨记录GW总和。",
@@ -50,10 +50,135 @@
           "research-a3",
           "research-a4"
         ]
+      },
+      {
+        "date": "2026-10-08",
+        "text": "整合用户提供的OpenAI External Relationship Network报告：新增存储、云、芯片、资本、媒体授权、科研及收购关联；更新$122B融资轮、$4.7B未提取授信和欧洲Stargate取消状态。总额仅在项目／融资层记录，不分摊给未披露个人份额；未核实直接关系不绘制为合作边。",
+        "sources": [
+          "openai-research-s04",
+          "openai-research-s05",
+          "openai-research-s02",
+          "openai-research-s03",
+          "openai-research-s01",
+          "openai-research-s06",
+          "oai-sites",
+          "openai-research-a3",
+          "openai-research-a7",
+          "openai-research-a4",
+          "openai-research-s08",
+          "oai-amd",
+          "oai-avgo",
+          "openai-research-s12",
+          "openai-research-s13",
+          "openai-research-s14",
+          "openai-research-a5",
+          "openai-research-a6",
+          "oai-uae",
+          "openai-research-a2",
+          "oai-no",
+          "openai-research-a1",
+          "oai-uk",
+          "openai-research-s19",
+          "openai-research-s20",
+          "openai-research-s21",
+          "openai-research-s26",
+          "openai-research-s27",
+          "openai-research-s28",
+          "openai-research-s29",
+          "openai-research-s38",
+          "openai-research-s30",
+          "openai-research-s31",
+          "openai-research-s32",
+          "openai-research-s33",
+          "openai-research-s34",
+          "openai-research-s35",
+          "openai-research-s36",
+          "openai-research-s37",
+          "openai-research-s22",
+          "openai-research-s23",
+          "openai-research-s24",
+          "openai-research-s25",
+          "openai-research-s39",
+          "openai-research-s40",
+          "openai-research-s41",
+          "openai-research-s42",
+          "openai-research-s43",
+          "openai-research-s44",
+          "openai-research-s45",
+          "openai-research-s46",
+          "openai-research-s47",
+          "openai-research-s48",
+          "research-w6",
+          "research-w13",
+          "openai-research-s50"
+        ]
       }
     ],
     "researchDocument": "/research-topics/model-lab-network/research.md",
-    "integrationPolicy": "Supplied research is attributed, not independently reverified at integration. Earlier official evidence and later updates remain intact; monetary and capacity figures must not be summed across layers."
+    "integrationPolicy": "Supplied research is attributed, not independently reverified at integration. Earlier official evidence and later updates remain intact; monetary and capacity figures must not be summed across layers.",
+    "openaiFundingRound": {
+      "announcedAt": "2026-02-27",
+      "closedAt": "2026-03-31",
+      "committedCapitalB": 122,
+      "postMoneyValuationB": 852,
+      "priorAnnouncedCapitalB": 110,
+      "sources": [
+        "openai-research-s01"
+      ],
+      "policy": "$122B supersedes $110B. Closed round with committed capital does not establish that all conditional tranches have been paid. Individual institutional allocations are undisclosed."
+    },
+    "openaiCreditFacility": {
+      "announcedAt": "2026-03-31",
+      "facilityB": 4.7,
+      "drawnAtCloseB": 0,
+      "sources": [
+        "openai-research-s01"
+      ],
+      "policy": "One shared bank facility; individual bank commitments undisclosed. Not equity financing or cash drawn."
+    },
+    "stargateProgramme": {
+      "announcedAt": "2025-01-21",
+      "intendedInvestmentB": 500,
+      "intendedInitialInvestmentB": 100,
+      "term": "4 years",
+      "sources": [
+        "openai-research-s06"
+      ],
+      "policy": "Program ambition shared across founding participants; not an executed single contract and not repeated per participant."
+    },
+    "openaiNegativeFindings": [
+      {
+        "counterparty": "anthropic",
+        "asOf": "2026-10-08",
+        "summary": "No verifiable current corporate relationship found. Historical people lineage exists because Anthropic was founded by former OpenAI personnel, but no current OpenAI-Anthropic investment, contract, partnership, licensing or infrastructure deal was verified.",
+        "note": "Competitors with separate infrastructure/deployment strategies.",
+        "sources": [
+          "research-w6"
+        ],
+        "policy": "Search-scope finding; absence of a verified relationship is not proof of absence and is not rendered as a corporate edge."
+      },
+      {
+        "counterparty": "wulf",
+        "asOf": "2026-10-08",
+        "summary": "no verifiable relationship found",
+        "note": "TeraWulf's verified frontier-model relationship is with Anthropic, including a 20-year Justified campus lease, not OpenAI.",
+        "sources": [
+          "research-w13"
+        ],
+        "policy": "Search-scope finding; absence of a verified relationship is not proof of absence and is not rendered as a corporate edge."
+      },
+      {
+        "counterparty": "hut8",
+        "asOf": "2026-10-08",
+        "summary": "no verifiable relationship found",
+        "note": "Hut 8's River Bend AI infrastructure relationship is with Fluidstack/Anthropic; no OpenAI counterparty was identified.",
+        "sources": [
+          "openai-research-s50"
+        ],
+        "policy": "Search-scope finding; absence of a verified relationship is not proof of absence and is not rendered as a corporate edge."
+      }
+    ],
+    "openaiResearchDocument": "/research-topics/model-lab-network/openai-research.md"
   },
   "entities": [
     {
@@ -80,7 +205,14 @@
       "ticker": "",
       "country": "US",
       "note": "模型与企业平台",
-      "isLab": true
+      "isLab": true,
+      "researchUpdate": {
+        "asOf": "2026-10-08",
+        "note": "Supplied report: March 31 round closed with $122B committed capital at $852B post-money, replacing the $110B announcement. Cloud portfolio includes Microsoft, Oracle, AWS, CoreWeave and Google Cloud; silicon includes NVIDIA, AMD, Trainium, Cerebras and custom Broadcom chips. Undrawn revolver: ~$4.7B. No verified current corporate OpenAI relationship was found with Anthropic, TeraWulf or Hut 8 within this report’s search scope.",
+        "sources": [
+          "openai-research-s01"
+        ]
+      }
     },
     {
       "id": "deepmind",
@@ -616,6 +748,537 @@
       "ticker": "",
       "country": "US",
       "note": "Added from supplied 2026-10-07 research.",
+      "isLab": false
+    },
+    {
+      "id": "a16z",
+      "name": "a16z",
+      "role": "investor",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "d-e-shaw-ventures",
+      "name": "D. E. Shaw Ventures",
+      "role": "investor",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "tpg",
+      "name": "TPG",
+      "role": "investor",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "t-rowe-price-advised-accounts",
+      "name": "T. Rowe Price-advised accounts",
+      "role": "investor",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "blackrock-affiliated-funds",
+      "name": "BlackRock-affiliated funds",
+      "role": "investor",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "blackstone",
+      "name": "Blackstone",
+      "role": "investor",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "fidelity-management-research",
+      "name": "Fidelity Management & Research",
+      "role": "investor",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "temasek",
+      "name": "Temasek",
+      "role": "investor",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "thrive-capital",
+      "name": "Thrive Capital",
+      "role": "investor",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "uc-investments",
+      "name": "UC Investments",
+      "role": "investor",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "citi",
+      "name": "Citi",
+      "role": "investor",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "goldman-sachs",
+      "name": "Goldman Sachs",
+      "role": "investor",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "morgan-stanley",
+      "name": "Morgan Stanley",
+      "role": "investor",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "wells-fargo",
+      "name": "Wells Fargo",
+      "role": "investor",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "mizuho",
+      "name": "Mizuho",
+      "role": "investor",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "rbc",
+      "name": "RBC",
+      "role": "investor",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "smbc",
+      "name": "SMBC",
+      "role": "investor",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "ubs",
+      "name": "UBS",
+      "role": "investor",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "hsbc",
+      "name": "HSBC",
+      "role": "investor",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "santander",
+      "name": "Santander",
+      "role": "investor",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "cerebras",
+      "name": "Cerebras",
+      "role": "chip",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "samsung-electronics",
+      "name": "Samsung Electronics",
+      "role": "chip",
+      "ticker": "",
+      "country": "KR",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "samsung-sds",
+      "name": "Samsung SDS",
+      "role": "infrastructure",
+      "ticker": "",
+      "country": "KR",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "samsung-c-t",
+      "name": "Samsung C&T",
+      "role": "infrastructure",
+      "ticker": "",
+      "country": "KR",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "samsung-heavy-industries",
+      "name": "Samsung Heavy Industries",
+      "role": "infrastructure",
+      "ticker": "",
+      "country": "KR",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "sk-telecom",
+      "name": "SK Telecom",
+      "role": "infrastructure",
+      "ticker": "",
+      "country": "KR",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "korea-ministry-of-science-and-ict",
+      "name": "Korea Ministry of Science and ICT",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "KR",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "atlassian",
+      "name": "Atlassian",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "codeai",
+      "name": "CodeAI",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "associated-press",
+      "name": "Associated Press",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "axel-springer",
+      "name": "Axel Springer",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "le-monde",
+      "name": "Le Monde",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "prisa-media",
+      "name": "Prisa Media",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "financial-times",
+      "name": "Financial Times",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "reddit",
+      "name": "Reddit",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "news-corp",
+      "name": "News Corp",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "the-atlantic",
+      "name": "The Atlantic",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "vox-media",
+      "name": "Vox Media",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "time",
+      "name": "TIME",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "conde-nast",
+      "name": "Condé Nast",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "hearst",
+      "name": "Hearst",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "future-plc",
+      "name": "Future plc",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "schibsted-media",
+      "name": "Schibsted Media",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "american-journalism-project",
+      "name": "American Journalism Project",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "lenfest",
+      "name": "Lenfest Institute",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "los-alamos-national-laboratory",
+      "name": "Los Alamos National Laboratory",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "lawrence-livermore-national-laboratory",
+      "name": "Lawrence Livermore National Laboratory",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "sandia-national-laboratories",
+      "name": "Sandia National Laboratories",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "global-illumination",
+      "name": "Global Illumination",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "rockset",
+      "name": "Rockset",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "io-products",
+      "name": "io Products",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "statsig",
+      "name": "Statsig",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "sky",
+      "name": "Software Applications Incorporated",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "neptune-ai",
+      "name": "Neptune.ai",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "promptfoo",
+      "name": "Promptfoo",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "astral",
+      "name": "Astral",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "ona",
+      "name": "Ona",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "lovefrom",
+      "name": "LoveFrom",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
+      "isLab": false
+    },
+    {
+      "id": "sierra",
+      "name": "Sierra",
+      "role": "enterprise",
+      "ticker": "",
+      "country": "Not specified",
+      "note": "Counterparty identified in the supplied OpenAI external-network research (2026-10-08).",
       "isLab": false
     }
   ],
@@ -1285,7 +1948,9 @@
       "type": "investment",
       "title": "重组时持股约27%",
       "sources": [
-        "oai-ms"
+        "oai-ms",
+        "openai-research-s02",
+        "openai-research-s03"
       ],
       "announcedAt": "2025-10-28",
       "amountB": null,
@@ -1297,8 +1962,10 @@
         "openai"
       ],
       "term": null,
-      "note": "27%仅对应2025年重组时点；后续融资稀释未统一核验。135B是当时持股估值，不是新增投入。",
-      "attribution": "direct"
+      "note": "Definitive partnership reset extended key Microsoft model/product IP rights through 2032, retained Azure API exclusivity until verified AGI, removed Microsoft's compute right of first refusal, and committed OpenAI to an incremental $250 billion of Azure services. Active. Microsoft remained a major investor and participated in OpenAI's March 2026 financing. Amount / scale: USD 250 billion incremental Azure services commitment; Microsoft investment valued at approximately USD 135 billion at recapitalization [Supplied research, 2026-10-08.] The approximately $135B holding value and 27% stake refer to the 2025 recapitalization, not a new investment or the March 2026 diluted percentage.",
+      "attribution": "direct",
+      "researchRecord": 2,
+      "evidenceAsOf": "2026-10-08"
     },
     {
       "id": "oai-ms-compute",
@@ -1307,31 +1974,36 @@
       "type": "compute",
       "title": "$250B增量Azure服务承诺",
       "sources": [
-        "oai-ms"
+        "oai-ms",
+        "openai-research-s02",
+        "openai-research-s03"
       ],
       "announcedAt": "2025-10-28",
       "amountB": 250,
       "currency": "USD",
       "amountBasis": "commitment",
-      "status": "announced",
+      "status": "active",
       "hardware": [
         "NVIDIA"
       ],
       "labs": [
         "openai"
       ],
-      "term": null,
-      "note": "",
-      "attribution": "direct"
+      "term": "IP rights through 2032; Azure API terms subject to verified AGI",
+      "note": "Definitive partnership reset extended key Microsoft model/product IP rights through 2032, retained Azure API exclusivity until verified AGI, removed Microsoft's compute right of first refusal, and committed OpenAI to an incremental $250 billion of Azure services. Active. Microsoft remained a major investor and participated in OpenAI's March 2026 financing. Amount / scale: USD 250 billion incremental Azure services commitment; Microsoft investment valued at approximately USD 135 billion at recapitalization [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 2,
+      "evidenceAsOf": "2026-10-08"
     },
     {
       "id": "oai-fund-amazon",
       "source": "amazon",
       "target": "openai",
       "type": "investment",
-      "title": "2026轮投资承诺",
+      "title": "2026已关闭融资轮：Amazon投资承诺",
       "sources": [
-        "oai-fund"
+        "oai-fund",
+        "openai-research-s01"
       ],
       "announcedAt": "2026-02-27",
       "amountB": 50,
@@ -1343,17 +2015,21 @@
         "openai"
       ],
       "term": null,
-      "note": "融资公告额度不等于交割完成。Amazon先15B、其余35B附条件。",
-      "attribution": "direct"
+      "note": "OpenAI closed a $122 billion funding round. The earlier February strategic announcement included $50 billion from Amazon, $30 billion from NVIDIA and $30 billion from SoftBank; the March closing added broader participation. Closed March 31, 2026. The $122 billion total supersedes the earlier $110 billion announcement and should not be added to it. Amount / scale: USD 122 billion committed capital at USD 852 billion post-money valuation [Supplied research, 2026-10-08.] Original individual commitment retained; no assumption that all funds have been paid. February terms: $15B initially; remaining $35B conditional.",
+      "attribution": "direct",
+      "roundId": "openai-2026-03-round",
+      "researchRecord": 3,
+      "evidenceAsOf": "2026-10-08"
     },
     {
       "id": "oai-fund-nvidia",
       "source": "nvidia",
       "target": "openai",
       "type": "investment",
-      "title": "2026轮投资承诺",
+      "title": "2026已关闭融资轮：NVIDIA投资承诺",
       "sources": [
-        "oai-fund"
+        "oai-fund",
+        "openai-research-s01"
       ],
       "announcedAt": "2026-02-27",
       "amountB": 30,
@@ -1365,17 +2041,21 @@
         "openai"
       ],
       "term": null,
-      "note": "融资公告额度不等于交割完成。Amazon先15B、其余35B附条件。",
-      "attribution": "direct"
+      "note": "OpenAI closed a $122 billion funding round. The earlier February strategic announcement included $50 billion from Amazon, $30 billion from NVIDIA and $30 billion from SoftBank; the March closing added broader participation. Closed March 31, 2026. The $122 billion total supersedes the earlier $110 billion announcement and should not be added to it. Amount / scale: USD 122 billion committed capital at USD 852 billion post-money valuation [Supplied research, 2026-10-08.] Original individual commitment retained; no assumption that all funds have been paid.",
+      "attribution": "direct",
+      "roundId": "openai-2026-03-round",
+      "researchRecord": 3,
+      "evidenceAsOf": "2026-10-08"
     },
     {
       "id": "oai-fund-softbank",
       "source": "softbank",
       "target": "openai",
       "type": "investment",
-      "title": "2026轮投资承诺",
+      "title": "2026已关闭融资轮：SoftBank投资承诺",
       "sources": [
-        "oai-fund"
+        "oai-fund",
+        "openai-research-s01"
       ],
       "announcedAt": "2026-02-27",
       "amountB": 30,
@@ -1387,8 +2067,11 @@
         "openai"
       ],
       "term": null,
-      "note": "融资公告额度不等于交割完成。Amazon先15B、其余35B附条件。",
-      "attribution": "direct"
+      "note": "OpenAI closed a $122 billion funding round. The earlier February strategic announcement included $50 billion from Amazon, $30 billion from NVIDIA and $30 billion from SoftBank; the March closing added broader participation. Closed March 31, 2026. The $122 billion total supersedes the earlier $110 billion announcement and should not be added to it. Amount / scale: USD 122 billion committed capital at USD 852 billion post-money valuation [Supplied research, 2026-10-08.] Original individual commitment retained; no assumption that all funds have been paid.",
+      "attribution": "direct",
+      "roundId": "openai-2026-03-round",
+      "researchRecord": 3,
+      "evidenceAsOf": "2026-10-08"
     },
     {
       "id": "oai-aws-compute",
@@ -1397,13 +2080,14 @@
       "type": "compute",
       "title": "既有$38B＋增量$100B长协",
       "sources": [
-        "oai-aws"
+        "oai-aws",
+        "openai-research-s01"
       ],
       "announcedAt": "2026-02-27",
       "amountB": 138,
       "currency": "USD",
       "amountBasis": "cumulative-agreements",
-      "status": "announced",
+      "status": "active",
       "hardware": [
         "Trainium",
         "NVIDIA"
@@ -1412,8 +2096,10 @@
         "openai"
       ],
       "term": "Expansion: 8 years",
-      "note": "138B包含旧38B，不能重复加总；约2GW Trainium容量按协议逐步部署。",
-      "attribution": "direct"
+      "note": "Strategic relationship spanning Amazon investment, AWS cloud capacity/distribution and AWS Trainium silicon. Active; OpenAI lists AWS among its core cloud providers and Trainium among its silicon platforms. Amount / scale: strategic investment included in 2026 funding round; cloud economics unspecified [Supplied research, 2026-10-08.] Existing official AWS evidence retains $38B prior + $100B expansion (8 years), about 2GW Trainium; do not add $138B to its components.",
+      "attribution": "direct",
+      "researchRecord": 12,
+      "evidenceAsOf": "2026-10-08"
     },
     {
       "id": "oai-aws-dist",
@@ -1422,20 +2108,23 @@
       "type": "distribution",
       "title": "Frontier第三方云分发及联合运行环境",
       "sources": [
-        "oai-aws"
+        "oai-aws",
+        "openai-research-s01"
       ],
       "announcedAt": "2026-02-27",
       "amountB": null,
       "currency": "USD",
       "amountBasis": "not-disclosed",
-      "status": "announced",
+      "status": "active",
       "hardware": [],
       "labs": [
         "openai"
       ],
       "term": null,
-      "note": "",
-      "attribution": "direct"
+      "note": "Strategic relationship spanning Amazon investment, AWS cloud capacity/distribution and AWS Trainium silicon. Active; OpenAI lists AWS among its core cloud providers and Trainium among its silicon platforms. Amount / scale: strategic investment included in 2026 funding round; cloud economics unspecified [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 12,
+      "evidenceAsOf": "2026-10-08"
     },
     {
       "id": "oai-nv-cap",
@@ -1444,7 +2133,9 @@
       "type": "technology",
       "title": "Vera Rubin训练2GW＋推理3GW",
       "sources": [
-        "oai-fund"
+        "oai-fund",
+        "openai-research-s08",
+        "openai-research-s01"
       ],
       "announcedAt": "2026-02-27",
       "amountB": null,
@@ -1458,8 +2149,10 @@
         "openai"
       ],
       "term": null,
-      "note": "容量安排；与云服务商和Stargate站点可能重叠，不能相加。",
-      "attribution": "direct"
+      "note": "OpenAI and NVIDIA established a large systems/investment framework; subsequent 2026 arrangements reframed the relationship around strategic equity and dedicated training/inference capacity. Active. Treat the 2025 $100 billion figure as an intended framework, not cash received, and avoid double counting against the 2026 package. Amount / scale: 2025 framework: intended investment up to USD 100 billion and at least 10 GW; 2026 strategic package included USD 30 billion investment and 5 GW dedicated Vera Rubin capacity [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 8,
+      "evidenceAsOf": "2026-10-08"
     },
     {
       "id": "oai-oracle",
@@ -1468,13 +2161,15 @@
       "type": "compute",
       "title": "超过$300B，新增容量至多4.5GW",
       "sources": [
-        "oai-sites"
+        "oai-sites",
+        "openai-research-a3",
+        "openai-research-a7"
       ],
       "announcedAt": "2025-09-23",
       "amountB": 300,
       "currency": "USD",
       "amountBasis": "lower-bound",
-      "status": "announced",
+      "status": "active",
       "hardware": [
         "NVIDIA"
       ],
@@ -1482,8 +2177,10 @@
         "openai"
       ],
       "term": "5 years",
-      "note": "",
-      "attribution": "direct"
+      "note": "OpenAI contracted major Oracle Cloud/Stargate capacity across multiple U.S. data-center sites. Active overall. Abilene entered operation; the New Mexico Project Jupiter component later encountered permitting and financing delays. Amount / scale: more than USD 300 billion over five years; up to 4.5 GW [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 6,
+      "evidenceAsOf": "2026-10-08"
     },
     {
       "id": "oai-coreweave",
@@ -1492,22 +2189,25 @@
       "type": "compute",
       "title": "累计协议上限约$22.4B",
       "sources": [
-        "oai-crwv"
+        "oai-crwv",
+        "openai-research-a4"
       ],
       "announcedAt": "2025-09-25",
       "amountB": 22.4,
       "currency": "USD",
       "amountBasis": "up-to-cumulative",
-      "status": "announced",
+      "status": "active",
       "hardware": [
         "NVIDIA"
       ],
       "labs": [
         "openai"
       ],
-      "term": null,
-      "note": "已包含多轮增量；未公开精确机房分配。",
-      "attribution": "direct"
+      "term": "September 2025 order through May 2031",
+      "note": "OpenAI progressively expanded reserved CoreWeave cloud capacity through multiple agreements, including a September 2025 order of up to $6.5 billion. Active; September order extends through May 2031. 2026 sell-side research continues to identify OpenAI as a major CoreWeave customer. Amount / scale: approximately USD 22.4 billion cumulative contracted capacity [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 7,
+      "evidenceAsOf": "2026-10-08"
     },
     {
       "id": "oai-amd",
@@ -1530,8 +2230,10 @@
         "openai"
       ],
       "term": null,
-      "note": "第一1GW计划2026下半年开始；不等于6GW全部已部署。",
-      "attribution": "direct"
+      "note": "Definitive multi-generation agreement for 6 GW of AMD Instinct GPUs. First 1 GW of MI450 systems was scheduled for deployment in the second half of 2026; no separate completion announcement was identified in this review. Amount / scale: unspecified; 6 GW capacity [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 9,
+      "evidenceAsOf": "2026-10-08"
     },
     {
       "id": "amd-warrant",
@@ -1552,8 +2254,10 @@
         "openai"
       ],
       "term": null,
-      "note": "方向表示AMD授予OpenAI认股权；不是AMD向OpenAI支付现金。解锁取决于部署里程碑。",
-      "attribution": "direct"
+      "note": "AMD issued OpenAI milestone-linked warrants tied to deployments, commercial outcomes and share-price milestones. Conditional equity instrument; not equivalent to cash consideration. Amount / scale: warrants for up to 160 million AMD shares [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 10,
+      "evidenceAsOf": "2026-10-08"
     },
     {
       "id": "oai-avgo",
@@ -1562,7 +2266,8 @@
       "type": "technology",
       "title": "10GW自研加速器合作",
       "sources": [
-        "oai-avgo"
+        "oai-avgo",
+        "openai-research-s01"
       ],
       "announcedAt": "2025-10-13",
       "amountB": null,
@@ -1576,8 +2281,10 @@
         "openai"
       ],
       "term": "2026–2029",
-      "note": "技术合作，不把10GW理解为一个已建成机房。",
-      "attribution": "direct"
+      "note": "OpenAI designs custom accelerators while Broadcom co-develops and deploys accelerator and networking systems. Deployment scheduled from the second half of 2026 through the end of 2029; OpenAI still listed its Broadcom chip in its March 2026 infrastructure strategy. Amount / scale: unspecified; 10 GW custom accelerator deployment [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 11,
+      "evidenceAsOf": "2026-10-08"
     },
     {
       "id": "oai-build-softbank",
@@ -1606,22 +2313,25 @@
       "source": "openai",
       "target": "sbenergy",
       "type": "construction",
-      "title": "Stargate站点开发合作",
+      "title": "Milam County 1.2GW租约及开发合作",
       "sources": [
-        "oai-sites"
+        "oai-sites",
+        "openai-research-s12"
       ],
-      "announcedAt": "2025-09-23",
+      "announcedAt": "2026-01-09",
       "amountB": null,
       "currency": "USD",
       "amountBasis": "not-disclosed",
-      "status": "announced",
+      "status": "active",
       "hardware": [],
       "labs": [
         "openai"
       ],
       "term": null,
-      "note": "",
-      "attribution": "direct"
+      "note": "OpenAI selected SB Energy to build and operate the Milam County data-center campus and signed a 1.2 GW lease. Facilities described as under construction with service beginning in 2026; SB Energy also became an OpenAI customer. Amount / scale: financial amount unspecified; 1.2 GW lease [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 16,
+      "evidenceAsOf": "2026-10-08"
     },
     {
       "id": "oai-related",
@@ -1652,20 +2362,23 @@
       "type": "construction",
       "title": "Stargate UAE合作",
       "sources": [
-        "oai-uae"
+        "oai-uae",
+        "openai-research-a2"
       ],
       "announcedAt": "2025-05-22",
       "amountB": null,
       "currency": "USD",
       "amountBasis": "not-disclosed",
-      "status": "announced",
+      "status": "active",
       "hardware": [],
       "labs": [
         "openai"
       ],
       "term": null,
-      "note": "",
-      "attribution": "direct"
+      "note": "Stargate UAE established a 1 GW Abu Dhabi compute cluster as the first phase of a larger UAE-US AI campus. Active but broader 5 GW masterplan was reported in September 2026 as being redesigned for security and geographic distribution; first 1 GW phase expected to continue. Amount / scale: approximately USD 30 billion reported for first 1 GW phase; original primary announcement did not specify this amount [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 22,
+      "evidenceAsOf": "2026-10-08"
     },
     {
       "id": "oai-uae-cisco",
@@ -1674,64 +2387,75 @@
       "type": "construction",
       "title": "Stargate UAE合作",
       "sources": [
-        "oai-uae"
+        "oai-uae",
+        "openai-research-a2"
       ],
       "announcedAt": "2025-05-22",
       "amountB": null,
       "currency": "USD",
       "amountBasis": "not-disclosed",
-      "status": "announced",
+      "status": "active",
       "hardware": [],
       "labs": [
         "openai"
       ],
       "term": null,
-      "note": "",
-      "attribution": "direct"
+      "note": "Stargate UAE established a 1 GW Abu Dhabi compute cluster as the first phase of a larger UAE-US AI campus. Active but broader 5 GW masterplan was reported in September 2026 as being redesigned for security and geographic distribution; first 1 GW phase expected to continue. Amount / scale: approximately USD 30 billion reported for first 1 GW phase; original primary announcement did not specify this amount [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 22,
+      "evidenceAsOf": "2026-10-08"
     },
     {
       "id": "oai-no-nscale",
       "source": "openai",
       "target": "nscale",
       "type": "construction",
-      "title": "Norway初始潜在承购合作",
+      "title": "Stargate Norway潜在承购（已取消）",
       "sources": [
-        "oai-no"
+        "oai-no",
+        "openai-research-a1"
       ],
       "announcedAt": "2025-07-31",
       "amountB": null,
       "currency": "USD",
       "amountBasis": "not-disclosed",
-      "status": "historical",
+      "status": "cancelled",
       "hardware": [],
       "labs": [
         "openai"
       ],
       "term": null,
-      "note": "初始公告是潜在offtaker；2026年Narvik新增容量协议指向Microsoft，不推断为OpenAI专属。",
-      "attribution": "direct"
+      "note": "Stargate Norway was announced with OpenAI as a prospective initial offtaker. Cancelled by OpenAI in April 2026 according to Nscale S-1/Bloomberg reporting carried by Aral; Microsoft agreed to take over the Norway capacity. Amount / scale: unspecified; original plan 230 MW with expansion ambition and target of 100,000 NVIDIA GPUs by end-2026 [Supplied research, 2026-10-08.]",
+      "attribution": "historical",
+      "cancelledAt": "2026-04",
+      "researchRecord": 23,
+      "evidenceAsOf": "2026-10-08"
     },
     {
       "id": "oai-no-aker",
       "source": "openai",
       "target": "aker",
       "type": "construction",
-      "title": "Norway初始潜在承购合作",
+      "title": "Stargate Norway潜在承购（已取消）",
       "sources": [
-        "oai-no"
+        "oai-no",
+        "openai-research-a1"
       ],
       "announcedAt": "2025-07-31",
       "amountB": null,
       "currency": "USD",
       "amountBasis": "not-disclosed",
-      "status": "historical",
+      "status": "cancelled",
       "hardware": [],
       "labs": [
         "openai"
       ],
       "term": null,
-      "note": "初始公告是潜在offtaker；2026年Narvik新增容量协议指向Microsoft，不推断为OpenAI专属。",
-      "attribution": "direct"
+      "note": "Stargate Norway was announced with OpenAI as a prospective initial offtaker. Cancelled by OpenAI in April 2026 according to Nscale S-1/Bloomberg reporting carried by Aral; Microsoft agreed to take over the Norway capacity. Amount / scale: unspecified; original plan 230 MW with expansion ambition and target of 100,000 NVIDIA GPUs by end-2026 [Supplied research, 2026-10-08.]",
+      "attribution": "historical",
+      "cancelledAt": "2026-04",
+      "researchRecord": 23,
+      "evidenceAsOf": "2026-10-08"
     },
     {
       "id": "ms-nscale",
@@ -1762,15 +2486,16 @@
       "source": "openai",
       "target": "nscale",
       "type": "construction",
-      "title": "Stargate UK潜在GPU承购",
+      "title": "Stargate UK潜在承购（已取消）",
       "sources": [
-        "oai-uk"
+        "oai-uk",
+        "openai-research-a1"
       ],
       "announcedAt": "2025-09-16",
       "amountB": null,
       "currency": "USD",
       "amountBasis": "not-disclosed",
-      "status": "conditional",
+      "status": "cancelled",
       "hardware": [
         "NVIDIA"
       ],
@@ -1778,8 +2503,11 @@
         "openai"
       ],
       "term": null,
-      "note": "公告为探索8000GPU、未来可扩31000GPU，非已建成证明。",
-      "attribution": "direct"
+      "note": "Stargate UK announcement contemplated OpenAI GPU offtake from Nscale infrastructure. OpenAI cancelled the Nscale UK plan in April 2026 according to Nscale S-1/Bloomberg reporting carried by Aral; Google was reportedly positioned as replacement. Amount / scale: unspecified; exploratory 8,000 GPUs with potential scaling to 31,000 [Supplied research, 2026-10-08.]",
+      "attribution": "historical",
+      "cancelledAt": "2026-04",
+      "researchRecord": 24,
+      "evidenceAsOf": "2026-10-08"
     },
     {
       "id": "oai-snow",
@@ -1794,14 +2522,16 @@
       "amountB": 0.2,
       "currency": "USD",
       "amountBasis": "agreement",
-      "status": "announced",
+      "status": "active",
       "hardware": [],
       "labs": [
         "openai"
       ],
       "term": "Multi-year",
-      "note": "",
-      "attribution": "direct"
+      "note": "Multi-year enterprise AI partnership integrating OpenAI capabilities into Snowflake's data platform. Active according to the existing Model Lab Network baseline. Amount / scale: USD 200 million multi-year [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 25,
+      "evidenceAsOf": "2026-10-08"
     },
     {
       "id": "oai-acn",
@@ -2835,6 +3565,2001 @@
       "note": "Spark led; individual investments undisclosed. Whole-round value is not attributed to individual investors.",
       "attribution": "direct",
       "researchAsOf": "2026-10-07"
+    },
+    {
+      "id": "openai-research-00-microsoft",
+      "source": "microsoft",
+      "target": "openai",
+      "type": "investment",
+      "title": "2019年$1B基础投资",
+      "sources": [
+        "openai-research-s04"
+      ],
+      "announcedAt": "2019-07-22",
+      "amountB": 1,
+      "currency": "USD",
+      "amountBasis": "agreement",
+      "status": "historical",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Microsoft invested $1 billion in OpenAI and became a preferred commercialization and Azure supercomputing partner. Historical foundation of the still-active Microsoft relationship; subsequently expanded and renegotiated. Amount / scale: USD 1 billion [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 0,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-01-microsoft",
+      "source": "microsoft",
+      "target": "openai",
+      "type": "investment",
+      "title": "2023年多年追加投资（金额未披露）",
+      "sources": [
+        "openai-research-s05"
+      ],
+      "announcedAt": "2023-01-23",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "historical",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI and Microsoft expanded their multi-year partnership through additional investment, Azure compute and commercial deployment. Superseded in important respects by the October 2025 definitive agreement but remains part of the financing history. Amount / scale: multi-billion USD; exact primary-source amount unspecified [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 1,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-03-microsoft",
+      "source": "microsoft",
+      "target": "openai",
+      "type": "investment",
+      "title": "参与2026年$122B融资轮（个人额度未披露）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI closed a $122 billion funding round. The earlier February strategic announcement included $50 billion from Amazon, $30 billion from NVIDIA and $30 billion from SoftBank; the March closing added broader participation. Closed March 31, 2026. The $122 billion total supersedes the earlier $110 billion announcement and should not be added to it. Amount / scale: USD 122 billion committed capital at USD 852 billion post-money valuation [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 3,
+      "evidenceAsOf": "2026-10-08",
+      "roundId": "openai-2026-03-round"
+    },
+    {
+      "id": "openai-research-03-a16z",
+      "source": "a16z",
+      "target": "openai",
+      "type": "investment",
+      "title": "参与2026年$122B融资轮（个人额度未披露）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI closed a $122 billion funding round. The earlier February strategic announcement included $50 billion from Amazon, $30 billion from NVIDIA and $30 billion from SoftBank; the March closing added broader participation. Closed March 31, 2026. The $122 billion total supersedes the earlier $110 billion announcement and should not be added to it. Amount / scale: USD 122 billion committed capital at USD 852 billion post-money valuation [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 3,
+      "evidenceAsOf": "2026-10-08",
+      "roundId": "openai-2026-03-round"
+    },
+    {
+      "id": "openai-research-03-d-e-shaw-ventures",
+      "source": "d-e-shaw-ventures",
+      "target": "openai",
+      "type": "investment",
+      "title": "参与2026年$122B融资轮（个人额度未披露）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI closed a $122 billion funding round. The earlier February strategic announcement included $50 billion from Amazon, $30 billion from NVIDIA and $30 billion from SoftBank; the March closing added broader participation. Closed March 31, 2026. The $122 billion total supersedes the earlier $110 billion announcement and should not be added to it. Amount / scale: USD 122 billion committed capital at USD 852 billion post-money valuation [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 3,
+      "evidenceAsOf": "2026-10-08",
+      "roundId": "openai-2026-03-round"
+    },
+    {
+      "id": "openai-research-03-mgx",
+      "source": "mgx",
+      "target": "openai",
+      "type": "investment",
+      "title": "参与2026年$122B融资轮（个人额度未披露）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI closed a $122 billion funding round. The earlier February strategic announcement included $50 billion from Amazon, $30 billion from NVIDIA and $30 billion from SoftBank; the March closing added broader participation. Closed March 31, 2026. The $122 billion total supersedes the earlier $110 billion announcement and should not be added to it. Amount / scale: USD 122 billion committed capital at USD 852 billion post-money valuation [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 3,
+      "evidenceAsOf": "2026-10-08",
+      "roundId": "openai-2026-03-round"
+    },
+    {
+      "id": "openai-research-03-tpg",
+      "source": "tpg",
+      "target": "openai",
+      "type": "investment",
+      "title": "参与2026年$122B融资轮（个人额度未披露）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI closed a $122 billion funding round. The earlier February strategic announcement included $50 billion from Amazon, $30 billion from NVIDIA and $30 billion from SoftBank; the March closing added broader participation. Closed March 31, 2026. The $122 billion total supersedes the earlier $110 billion announcement and should not be added to it. Amount / scale: USD 122 billion committed capital at USD 852 billion post-money valuation [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 3,
+      "evidenceAsOf": "2026-10-08",
+      "roundId": "openai-2026-03-round"
+    },
+    {
+      "id": "openai-research-03-t-rowe-price-advised-accounts",
+      "source": "t-rowe-price-advised-accounts",
+      "target": "openai",
+      "type": "investment",
+      "title": "参与2026年$122B融资轮（个人额度未披露）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI closed a $122 billion funding round. The earlier February strategic announcement included $50 billion from Amazon, $30 billion from NVIDIA and $30 billion from SoftBank; the March closing added broader participation. Closed March 31, 2026. The $122 billion total supersedes the earlier $110 billion announcement and should not be added to it. Amount / scale: USD 122 billion committed capital at USD 852 billion post-money valuation [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 3,
+      "evidenceAsOf": "2026-10-08",
+      "roundId": "openai-2026-03-round"
+    },
+    {
+      "id": "openai-research-03-blackrock-affiliated-funds",
+      "source": "blackrock-affiliated-funds",
+      "target": "openai",
+      "type": "investment",
+      "title": "参与2026年$122B融资轮（个人额度未披露）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI closed a $122 billion funding round. The earlier February strategic announcement included $50 billion from Amazon, $30 billion from NVIDIA and $30 billion from SoftBank; the March closing added broader participation. Closed March 31, 2026. The $122 billion total supersedes the earlier $110 billion announcement and should not be added to it. Amount / scale: USD 122 billion committed capital at USD 852 billion post-money valuation [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 3,
+      "evidenceAsOf": "2026-10-08",
+      "roundId": "openai-2026-03-round"
+    },
+    {
+      "id": "openai-research-03-blackstone",
+      "source": "blackstone",
+      "target": "openai",
+      "type": "investment",
+      "title": "参与2026年$122B融资轮（个人额度未披露）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI closed a $122 billion funding round. The earlier February strategic announcement included $50 billion from Amazon, $30 billion from NVIDIA and $30 billion from SoftBank; the March closing added broader participation. Closed March 31, 2026. The $122 billion total supersedes the earlier $110 billion announcement and should not be added to it. Amount / scale: USD 122 billion committed capital at USD 852 billion post-money valuation [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 3,
+      "evidenceAsOf": "2026-10-08",
+      "roundId": "openai-2026-03-round"
+    },
+    {
+      "id": "openai-research-03-coatue",
+      "source": "coatue",
+      "target": "openai",
+      "type": "investment",
+      "title": "参与2026年$122B融资轮（个人额度未披露）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI closed a $122 billion funding round. The earlier February strategic announcement included $50 billion from Amazon, $30 billion from NVIDIA and $30 billion from SoftBank; the March closing added broader participation. Closed March 31, 2026. The $122 billion total supersedes the earlier $110 billion announcement and should not be added to it. Amount / scale: USD 122 billion committed capital at USD 852 billion post-money valuation [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 3,
+      "evidenceAsOf": "2026-10-08",
+      "roundId": "openai-2026-03-round"
+    },
+    {
+      "id": "openai-research-03-fidelity-management-research",
+      "source": "fidelity-management-research",
+      "target": "openai",
+      "type": "investment",
+      "title": "参与2026年$122B融资轮（个人额度未披露）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI closed a $122 billion funding round. The earlier February strategic announcement included $50 billion from Amazon, $30 billion from NVIDIA and $30 billion from SoftBank; the March closing added broader participation. Closed March 31, 2026. The $122 billion total supersedes the earlier $110 billion announcement and should not be added to it. Amount / scale: USD 122 billion committed capital at USD 852 billion post-money valuation [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 3,
+      "evidenceAsOf": "2026-10-08",
+      "roundId": "openai-2026-03-round"
+    },
+    {
+      "id": "openai-research-03-sequoia",
+      "source": "sequoia",
+      "target": "openai",
+      "type": "investment",
+      "title": "参与2026年$122B融资轮（个人额度未披露）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI closed a $122 billion funding round. The earlier February strategic announcement included $50 billion from Amazon, $30 billion from NVIDIA and $30 billion from SoftBank; the March closing added broader participation. Closed March 31, 2026. The $122 billion total supersedes the earlier $110 billion announcement and should not be added to it. Amount / scale: USD 122 billion committed capital at USD 852 billion post-money valuation [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 3,
+      "evidenceAsOf": "2026-10-08",
+      "roundId": "openai-2026-03-round"
+    },
+    {
+      "id": "openai-research-03-temasek",
+      "source": "temasek",
+      "target": "openai",
+      "type": "investment",
+      "title": "参与2026年$122B融资轮（个人额度未披露）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI closed a $122 billion funding round. The earlier February strategic announcement included $50 billion from Amazon, $30 billion from NVIDIA and $30 billion from SoftBank; the March closing added broader participation. Closed March 31, 2026. The $122 billion total supersedes the earlier $110 billion announcement and should not be added to it. Amount / scale: USD 122 billion committed capital at USD 852 billion post-money valuation [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 3,
+      "evidenceAsOf": "2026-10-08",
+      "roundId": "openai-2026-03-round"
+    },
+    {
+      "id": "openai-research-03-thrive-capital",
+      "source": "thrive-capital",
+      "target": "openai",
+      "type": "investment",
+      "title": "参与2026年$122B融资轮（个人额度未披露）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI closed a $122 billion funding round. The earlier February strategic announcement included $50 billion from Amazon, $30 billion from NVIDIA and $30 billion from SoftBank; the March closing added broader participation. Closed March 31, 2026. The $122 billion total supersedes the earlier $110 billion announcement and should not be added to it. Amount / scale: USD 122 billion committed capital at USD 852 billion post-money valuation [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 3,
+      "evidenceAsOf": "2026-10-08",
+      "roundId": "openai-2026-03-round"
+    },
+    {
+      "id": "openai-research-03-uc-investments",
+      "source": "uc-investments",
+      "target": "openai",
+      "type": "investment",
+      "title": "参与2026年$122B融资轮（个人额度未披露）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI closed a $122 billion funding round. The earlier February strategic announcement included $50 billion from Amazon, $30 billion from NVIDIA and $30 billion from SoftBank; the March closing added broader participation. Closed March 31, 2026. The $122 billion total supersedes the earlier $110 billion announcement and should not be added to it. Amount / scale: USD 122 billion committed capital at USD 852 billion post-money valuation [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 3,
+      "evidenceAsOf": "2026-10-08",
+      "roundId": "openai-2026-03-round"
+    },
+    {
+      "id": "openai-research-04-jpmorgan",
+      "source": "jpmorgan",
+      "target": "openai",
+      "type": "guarantee",
+      "title": "参与约$4.7B循环授信银团（未提取）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Global bank syndicate supports OpenAI's expanded revolving credit facility. Facility was undrawn at the March 2026 financing close. Amount / scale: approximately USD 4.7 billion revolving credit facility; undrawn at close [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 4,
+      "evidenceAsOf": "2026-10-08",
+      "facilityId": "openai-2026-03-revolver"
+    },
+    {
+      "id": "openai-research-04-citi",
+      "source": "citi",
+      "target": "openai",
+      "type": "guarantee",
+      "title": "参与约$4.7B循环授信银团（未提取）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Global bank syndicate supports OpenAI's expanded revolving credit facility. Facility was undrawn at the March 2026 financing close. Amount / scale: approximately USD 4.7 billion revolving credit facility; undrawn at close [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 4,
+      "evidenceAsOf": "2026-10-08",
+      "facilityId": "openai-2026-03-revolver"
+    },
+    {
+      "id": "openai-research-04-goldman-sachs",
+      "source": "goldman-sachs",
+      "target": "openai",
+      "type": "guarantee",
+      "title": "参与约$4.7B循环授信银团（未提取）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Global bank syndicate supports OpenAI's expanded revolving credit facility. Facility was undrawn at the March 2026 financing close. Amount / scale: approximately USD 4.7 billion revolving credit facility; undrawn at close [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 4,
+      "evidenceAsOf": "2026-10-08",
+      "facilityId": "openai-2026-03-revolver"
+    },
+    {
+      "id": "openai-research-04-morgan-stanley",
+      "source": "morgan-stanley",
+      "target": "openai",
+      "type": "guarantee",
+      "title": "参与约$4.7B循环授信银团（未提取）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Global bank syndicate supports OpenAI's expanded revolving credit facility. Facility was undrawn at the March 2026 financing close. Amount / scale: approximately USD 4.7 billion revolving credit facility; undrawn at close [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 4,
+      "evidenceAsOf": "2026-10-08",
+      "facilityId": "openai-2026-03-revolver"
+    },
+    {
+      "id": "openai-research-04-wells-fargo",
+      "source": "wells-fargo",
+      "target": "openai",
+      "type": "guarantee",
+      "title": "参与约$4.7B循环授信银团（未提取）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Global bank syndicate supports OpenAI's expanded revolving credit facility. Facility was undrawn at the March 2026 financing close. Amount / scale: approximately USD 4.7 billion revolving credit facility; undrawn at close [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 4,
+      "evidenceAsOf": "2026-10-08",
+      "facilityId": "openai-2026-03-revolver"
+    },
+    {
+      "id": "openai-research-04-mizuho",
+      "source": "mizuho",
+      "target": "openai",
+      "type": "guarantee",
+      "title": "参与约$4.7B循环授信银团（未提取）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Global bank syndicate supports OpenAI's expanded revolving credit facility. Facility was undrawn at the March 2026 financing close. Amount / scale: approximately USD 4.7 billion revolving credit facility; undrawn at close [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 4,
+      "evidenceAsOf": "2026-10-08",
+      "facilityId": "openai-2026-03-revolver"
+    },
+    {
+      "id": "openai-research-04-rbc",
+      "source": "rbc",
+      "target": "openai",
+      "type": "guarantee",
+      "title": "参与约$4.7B循环授信银团（未提取）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Global bank syndicate supports OpenAI's expanded revolving credit facility. Facility was undrawn at the March 2026 financing close. Amount / scale: approximately USD 4.7 billion revolving credit facility; undrawn at close [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 4,
+      "evidenceAsOf": "2026-10-08",
+      "facilityId": "openai-2026-03-revolver"
+    },
+    {
+      "id": "openai-research-04-smbc",
+      "source": "smbc",
+      "target": "openai",
+      "type": "guarantee",
+      "title": "参与约$4.7B循环授信银团（未提取）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Global bank syndicate supports OpenAI's expanded revolving credit facility. Facility was undrawn at the March 2026 financing close. Amount / scale: approximately USD 4.7 billion revolving credit facility; undrawn at close [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 4,
+      "evidenceAsOf": "2026-10-08",
+      "facilityId": "openai-2026-03-revolver"
+    },
+    {
+      "id": "openai-research-04-ubs",
+      "source": "ubs",
+      "target": "openai",
+      "type": "guarantee",
+      "title": "参与约$4.7B循环授信银团（未提取）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Global bank syndicate supports OpenAI's expanded revolving credit facility. Facility was undrawn at the March 2026 financing close. Amount / scale: approximately USD 4.7 billion revolving credit facility; undrawn at close [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 4,
+      "evidenceAsOf": "2026-10-08",
+      "facilityId": "openai-2026-03-revolver"
+    },
+    {
+      "id": "openai-research-04-hsbc",
+      "source": "hsbc",
+      "target": "openai",
+      "type": "guarantee",
+      "title": "参与约$4.7B循环授信银团（未提取）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Global bank syndicate supports OpenAI's expanded revolving credit facility. Facility was undrawn at the March 2026 financing close. Amount / scale: approximately USD 4.7 billion revolving credit facility; undrawn at close [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 4,
+      "evidenceAsOf": "2026-10-08",
+      "facilityId": "openai-2026-03-revolver"
+    },
+    {
+      "id": "openai-research-04-santander",
+      "source": "santander",
+      "target": "openai",
+      "type": "guarantee",
+      "title": "参与约$4.7B循环授信银团（未提取）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Global bank syndicate supports OpenAI's expanded revolving credit facility. Facility was undrawn at the March 2026 financing close. Amount / scale: approximately USD 4.7 billion revolving credit facility; undrawn at close [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 4,
+      "evidenceAsOf": "2026-10-08",
+      "facilityId": "openai-2026-03-revolver"
+    },
+    {
+      "id": "openai-research-05-softbank",
+      "source": "openai",
+      "target": "softbank",
+      "type": "construction",
+      "title": "Stargate发起方／项目合作",
+      "sources": [
+        "openai-research-s06"
+      ],
+      "announcedAt": "2025-01-21",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Stargate Project established a large-scale U.S. AI infrastructure platform, with SoftBank as financial lead and OpenAI as operational lead. Active umbrella program. Program-level investment ambitions should not be treated as a single executed OpenAI contract. Amount / scale: USD 500 billion intended over four years; USD 100 billion intended immediately [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 5,
+      "evidenceAsOf": "2026-10-08",
+      "programmeId": "stargate-us"
+    },
+    {
+      "id": "openai-research-05-oracle",
+      "source": "openai",
+      "target": "oracle",
+      "type": "construction",
+      "title": "Stargate发起方／项目合作",
+      "sources": [
+        "openai-research-s06"
+      ],
+      "announcedAt": "2025-01-21",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Stargate Project established a large-scale U.S. AI infrastructure platform, with SoftBank as financial lead and OpenAI as operational lead. Active umbrella program. Program-level investment ambitions should not be treated as a single executed OpenAI contract. Amount / scale: USD 500 billion intended over four years; USD 100 billion intended immediately [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 5,
+      "evidenceAsOf": "2026-10-08",
+      "programmeId": "stargate-us"
+    },
+    {
+      "id": "openai-research-05-mgx",
+      "source": "openai",
+      "target": "mgx",
+      "type": "construction",
+      "title": "Stargate发起方／项目合作",
+      "sources": [
+        "openai-research-s06"
+      ],
+      "announcedAt": "2025-01-21",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Stargate Project established a large-scale U.S. AI infrastructure platform, with SoftBank as financial lead and OpenAI as operational lead. Active umbrella program. Program-level investment ambitions should not be treated as a single executed OpenAI contract. Amount / scale: USD 500 billion intended over four years; USD 100 billion intended immediately [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 5,
+      "evidenceAsOf": "2026-10-08",
+      "programmeId": "stargate-us"
+    },
+    {
+      "id": "openai-research-08-nvidia",
+      "source": "openai",
+      "target": "nvidia",
+      "type": "technology",
+      "title": "2025年10GW／至多$100B意向框架",
+      "sources": [
+        "openai-research-s08",
+        "openai-research-s01"
+      ],
+      "announcedAt": "2025-09-22",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "historical",
+      "hardware": [
+        "NVIDIA"
+      ],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI and NVIDIA established a large systems/investment framework; subsequent 2026 arrangements reframed the relationship around strategic equity and dedicated training/inference capacity. Active. Treat the 2025 $100 billion figure as an intended framework, not cash received, and avoid double counting against the 2026 package. Amount / scale: 2025 framework: intended investment up to USD 100 billion and at least 10 GW; 2026 strategic package included USD 30 billion investment and 5 GW dedicated Vera Rubin capacity [Supplied research, 2026-10-08.] Historical LOI; the intended $100B is not assigned as a current cash amount or added to the 2026 round.",
+      "attribution": "direct",
+      "researchRecord": 8,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-13-google",
+      "source": "openai",
+      "target": "google",
+      "type": "compute",
+      "title": "Google Cloud算力供应（条款未披露）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Google Cloud is explicitly included in OpenAI's multi-cloud infrastructure portfolio. Active as of OpenAI's March 2026 infrastructure disclosure. Amount / scale: unspecified [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 13,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-14-cerebras",
+      "source": "openai",
+      "target": "cerebras",
+      "type": "technology",
+      "title": "Cerebras芯片平台合作（条款未披露）",
+      "sources": [
+        "openai-research-s01"
+      ],
+      "announcedAt": "2026-03-31",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [
+        "Cerebras"
+      ],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI explicitly lists Cerebras among the silicon platforms supporting its infrastructure strategy. Active relationship disclosed by OpenAI; detailed commercial terms unspecified. Amount / scale: unspecified [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 14,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-15-sbenergy",
+      "source": "openai",
+      "target": "sbenergy",
+      "type": "investment",
+      "title": "OpenAI向SB Energy投资$500M",
+      "sources": [
+        "openai-research-s12"
+      ],
+      "announcedAt": "2026-01-09",
+      "amountB": 0.5,
+      "currency": "USD",
+      "amountBasis": "agreement",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI and SoftBank each invested $500 million in SB Energy. Active equity relationship separate from the data-center lease. Amount / scale: USD 1 billion total equity investment; USD 500 million OpenAI and USD 500 million SoftBank [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 15,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-15-sbenergy-softbank",
+      "source": "softbank",
+      "target": "sbenergy",
+      "type": "investment",
+      "title": "SoftBank向SB Energy投资$500M",
+      "sources": [
+        "openai-research-s12"
+      ],
+      "announcedAt": "2026-01-09",
+      "amountB": 0.5,
+      "currency": "USD",
+      "amountBasis": "agreement",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI and SoftBank each invested $500 million in SB Energy. Active equity relationship separate from the data-center lease. Amount / scale: USD 1 billion total equity investment; USD 500 million OpenAI and USD 500 million SoftBank [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 15,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-17-samsung-electronics",
+      "source": "openai",
+      "target": "samsung-electronics",
+      "type": "technology",
+      "title": "Stargate先进存储战略合作",
+      "sources": [
+        "openai-research-s13",
+        "openai-research-s14",
+        "openai-research-a5",
+        "openai-research-a6"
+      ],
+      "announcedAt": "2025-10-01",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Samsung Electronics and SK hynix became strategic memory partners for Stargate and agreed to accelerate advanced-memory production supporting OpenAI infrastructure. Active strategic partnerships; detailed purchase values and allocation remain unspecified. Amount / scale: unspecified; advanced-memory capacity targeting up to 900,000 DRAM wafer starts per month [Supplied research, 2026-10-08.] The up-to-900,000 wafer-starts/month target is shared; no per-supplier split or delivered output is inferred.",
+      "attribution": "direct",
+      "researchRecord": 17,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-17-skhynix",
+      "source": "openai",
+      "target": "skhynix",
+      "type": "technology",
+      "title": "Stargate先进存储战略合作",
+      "sources": [
+        "openai-research-s13",
+        "openai-research-s14",
+        "openai-research-a5",
+        "openai-research-a6"
+      ],
+      "announcedAt": "2025-10-01",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Samsung Electronics and SK hynix became strategic memory partners for Stargate and agreed to accelerate advanced-memory production supporting OpenAI infrastructure. Active strategic partnerships; detailed purchase values and allocation remain unspecified. Amount / scale: unspecified; advanced-memory capacity targeting up to 900,000 DRAM wafer starts per month [Supplied research, 2026-10-08.] The up-to-900,000 wafer-starts/month target is shared; no per-supplier split or delivered output is inferred.",
+      "attribution": "direct",
+      "researchRecord": 17,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-18-samsung-sds",
+      "source": "openai",
+      "target": "samsung-sds",
+      "type": "construction",
+      "title": "韩国AI数据中心开发意向",
+      "sources": [
+        "openai-research-s14"
+      ],
+      "announcedAt": "2025-10-01",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "conditional",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "LOI covers AI-data-center development and operation; Samsung SDS also became a reseller for OpenAI services in Korea. Active strategic/reseller relationship; data-center component remains development-stage. Amount / scale: unspecified [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 18,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-18-samsung-sds-reseller",
+      "source": "openai",
+      "target": "samsung-sds",
+      "type": "distribution",
+      "title": "韩国OpenAI服务转售合作",
+      "sources": [
+        "openai-research-s14"
+      ],
+      "announcedAt": "2025-10-01",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "LOI covers AI-data-center development and operation; Samsung SDS also became a reseller for OpenAI services in Korea. Active strategic/reseller relationship; data-center component remains development-stage. Amount / scale: unspecified [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 18,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-19-samsung-c-t",
+      "source": "openai",
+      "target": "samsung-c-t",
+      "type": "research",
+      "title": "浮动数据中心／电力设施探索",
+      "sources": [
+        "openai-research-s14"
+      ],
+      "announcedAt": "2025-10-01",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "conditional",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Parties agreed to explore global and floating AI data centers, floating power plants and control centers. Exploratory; no committed deployed capacity or monetary consideration disclosed. Amount / scale: unspecified [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 19,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-19-samsung-heavy-industries",
+      "source": "openai",
+      "target": "samsung-heavy-industries",
+      "type": "research",
+      "title": "浮动数据中心／电力设施探索",
+      "sources": [
+        "openai-research-s14"
+      ],
+      "announcedAt": "2025-10-01",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "conditional",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Parties agreed to explore global and floating AI data centers, floating power plants and control centers. Exploratory; no committed deployed capacity or monetary consideration disclosed. Amount / scale: unspecified [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 19,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-20-sk-telecom",
+      "source": "openai",
+      "target": "sk-telecom",
+      "type": "construction",
+      "title": "韩国AI数据中心探索",
+      "sources": [
+        "openai-research-s13"
+      ],
+      "announcedAt": "2025-10-01",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "conditional",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Partnership to explore an AI data center in Korea. Exploratory/MoU-stage in the public announcement. Amount / scale: unspecified [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 20,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-21-korea-ministry-of-science-and-ict",
+      "source": "openai",
+      "target": "korea-ministry-of-science-and-ict",
+      "type": "partnership",
+      "title": "韩国首都圈外AI数据中心评估MoU",
+      "sources": [
+        "openai-research-s13"
+      ],
+      "announcedAt": "2025-10-01",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "conditional",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "MoU to evaluate AI-data-center development outside the Seoul metropolitan area. Evaluation-stage government infrastructure partnership. Amount / scale: unspecified [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 21,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-22-oracle-uae",
+      "source": "openai",
+      "target": "oracle",
+      "type": "construction",
+      "title": "Stargate UAE项目合作",
+      "sources": [
+        "oai-uae",
+        "openai-research-a2"
+      ],
+      "announcedAt": "2025-05-22",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Stargate UAE established a 1 GW Abu Dhabi compute cluster as the first phase of a larger UAE-US AI campus. Active but broader 5 GW masterplan was reported in September 2026 as being redesigned for security and geographic distribution; first 1 GW phase expected to continue. Amount / scale: approximately USD 30 billion reported for first 1 GW phase; original primary announcement did not specify this amount [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 22,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-22-nvidia-uae",
+      "source": "openai",
+      "target": "nvidia",
+      "type": "construction",
+      "title": "Stargate UAE项目合作",
+      "sources": [
+        "oai-uae",
+        "openai-research-a2"
+      ],
+      "announcedAt": "2025-05-22",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Stargate UAE established a 1 GW Abu Dhabi compute cluster as the first phase of a larger UAE-US AI campus. Active but broader 5 GW masterplan was reported in September 2026 as being redesigned for security and geographic distribution; first 1 GW phase expected to continue. Amount / scale: approximately USD 30 billion reported for first 1 GW phase; original primary announcement did not specify this amount [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 22,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-22-softbank-uae",
+      "source": "openai",
+      "target": "softbank",
+      "type": "construction",
+      "title": "Stargate UAE项目合作",
+      "sources": [
+        "oai-uae",
+        "openai-research-a2"
+      ],
+      "announcedAt": "2025-05-22",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Stargate UAE established a 1 GW Abu Dhabi compute cluster as the first phase of a larger UAE-US AI campus. Active but broader 5 GW masterplan was reported in September 2026 as being redesigned for security and geographic distribution; first 1 GW phase expected to continue. Amount / scale: approximately USD 30 billion reported for first 1 GW phase; original primary announcement did not specify this amount [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 22,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-26-atlassian",
+      "source": "openai",
+      "target": "atlassian",
+      "type": "partnership",
+      "title": "Atlassian／Rovo／Codex企业合作扩展",
+      "sources": [
+        "openai-research-s19"
+      ],
+      "announcedAt": "2026-10-06",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Long-running enterprise partnership expanded in October 2026 across Atlassian products, Rovo, ChatGPT Enterprise and Codex. Active and expanded; more than 3,000 Atlassian developers were reported using Codex. Amount / scale: unspecified [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 26,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-27-apple",
+      "source": "openai",
+      "target": "apple",
+      "type": "distribution",
+      "title": "ChatGPT与Siri／Writing Tools集成",
+      "sources": [
+        "openai-research-s20"
+      ],
+      "announcedAt": "2024-06-10",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Apple integrated ChatGPT into iOS, iPadOS and macOS, including Siri and Writing Tools. Product-distribution/integration relationship; no disclosed capital consideration in the primary announcement. Amount / scale: unspecified [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 27,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-28-codeai",
+      "source": "openai",
+      "target": "codeai",
+      "type": "partnership",
+      "title": "Code.org／CodeAI AI教育合作",
+      "sources": [
+        "openai-research-s21"
+      ],
+      "announcedAt": "2026-08-18",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "AI-literacy partnership supporting students and educators through advisory, Hour of AI and Builders Challenge initiatives. Active program announced for the following year. Amount / scale: unspecified [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 28,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-29-associated-press",
+      "source": "openai",
+      "target": "associated-press",
+      "type": "licensing",
+      "title": "内容／数据授权合作",
+      "sources": [
+        "openai-research-s26"
+      ],
+      "announcedAt": "2023-07-13",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "announced",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "AP licensed portions of its text archive to OpenAI while gaining access to OpenAI technology. No public termination identified in this review. Amount / scale: undisclosed [Supplied research, 2026-10-08.] The supplied review found no termination; ongoing validity is not independently established.",
+      "attribution": "direct",
+      "researchRecord": 29,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-30-axel-springer",
+      "source": "openai",
+      "target": "axel-springer",
+      "type": "licensing",
+      "title": "内容／数据授权合作",
+      "sources": [
+        "openai-research-s27"
+      ],
+      "announcedAt": "2023-12-13",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "announced",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Global content and technology partnership covering brands including POLITICO, Business Insider, BILD and WELT. Multi-year strategic content relationship; no public termination identified. Amount / scale: undisclosed [Supplied research, 2026-10-08.] The supplied review found no termination; ongoing validity is not independently established.",
+      "attribution": "direct",
+      "researchRecord": 30,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-31-le-monde",
+      "source": "openai",
+      "target": "le-monde",
+      "type": "licensing",
+      "title": "内容／数据授权合作",
+      "sources": [
+        "openai-research-s28"
+      ],
+      "announcedAt": "2024-03-13",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "announced",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Content partnerships provide attributed publisher material in ChatGPT and support model training. No public termination identified in this review. Amount / scale: undisclosed [Supplied research, 2026-10-08.] The supplied review found no termination; ongoing validity is not independently established.",
+      "attribution": "direct",
+      "researchRecord": 31,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-31-prisa-media",
+      "source": "openai",
+      "target": "prisa-media",
+      "type": "licensing",
+      "title": "内容／数据授权合作",
+      "sources": [
+        "openai-research-s28"
+      ],
+      "announcedAt": "2024-03-13",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "announced",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Content partnerships provide attributed publisher material in ChatGPT and support model training. No public termination identified in this review. Amount / scale: undisclosed [Supplied research, 2026-10-08.] The supplied review found no termination; ongoing validity is not independently established.",
+      "attribution": "direct",
+      "researchRecord": 31,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-32-financial-times",
+      "source": "openai",
+      "target": "financial-times",
+      "type": "licensing",
+      "title": "内容／数据授权合作",
+      "sources": [
+        "openai-research-s29"
+      ],
+      "announcedAt": "2024-04-29",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "announced",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Strategic licensing and product-development partnership with attribution and links to FT content. Ongoing multi-dimensional publisher and enterprise relationship unless otherwise terminated. Amount / scale: undisclosed [Supplied research, 2026-10-08.] The supplied review found no termination; ongoing validity is not independently established.",
+      "attribution": "direct",
+      "researchRecord": 32,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-33-reddit",
+      "source": "openai",
+      "target": "reddit",
+      "type": "licensing",
+      "title": "内容／数据授权合作",
+      "sources": [
+        "openai-research-s38"
+      ],
+      "announcedAt": "2024-05",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "announced",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI received access to Reddit's real-time structured content through its Data API; Reddit gained OpenAI-powered capabilities and OpenAI became an advertising partner. Strategic data/product relationship; no termination identified in this review. Amount / scale: undisclosed [Supplied research, 2026-10-08.] The supplied review found no termination; ongoing validity is not independently established.",
+      "attribution": "direct",
+      "researchRecord": 33,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-34-news-corp",
+      "source": "openai",
+      "target": "news-corp",
+      "type": "licensing",
+      "title": "内容／数据授权合作",
+      "sources": [
+        "openai-research-s30"
+      ],
+      "announcedAt": "2024-05-22",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "announced",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Multi-year agreement permits use of current and archival content from major News Corp publications in OpenAI products. Multi-year relationship; no public termination identified. Amount / scale: undisclosed [Supplied research, 2026-10-08.] The supplied review found no termination; ongoing validity is not independently established.",
+      "attribution": "direct",
+      "researchRecord": 34,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-35-the-atlantic",
+      "source": "openai",
+      "target": "the-atlantic",
+      "type": "licensing",
+      "title": "内容／数据授权合作",
+      "sources": [
+        "openai-research-s31"
+      ],
+      "announcedAt": "2024-05-29",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "announced",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Content and product partnership involving discoverability, attribution and publisher experimentation with OpenAI technology. No public termination identified. Amount / scale: undisclosed [Supplied research, 2026-10-08.] The supplied review found no termination; ongoing validity is not independently established.",
+      "attribution": "direct",
+      "researchRecord": 35,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-36-vox-media",
+      "source": "openai",
+      "target": "vox-media",
+      "type": "licensing",
+      "title": "内容／数据授权合作",
+      "sources": [
+        "openai-research-s32"
+      ],
+      "announcedAt": "2024-05-29",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "announced",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Strategic partnership allows OpenAI to use Vox archives to enhance ChatGPT while Vox uses OpenAI technology in publishing products. No public termination identified. Amount / scale: undisclosed [Supplied research, 2026-10-08.] The supplied review found no termination; ongoing validity is not independently established.",
+      "attribution": "direct",
+      "researchRecord": 36,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-37-time",
+      "source": "openai",
+      "target": "time",
+      "type": "licensing",
+      "title": "内容／数据授权合作",
+      "sources": [
+        "openai-research-s33"
+      ],
+      "announcedAt": "2024-06-27",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "announced",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Multi-year agreement provides OpenAI access to TIME's current content and historical archive for attributed responses. Multi-year relationship; no public termination identified. Amount / scale: undisclosed [Supplied research, 2026-10-08.] The supplied review found no termination; ongoing validity is not independently established.",
+      "attribution": "direct",
+      "researchRecord": 37,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-38-conde-nast",
+      "source": "openai",
+      "target": "conde-nast",
+      "type": "licensing",
+      "title": "内容／数据授权合作",
+      "sources": [
+        "openai-research-s34"
+      ],
+      "announcedAt": "2024-08-20",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "announced",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI products may surface attributed content from Condé Nast brands. No public termination identified. Amount / scale: undisclosed [Supplied research, 2026-10-08.] The supplied review found no termination; ongoing validity is not independently established.",
+      "attribution": "direct",
+      "researchRecord": 38,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-39-hearst",
+      "source": "openai",
+      "target": "hearst",
+      "type": "licensing",
+      "title": "内容／数据授权合作",
+      "sources": [
+        "openai-research-s35"
+      ],
+      "announcedAt": "2024-10-08",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "announced",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Content partnership covers more than 20 magazine brands and more than 40 newspapers. No public termination identified. Amount / scale: undisclosed [Supplied research, 2026-10-08.] The supplied review found no termination; ongoing validity is not independently established.",
+      "attribution": "direct",
+      "researchRecord": 39,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-40-future-plc",
+      "source": "openai",
+      "target": "future-plc",
+      "type": "licensing",
+      "title": "内容／数据授权合作",
+      "sources": [
+        "openai-research-s36"
+      ],
+      "announcedAt": "2024-12-04",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "announced",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Strategic content partnership covers Future's portfolio of more than 200 media brands. No public termination identified. Amount / scale: undisclosed [Supplied research, 2026-10-08.] The supplied review found no termination; ongoing validity is not independently established.",
+      "attribution": "direct",
+      "researchRecord": 40,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-41-schibsted-media",
+      "source": "openai",
+      "target": "schibsted-media",
+      "type": "licensing",
+      "title": "内容／数据授权合作",
+      "sources": [
+        "openai-research-s37"
+      ],
+      "announcedAt": "2025-02-10",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "announced",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Content from major Scandinavian news brands is made available for attributed ChatGPT experiences. No public termination identified. Amount / scale: undisclosed [Supplied research, 2026-10-08.] The supplied review found no termination; ongoing validity is not independently established.",
+      "attribution": "direct",
+      "researchRecord": 41,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-42-american-journalism-project",
+      "source": "openai",
+      "target": "american-journalism-project",
+      "type": "grant",
+      "title": "$5M现金支持＋至多$5M额度／服务",
+      "sources": [
+        "openai-research-s22"
+      ],
+      "announcedAt": "2023-07-18",
+      "amountB": 0.005,
+      "currency": "USD",
+      "amountBasis": "agreement",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI funded experimentation and tooling for AI in local journalism. Programmatic grant relationship. Amount / scale: USD 5 million cash grant plus up to USD 5 million of API credits [Supplied research, 2026-10-08.] amountB includes only $5M cash / cash commitment; up to $5M noncash support is separate.",
+      "attribution": "direct",
+      "researchRecord": 42,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-43-lenfest",
+      "source": "openai",
+      "target": "lenfest",
+      "type": "grant",
+      "title": "$5M现金支持＋至多$5M额度／服务",
+      "sources": [
+        "openai-research-s23"
+      ],
+      "announcedAt": "2026-09-28",
+      "amountB": 0.005,
+      "currency": "USD",
+      "amountBasis": "commitment",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI expanded support for journalism-focused AI development and fellowships. Active newly expanded program. Amount / scale: USD 5 million commitment plus up to USD 5 million in software credits and engineering support [Supplied research, 2026-10-08.] amountB includes only $5M cash / cash commitment; up to $5M noncash support is separate.",
+      "attribution": "direct",
+      "researchRecord": 43,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-44-los-alamos-national-laboratory",
+      "source": "openai",
+      "target": "los-alamos-national-laboratory",
+      "type": "research",
+      "title": "生物科学与模型安全研究",
+      "sources": [
+        "openai-research-s24"
+      ],
+      "announcedAt": "2024-07-10",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Joint bioscience safety research evaluates multimodal frontier-model effects in physical laboratory tasks. Research collaboration later broadened through the U.S. National Laboratories agreement. Amount / scale: unspecified [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 44,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-45-los-alamos-national-laboratory",
+      "source": "openai",
+      "target": "los-alamos-national-laboratory",
+      "type": "research",
+      "title": "美国国家实验室推理模型科研合作",
+      "sources": [
+        "openai-research-s25"
+      ],
+      "announcedAt": "2025-01-30",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [
+        "NVIDIA"
+      ],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI agreed to make reasoning models available to approximately 15,000 national-lab scientists, including deployment on the Venado NVIDIA supercomputer. Expanded public-sector scientific and national-security collaboration. Amount / scale: unspecified [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 45,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-45-lawrence-livermore-national-laboratory",
+      "source": "openai",
+      "target": "lawrence-livermore-national-laboratory",
+      "type": "research",
+      "title": "美国国家实验室推理模型科研合作",
+      "sources": [
+        "openai-research-s25"
+      ],
+      "announcedAt": "2025-01-30",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [
+        "NVIDIA"
+      ],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI agreed to make reasoning models available to approximately 15,000 national-lab scientists, including deployment on the Venado NVIDIA supercomputer. Expanded public-sector scientific and national-security collaboration. Amount / scale: unspecified [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 45,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-45-sandia-national-laboratories",
+      "source": "openai",
+      "target": "sandia-national-laboratories",
+      "type": "research",
+      "title": "美国国家实验室推理模型科研合作",
+      "sources": [
+        "openai-research-s25"
+      ],
+      "announcedAt": "2025-01-30",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [
+        "NVIDIA"
+      ],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI agreed to make reasoning models available to approximately 15,000 national-lab scientists, including deployment on the Venado NVIDIA supercomputer. Expanded public-sector scientific and national-security collaboration. Amount / scale: unspecified [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 45,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-45-microsoft",
+      "source": "openai",
+      "target": "microsoft",
+      "type": "research",
+      "title": "美国国家实验室推理模型科研合作",
+      "sources": [
+        "openai-research-s25"
+      ],
+      "announcedAt": "2025-01-30",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [
+        "NVIDIA"
+      ],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI agreed to make reasoning models available to approximately 15,000 national-lab scientists, including deployment on the Venado NVIDIA supercomputer. Expanded public-sector scientific and national-security collaboration. Amount / scale: unspecified [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 45,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-46-global-illumination",
+      "source": "openai",
+      "target": "global-illumination",
+      "type": "ownership",
+      "title": "收购：Global Illumination（已完成）",
+      "sources": [
+        "openai-research-s39"
+      ],
+      "announcedAt": "2023-08-16",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI acquired Global Illumination and its team joined OpenAI. Completed and integrated. Amount / scale: unspecified [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 46,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-47-rockset",
+      "source": "openai",
+      "target": "rockset",
+      "type": "ownership",
+      "title": "收购：Rockset（已完成）",
+      "sources": [
+        "openai-research-s40"
+      ],
+      "announcedAt": "2024-06-21",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI acquired real-time analytics database company Rockset to strengthen retrieval infrastructure. Completed; Rockset team joined OpenAI and technology was slated for product integration. Amount / scale: unspecified [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 47,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-48-io-products",
+      "source": "openai",
+      "target": "io-products",
+      "type": "ownership",
+      "title": "收购：io Products（已完成）",
+      "sources": [
+        "openai-research-s41"
+      ],
+      "announcedAt": "2025-07-09",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "io Products' team merged into OpenAI; Jony Ive and LoveFrom remained independent while taking a deep design role across OpenAI. io team integrated; LoveFrom relationship remains collaborative rather than acquired. Amount / scale: unspecified in primary source [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 48,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-49-statsig",
+      "source": "openai",
+      "target": "statsig",
+      "type": "ownership",
+      "title": "收购：Statsig（待确认交割）",
+      "sources": [
+        "openai-research-s42"
+      ],
+      "announcedAt": "2025-09-02",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "conditional",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI announced the acquisition of Statsig and planned for founder Vijaye Raji to become CTO of Applications. Transaction was announced subject to approval; later closing was not separately re-verified in this research pass. Amount / scale: unspecified in primary announcement [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 49,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-50-sky",
+      "source": "openai",
+      "target": "sky",
+      "type": "ownership",
+      "title": "收购：Software Applications Incorporated（已完成）",
+      "sources": [
+        "openai-research-s43"
+      ],
+      "announcedAt": "2025-10-23",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI acquired Software Applications Incorporated, maker of the Sky natural-language Mac interface. Completed; team joined OpenAI. OpenAI disclosed a passive investment by a fund associated with Sam Altman and independent board approval. Amount / scale: unspecified [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 50,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-51-neptune-ai",
+      "source": "openai",
+      "target": "neptune-ai",
+      "type": "ownership",
+      "title": "收购：Neptune.ai（待确认交割）",
+      "sources": [
+        "openai-research-s44"
+      ],
+      "announcedAt": "2025-12-03",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "conditional",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI entered a definitive agreement to acquire Neptune after collaborating on frontier-training experiment tooling. Integration into OpenAI's training stack was planned; later closing status was not separately re-verified. Amount / scale: unspecified [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 51,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-52-promptfoo",
+      "source": "openai",
+      "target": "promptfoo",
+      "type": "ownership",
+      "title": "收购：Promptfoo（待确认交割）",
+      "sources": [
+        "openai-research-s45"
+      ],
+      "announcedAt": "2026-03-09",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "conditional",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI announced acquisition of Promptfoo to expand security and evaluation capabilities. Announcement-stage transaction in the primary source reviewed. Amount / scale: unspecified [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 52,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-53-astral",
+      "source": "openai",
+      "target": "astral",
+      "type": "ownership",
+      "title": "收购：Astral（待确认交割）",
+      "sources": [
+        "openai-research-s46"
+      ],
+      "announcedAt": "2026-03-19",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "conditional",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI agreed to acquire Astral and integrate its Python developer tooling with Codex. Primary announcement says closing remains subject to customary conditions and regulatory approval; no later closing confirmation was identified. Amount / scale: unspecified [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 53,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-54-ona",
+      "source": "openai",
+      "target": "ona",
+      "type": "ownership",
+      "title": "收购：Ona（待确认交割）",
+      "sources": [
+        "openai-research-s47"
+      ],
+      "announcedAt": "2026-06-11",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "conditional",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "OpenAI agreed to acquire Ona's secure cloud execution and orchestration technology for Codex. At announcement, closing was subject to customary conditions and regulatory approvals and the companies remained independent until close. Amount / scale: unspecified [Supplied research, 2026-10-08.]",
+      "attribution": "direct",
+      "researchRecord": 54,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-48-lovefrom-design",
+      "source": "openai",
+      "target": "lovefrom",
+      "type": "partnership",
+      "title": "Jony Ive／LoveFrom独立设计合作",
+      "sources": [
+        "openai-research-s41"
+      ],
+      "announcedAt": "2025-07-09",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "io Products' team merged into OpenAI; Jony Ive and LoveFrom remained independent while taking a deep design role across OpenAI. io team integrated; LoveFrom relationship remains collaborative rather than acquired. Amount / scale: unspecified in primary source [Supplied research, 2026-10-08.] LoveFrom remains independent; no acquisition edge is created for Jony Ive or LoveFrom.",
+      "attribution": "direct",
+      "researchRecord": 48,
+      "evidenceAsOf": "2026-10-08"
+    },
+    {
+      "id": "openai-research-55-sierra",
+      "source": "openai",
+      "target": "sierra",
+      "type": "governance",
+      "title": "Bret Taylor共同治理／人员关联",
+      "sources": [
+        "openai-research-s03",
+        "openai-research-s48"
+      ],
+      "announcedAt": "2026-10-08",
+      "amountB": null,
+      "currency": "USD",
+      "amountBasis": "not-disclosed",
+      "status": "active",
+      "hardware": [],
+      "labs": [
+        "openai"
+      ],
+      "term": null,
+      "note": "Bret Taylor is Chair of OpenAI's board and co-founder of Sierra. Current governance/people overlap; no commercial OpenAI-Sierra relationship should be inferred solely from the shared individual. Amount / scale: none [Supplied research, 2026-10-08.] This is a people overlap, not a verified commercial partnership. Date is observation date, not appointment date.",
+      "attribution": "direct",
+      "researchRecord": 55,
+      "evidenceAsOf": "2026-10-08"
     }
   ],
   "sites": [
@@ -2965,8 +5690,8 @@
       "region": "Texas",
       "lat": 30.79,
       "lng": -96.98,
-      "status": "planned",
-      "statusAsOf": "2025-09-23",
+      "status": "construction",
+      "statusAsOf": "2026-01-09",
       "entities": [
         "softbank",
         "sbenergy"
@@ -2978,16 +5703,17 @@
         "NVIDIA"
       ],
       "sources": [
-        "oai-sites"
+        "oai-sites",
+        "openai-research-s12"
       ],
-      "capacityMW": null,
-      "capacityBasis": "Not disclosed",
-      "note": "公告确认开发计划；与Lordstown合计目标1.5GW，未分摊到本点。",
+      "capacityMW": 1200,
+      "capacityBasis": "OpenAI lease target; not operating capacity",
+      "note": "OpenAI selected SB Energy to build and operate the Milam County data-center campus and signed a 1.2 GW lease. Facilities described as under construction with service beginning in 2026; SB Energy also became an OpenAI customer. Amount / scale: financial amount unspecified; 1.2 GW lease [Supplied research, 2026-10-08.]",
       "attribution": "direct",
       "coordinatePrecision": "county",
-      "expectedCompletion": "Not disclosed for this site",
+      "expectedCompletion": "Service beginning in 2026 per supplied report; actual commissioning unconfirmed",
       "onlineCapacity": null,
-      "plannedCapacity": null,
+      "plannedCapacity": "1200 MW lease target",
       "acceleratorCount": null,
       "hardwareDetails": [
         {
@@ -3056,11 +5782,13 @@
         "NVIDIA"
       ],
       "sources": [
-        "oai-sites"
+        "oai-sites",
+        "openai-research-a3",
+        "openai-research-a7"
       ],
       "capacityMW": null,
       "capacityBasis": "Not disclosed",
-      "note": "公告为选定站点，建设进度未在本数据集独立确认。",
+      "note": "公告为选定站点，建设进度未在本数据集独立确认。 Active overall. Abilene entered operation; the New Mexico Project Jupiter component later encountered permitting and financing delays. Delay/risk from supplied secondary research; no commissioning upgrade.",
       "attribution": "direct",
       "coordinatePrecision": "county",
       "expectedCompletion": "Not disclosed",
@@ -3074,7 +5802,8 @@
           "sharePct": null,
           "evidence": "Platform disclosed; site allocation / share not disclosed"
         }
-      ]
+      ],
+      "researchAsOf": "2026-10-08"
     },
     {
       "id": "saline",
@@ -3136,11 +5865,12 @@
         "NVIDIA"
       ],
       "sources": [
-        "oai-uae"
+        "oai-uae",
+        "openai-research-a2"
       ],
       "capacityMW": 1000,
       "capacityBasis": "Announced cluster target",
-      "note": "2026预计首期200MW；没有本数据集投运确认。不是整个5GW园区都属于OpenAI。",
+      "note": "2026预计首期200MW；没有本数据集投运确认。不是整个5GW园区都属于OpenAI。 Stargate UAE established a 1 GW Abu Dhabi compute cluster as the first phase of a larger UAE-US AI campus. Active but broader 5 GW masterplan was reported in September 2026 as being redesigned for security and geographic distribution; first 1 GW phase expected to continue. Amount / scale: approximately USD 30 billion reported for first 1 GW phase; original primary announcement did not specify this amount [Supplied research, 2026-10-08.] Reported $30B belongs to a shared first-phase program; not assigned as an OpenAI contract amount.",
       "attribution": "direct",
       "coordinatePrecision": "city",
       "expectedCompletion": "First 200 MW targeted in 2026; full 1 GW schedule undisclosed",
@@ -3154,7 +5884,8 @@
           "sharePct": null,
           "evidence": "Platform disclosed; site allocation / share not disclosed"
         }
-      ]
+      ],
+      "researchAsOf": "2026-10-08"
     },
     {
       "id": "narvik",
@@ -3178,14 +5909,15 @@
       ],
       "sources": [
         "oai-no",
-        "nscale-no"
+        "nscale-no",
+        "openai-research-a1"
       ],
       "capacityMW": 230,
       "capacityBasis": "Campus target",
-      "note": "2025曾宣布OpenAI潜在承购；2026新增Rubin容量合同指向Microsoft、2027部署。OpenAI分配待确认。",
+      "note": "Stargate Norway was announced with OpenAI as a prospective initial offtaker. Cancelled by OpenAI in April 2026 according to Nscale S-1/Bloomberg reporting carried by Aral; Microsoft agreed to take over the Norway capacity. Amount / scale: unspecified; original plan 230 MW with expansion ambition and target of 100,000 NVIDIA GPUs by end-2026 [Supplied research, 2026-10-08.] The campus itself is not classified as cancelled: Microsoft took over capacity. OpenAI attribution is historical only.",
       "attribution": "historical",
       "coordinatePrecision": "city",
-      "expectedCompletion": "2027 Rubin deployment; OpenAI allocation unconfirmed",
+      "expectedCompletion": "2027 Rubin deployment for Microsoft; OpenAI offtake cancelled April 2026",
       "onlineCapacity": null,
       "plannedCapacity": "230 MW · Campus target",
       "acceleratorCount": null,
@@ -3196,7 +5928,8 @@
           "sharePct": null,
           "evidence": "Platform disclosed; site allocation / share not disclosed"
         }
-      ]
+      ],
+      "researchAsOf": "2026-10-08"
     },
     {
       "id": "colossus",
@@ -4559,6 +7292,486 @@
       "grade": "secondary",
       "kind": "research",
       "verification": "Source attribution from supplied research; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s04",
+      "title": "OpenAI — Microsoft 2019 investment",
+      "url": "https://openai.com/index/microsoft-invests-in-and-partners-with-openai/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s05",
+      "title": "Microsoft — 2023 OpenAI expansion",
+      "url": "https://blogs.microsoft.com/blog/2023/01/23/microsoftandopenaiextendpartnership/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s02",
+      "title": "OpenAI — Microsoft partnership reset",
+      "url": "https://openai.com/index/next-chapter-of-microsoft-openai-partnership/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s03",
+      "title": "OpenAI — corporate structure and board",
+      "url": "https://openai.com/our-structure/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s01",
+      "title": "OpenAI — $122B funding round / infrastructure strategy",
+      "url": "https://openai.com/index/accelerating-the-next-phase-ai/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s06",
+      "title": "OpenAI — Stargate launch",
+      "url": "https://openai.com/index/announcing-the-stargate-project/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-a3",
+      "title": "Aral — Oracle Project Jupiter / Stargate financing and delay risk",
+      "url": "https://aral.instap.net/reports?topic_id=14425428548582552",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "secondary",
+      "kind": "research",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-a7",
+      "title": "Aral — Oracle credit/Stargate concentration discussion",
+      "url": "https://aral.instap.net/reports?topic_id=82258281182885242",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "secondary",
+      "kind": "research",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-a4",
+      "title": "UBS / Aral — CoreWeave customer concentration and infrastructure outlook",
+      "url": "https://aral.instap.net/reports?topic_id=55521524811245514",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "secondary",
+      "kind": "research",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s08",
+      "title": "OpenAI — NVIDIA systems partnership",
+      "url": "https://openai.com/index/openai-nvidia-systems-partnership/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s12",
+      "title": "OpenAI — SB Energy partnership",
+      "url": "https://openai.com/index/stargate-sb-energy-partnership/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s13",
+      "title": "OpenAI — Samsung and SK join Stargate",
+      "url": "https://openai.com/index/samsung-and-sk-join-stargate/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s14",
+      "title": "Samsung — OpenAI strategic partnership",
+      "url": "https://news.samsung.com/global/samsung-and-openai-announce-strategic-partnership-to-accelerate-advancements-in-global-ai-infrastructure",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-a5",
+      "title": "Aral — OpenAI / Samsung strategic-memory significance",
+      "url": "https://aral.instap.net/reports?topic_id=82258815548451152",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "secondary",
+      "kind": "research",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-a6",
+      "title": "Aral — model companies moving toward direct memory procurement; OpenAI Samsung/SK reference",
+      "url": "https://aral.instap.net/reports?topic_id=82258251441524222",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "secondary",
+      "kind": "research",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-a2",
+      "title": "Reuters / Aral — Stargate UAE security redesign",
+      "url": "https://aral.instap.net/reports?topic_id=22258815181252811",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "secondary",
+      "kind": "research",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-a1",
+      "title": "Nscale S-1 / Bloomberg — OpenAI Norway and UK cancellations",
+      "url": "https://aral.instap.net/reports?topic_id=55521525825288524",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "secondary",
+      "kind": "research",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s19",
+      "title": "OpenAI — Atlassian partnership expansion",
+      "url": "https://openai.com/index/atlassian-partnership/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s20",
+      "title": "OpenAI — Apple partnership",
+      "url": "https://openai.com/index/openai-and-apple-announce-partnership/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s21",
+      "title": "OpenAI — CodeAI",
+      "url": "https://openai.com/index/partnering-with-codeai/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s26",
+      "title": "Associated Press — OpenAI agreement",
+      "url": "https://www.ap.org/media-center/press-releases/2023/ap-open-ai-agree-to-share-select-news-content-and-technology-in-new-collaboration/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s27",
+      "title": "Axel Springer — OpenAI partnership",
+      "url": "https://www.axelspringer.com/en/ax-press-release/axel-springer-and-openai-partner-to-deepen-beneficial-use-of-ai-in-journalism",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s28",
+      "title": "OpenAI — Le Monde / Prisa",
+      "url": "https://openai.com/index/global-news-partnerships-le-monde-and-prisa-media/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s29",
+      "title": "Financial Times — OpenAI partnership",
+      "url": "https://aboutus.ft.com/press_release/financial-times-announces-strategic-partnership-with-openai",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s38",
+      "title": "Reddit — OpenAI partnership",
+      "url": "https://www.redditinc.com/blog/reddit-and-openai-build-partnership",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s30",
+      "title": "OpenAI — News Corp",
+      "url": "https://openai.com/index/news-corp-and-openai-sign-landmark-multi-year-global-partnership/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s31",
+      "title": "The Atlantic — OpenAI partnership",
+      "url": "https://www.theatlantic.com/press-releases/archive/2024/05/atlantic-and-openai-announce-strategic-content-product-partnership/678558/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s32",
+      "title": "Vox Media — OpenAI partnership",
+      "url": "https://www.voxmedia.com/2024/5/29/24167472/vox-media-and-openai-form-strategic-content-and-product-partnership",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s33",
+      "title": "OpenAI — TIME",
+      "url": "https://openai.com/index/time-and-openai-announce-strategic-content-partnership/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s34",
+      "title": "OpenAI — Condé Nast",
+      "url": "https://openai.com/index/conde-nast/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s35",
+      "title": "Hearst — OpenAI partnership",
+      "url": "https://www.hearst.com/-/hearst-and-openai-announce-strategic-content-partnership",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s36",
+      "title": "OpenAI — Future partnership",
+      "url": "https://openai.com/index/future-partnership/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s37",
+      "title": "OpenAI — Schibsted Media",
+      "url": "https://openai.com/index/schibsted-media-partnership/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s22",
+      "title": "American Journalism Project — OpenAI grant",
+      "url": "https://www.theajp.org/news-insights/press-releases/openai-commits-5-million-to-the-american-journalism-project-to-support-ai-powered-local-news/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s23",
+      "title": "OpenAI — Lenfest expansion",
+      "url": "https://openai.com/index/lenfest-ai-collaborative-expansion/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s24",
+      "title": "OpenAI — LANL bioscience partnership",
+      "url": "https://openai.com/index/openai-and-los-alamos-national-laboratory-work-together/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s25",
+      "title": "OpenAI — U.S. National Laboratories",
+      "url": "https://openai.com/index/strengthening-americas-ai-leadership-with-the-us-national-laboratories/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s39",
+      "title": "OpenAI — Global Illumination acquisition",
+      "url": "https://openai.com/index/openai-acquires-global-illumination/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s40",
+      "title": "OpenAI — Rockset acquisition",
+      "url": "https://openai.com/index/openai-acquires-rockset/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s41",
+      "title": "OpenAI — Sam & Jony / io",
+      "url": "https://openai.com/sam-and-jony/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s42",
+      "title": "OpenAI — Statsig acquisition",
+      "url": "https://openai.com/index/vijaye-raji-to-become-cto-of-applications-with-acquisition-of-statsig/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s43",
+      "title": "OpenAI — Software Applications / Sky acquisition",
+      "url": "https://openai.com/index/openai-acquires-software-applications-incorporated/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s44",
+      "title": "OpenAI — Neptune acquisition",
+      "url": "https://openai.com/index/openai-to-acquire-neptune/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s45",
+      "title": "OpenAI — Promptfoo acquisition",
+      "url": "https://openai.com/index/openai-to-acquire-promptfoo/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s46",
+      "title": "OpenAI — Astral acquisition",
+      "url": "https://openai.com/index/openai-to-acquire-astral/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s47",
+      "title": "OpenAI — Ona acquisition",
+      "url": "https://openai.com/index/openai-to-acquire-ona/",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s48",
+      "title": "Sierra — Bret Taylor",
+      "url": "https://sierra.ai/author/bret-taylor",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
+    },
+    {
+      "id": "openai-research-s50",
+      "title": "Hut 8 — Anthropic / Fluidstack infrastructure partnership",
+      "url": "https://www.hut8.com/news-insights/press-releases/hut-8-announces-ai-infrastructure-partnership-with-anthropic-and-fluidstack",
+      "publishedAt": null,
+      "accessedAt": "2026-10-08",
+      "grade": "primary",
+      "kind": "official",
+      "integrationNote": "Referenced by supplied drr.md; not independently reverified during integration."
     }
   ]
 }

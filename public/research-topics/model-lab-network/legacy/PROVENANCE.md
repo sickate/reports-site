@@ -22,3 +22,13 @@ Cytoscape wheelSensitivity 0.12 to reduce scroll zoom jumps. Leaflet uses
 zoomSnap 0.25, zoomDelta 0.5 and wheelPxPerZoomLevel 240 for finer map zoom.
 These changes apply only to report options; bundled vendor implementations
 and research content are preserved.
+
+Local timeline enhancement: `../timeline.js` and `../timeline.css` add an
+announcement-date range control above the relationship graph, reusing the
+existing from/until filter state. Month-only announcements use interval overlap
+so a date range inside that month still includes the relationship.
+
+OpenAI research integration (2026-10-08): report configuration adds content
+licensing, grants, research and governance relationship types and a cancelled
+status. Cancelled edges use faint dotted lines. Canonical content is still
+maintained in JSON and the authored research Markdown, not in vendor code.

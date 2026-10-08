@@ -1,0 +1,890 @@
+[
+  {
+    "date": "2019-07-22",
+    "amount": "USD 1 billion",
+    "counterparties": [
+      "OpenAI",
+      "Microsoft"
+    ],
+    "relationship_type": "investment",
+    "summary": "Microsoft invested $1 billion in OpenAI and became a preferred commercialization and Azure supercomputing partner.",
+    "current_status_progress": "Historical foundation of the still-active Microsoft relationship; subsequently expanded and renegotiated.",
+    "sources": [
+      "https://openai.com/index/microsoft-invests-in-and-partners-with-openai/"
+    ]
+  },
+  {
+    "date": "2023-01-23",
+    "amount": "multi-billion USD; exact primary-source amount unspecified",
+    "counterparties": [
+      "OpenAI",
+      "Microsoft"
+    ],
+    "relationship_type": "investment",
+    "summary": "OpenAI and Microsoft expanded their multi-year partnership through additional investment, Azure compute and commercial deployment.",
+    "current_status_progress": "Superseded in important respects by the October 2025 definitive agreement but remains part of the financing history.",
+    "sources": [
+      "https://blogs.microsoft.com/blog/2023/01/23/microsoftandopenaiextendpartnership/"
+    ]
+  },
+  {
+    "date": "2025-10-28 onward",
+    "amount": "USD 250 billion incremental Azure services commitment; Microsoft investment valued at approximately USD 135 billion at recapitalization",
+    "counterparties": [
+      "OpenAI",
+      "Microsoft"
+    ],
+    "relationship_type": "contract",
+    "summary": "Definitive partnership reset extended key Microsoft model/product IP rights through 2032, retained Azure API exclusivity until verified AGI, removed Microsoft's compute right of first refusal, and committed OpenAI to an incremental $250 billion of Azure services.",
+    "current_status_progress": "Active. Microsoft remained a major investor and participated in OpenAI's March 2026 financing.",
+    "sources": [
+      "https://openai.com/index/next-chapter-of-microsoft-openai-partnership/",
+      "https://openai.com/our-structure/"
+    ]
+  },
+  {
+    "date": "2026-02-27 to 2026-03-31",
+    "amount": "USD 122 billion committed capital at USD 852 billion post-money valuation",
+    "counterparties": [
+      "OpenAI",
+      "Amazon",
+      "NVIDIA",
+      "SoftBank",
+      "Microsoft",
+      "a16z",
+      "D. E. Shaw Ventures",
+      "MGX",
+      "TPG",
+      "T. Rowe Price-advised accounts",
+      "BlackRock-affiliated funds",
+      "Blackstone",
+      "Coatue",
+      "Fidelity Management & Research",
+      "Sequoia Capital",
+      "Temasek",
+      "Thrive Capital",
+      "UC Investments",
+      "other disclosed institutional investors"
+    ],
+    "relationship_type": "investment",
+    "summary": "OpenAI closed a $122 billion funding round. The earlier February strategic announcement included $50 billion from Amazon, $30 billion from NVIDIA and $30 billion from SoftBank; the March closing added broader participation.",
+    "current_status_progress": "Closed March 31, 2026. The $122 billion total supersedes the earlier $110 billion announcement and should not be added to it.",
+    "sources": [
+      "https://openai.com/index/accelerating-the-next-phase-ai/"
+    ]
+  },
+  {
+    "date": "2026-03-31",
+    "amount": "approximately USD 4.7 billion revolving credit facility; undrawn at close",
+    "counterparties": [
+      "OpenAI",
+      "JPMorgan Chase",
+      "Citi",
+      "Goldman Sachs",
+      "Morgan Stanley",
+      "Wells Fargo",
+      "Mizuho",
+      "RBC",
+      "SMBC",
+      "UBS",
+      "HSBC",
+      "Santander"
+    ],
+    "relationship_type": "contract",
+    "summary": "Global bank syndicate supports OpenAI's expanded revolving credit facility.",
+    "current_status_progress": "Facility was undrawn at the March 2026 financing close.",
+    "sources": [
+      "https://openai.com/index/accelerating-the-next-phase-ai/"
+    ]
+  },
+  {
+    "date": "2025-01-21 onward",
+    "amount": "USD 500 billion intended over four years; USD 100 billion intended immediately",
+    "counterparties": [
+      "OpenAI",
+      "SoftBank",
+      "Oracle",
+      "MGX"
+    ],
+    "relationship_type": "infrastructure deal",
+    "summary": "Stargate Project established a large-scale U.S. AI infrastructure platform, with SoftBank as financial lead and OpenAI as operational lead.",
+    "current_status_progress": "Active umbrella program. Program-level investment ambitions should not be treated as a single executed OpenAI contract.",
+    "sources": [
+      "https://openai.com/index/announcing-the-stargate-project/"
+    ]
+  },
+  {
+    "date": "2025-07 onward",
+    "amount": "more than USD 300 billion over five years; up to 4.5 GW",
+    "counterparties": [
+      "OpenAI",
+      "Oracle"
+    ],
+    "relationship_type": "infrastructure deal",
+    "summary": "OpenAI contracted major Oracle Cloud/Stargate capacity across multiple U.S. data-center sites.",
+    "current_status_progress": "Active overall. Abilene entered operation; the New Mexico Project Jupiter component later encountered permitting and financing delays.",
+    "sources": [
+      "https://openai.com/index/five-new-stargate-sites/",
+      "https://aral.instap.net/reports?topic_id=14425428548582552",
+      "https://aral.instap.net/reports?topic_id=82258281182885242"
+    ]
+  },
+  {
+    "date": "2025-03 to 2025-09-23 and ongoing",
+    "amount": "approximately USD 22.4 billion cumulative contracted capacity",
+    "counterparties": [
+      "OpenAI",
+      "CoreWeave"
+    ],
+    "relationship_type": "contract",
+    "summary": "OpenAI progressively expanded reserved CoreWeave cloud capacity through multiple agreements, including a September 2025 order of up to $6.5 billion.",
+    "current_status_progress": "Active; September order extends through May 2031. 2026 sell-side research continues to identify OpenAI as a major CoreWeave customer.",
+    "sources": [
+      "https://reports.instap.net/data/model-lab-network.json",
+      "https://aral.instap.net/reports?topic_id=55521524811245514"
+    ]
+  },
+  {
+    "date": "2025-09-22 to 2026",
+    "amount": "2025 framework: intended investment up to USD 100 billion and at least 10 GW; 2026 strategic package included USD 30 billion investment and 5 GW dedicated Vera Rubin capacity",
+    "counterparties": [
+      "OpenAI",
+      "NVIDIA"
+    ],
+    "relationship_type": "infrastructure deal",
+    "summary": "OpenAI and NVIDIA established a large systems/investment framework; subsequent 2026 arrangements reframed the relationship around strategic equity and dedicated training/inference capacity.",
+    "current_status_progress": "Active. Treat the 2025 $100 billion figure as an intended framework, not cash received, and avoid double counting against the 2026 package.",
+    "sources": [
+      "https://openai.com/index/openai-nvidia-systems-partnership/",
+      "https://openai.com/index/accelerating-the-next-phase-ai/"
+    ]
+  },
+  {
+    "date": "2025-10-06 onward",
+    "amount": "unspecified; 6 GW capacity",
+    "counterparties": [
+      "OpenAI",
+      "AMD"
+    ],
+    "relationship_type": "infrastructure deal",
+    "summary": "Definitive multi-generation agreement for 6 GW of AMD Instinct GPUs.",
+    "current_status_progress": "First 1 GW of MI450 systems was scheduled for deployment in the second half of 2026; no separate completion announcement was identified in this review.",
+    "sources": [
+      "https://openai.com/index/openai-amd-strategic-partnership/"
+    ]
+  },
+  {
+    "date": "2025-10-06 onward",
+    "amount": "warrants for up to 160 million AMD shares",
+    "counterparties": [
+      "OpenAI",
+      "AMD"
+    ],
+    "relationship_type": "investment",
+    "summary": "AMD issued OpenAI milestone-linked warrants tied to deployments, commercial outcomes and share-price milestones.",
+    "current_status_progress": "Conditional equity instrument; not equivalent to cash consideration.",
+    "sources": [
+      "https://openai.com/index/openai-amd-strategic-partnership/"
+    ]
+  },
+  {
+    "date": "2025-10-13 to 2029",
+    "amount": "unspecified; 10 GW custom accelerator deployment",
+    "counterparties": [
+      "OpenAI",
+      "Broadcom"
+    ],
+    "relationship_type": "infrastructure deal",
+    "summary": "OpenAI designs custom accelerators while Broadcom co-develops and deploys accelerator and networking systems.",
+    "current_status_progress": "Deployment scheduled from the second half of 2026 through the end of 2029; OpenAI still listed its Broadcom chip in its March 2026 infrastructure strategy.",
+    "sources": [
+      "https://openai.com/index/openai-and-broadcom-announce-strategic-collaboration/",
+      "https://openai.com/index/accelerating-the-next-phase-ai/"
+    ]
+  },
+  {
+    "date": "2026-02-27 onward",
+    "amount": "strategic investment included in 2026 funding round; cloud economics unspecified",
+    "counterparties": [
+      "OpenAI",
+      "Amazon",
+      "AWS"
+    ],
+    "relationship_type": "partnership",
+    "summary": "Strategic relationship spanning Amazon investment, AWS cloud capacity/distribution and AWS Trainium silicon.",
+    "current_status_progress": "Active; OpenAI lists AWS among its core cloud providers and Trainium among its silicon platforms.",
+    "sources": [
+      "https://openai.com/index/accelerating-the-next-phase-ai/"
+    ]
+  },
+  {
+    "date": "by 2026-03-31",
+    "amount": "unspecified",
+    "counterparties": [
+      "OpenAI",
+      "Google Cloud"
+    ],
+    "relationship_type": "infrastructure deal",
+    "summary": "Google Cloud is explicitly included in OpenAI's multi-cloud infrastructure portfolio.",
+    "current_status_progress": "Active as of OpenAI's March 2026 infrastructure disclosure.",
+    "sources": [
+      "https://openai.com/index/accelerating-the-next-phase-ai/"
+    ]
+  },
+  {
+    "date": "by 2026-03-31",
+    "amount": "unspecified",
+    "counterparties": [
+      "OpenAI",
+      "Cerebras"
+    ],
+    "relationship_type": "partnership",
+    "summary": "OpenAI explicitly lists Cerebras among the silicon platforms supporting its infrastructure strategy.",
+    "current_status_progress": "Active relationship disclosed by OpenAI; detailed commercial terms unspecified.",
+    "sources": [
+      "https://openai.com/index/accelerating-the-next-phase-ai/"
+    ]
+  },
+  {
+    "date": "2026-01-09 onward",
+    "amount": "USD 1 billion total equity investment; USD 500 million OpenAI and USD 500 million SoftBank",
+    "counterparties": [
+      "OpenAI",
+      "SoftBank",
+      "SB Energy"
+    ],
+    "relationship_type": "investment",
+    "summary": "OpenAI and SoftBank each invested $500 million in SB Energy.",
+    "current_status_progress": "Active equity relationship separate from the data-center lease.",
+    "sources": [
+      "https://openai.com/index/stargate-sb-energy-partnership/"
+    ]
+  },
+  {
+    "date": "2026-01-09 onward",
+    "amount": "financial amount unspecified; 1.2 GW lease",
+    "counterparties": [
+      "OpenAI",
+      "SB Energy"
+    ],
+    "relationship_type": "infrastructure deal",
+    "summary": "OpenAI selected SB Energy to build and operate the Milam County data-center campus and signed a 1.2 GW lease.",
+    "current_status_progress": "Facilities described as under construction with service beginning in 2026; SB Energy also became an OpenAI customer.",
+    "sources": [
+      "https://openai.com/index/stargate-sb-energy-partnership/"
+    ]
+  },
+  {
+    "date": "2025-10-01 onward",
+    "amount": "unspecified; advanced-memory capacity targeting up to 900,000 DRAM wafer starts per month",
+    "counterparties": [
+      "OpenAI",
+      "Samsung Electronics",
+      "SK hynix"
+    ],
+    "relationship_type": "infrastructure deal",
+    "summary": "Samsung Electronics and SK hynix became strategic memory partners for Stargate and agreed to accelerate advanced-memory production supporting OpenAI infrastructure.",
+    "current_status_progress": "Active strategic partnerships; detailed purchase values and allocation remain unspecified.",
+    "sources": [
+      "https://openai.com/index/samsung-and-sk-join-stargate/",
+      "https://news.samsung.com/global/samsung-and-openai-announce-strategic-partnership-to-accelerate-advancements-in-global-ai-infrastructure",
+      "https://aral.instap.net/reports?topic_id=82258815548451152",
+      "https://aral.instap.net/reports?topic_id=82258251441524222"
+    ]
+  },
+  {
+    "date": "2025-10-01 onward",
+    "amount": "unspecified",
+    "counterparties": [
+      "OpenAI",
+      "Samsung SDS"
+    ],
+    "relationship_type": "partnership",
+    "summary": "LOI covers AI-data-center development and operation; Samsung SDS also became a reseller for OpenAI services in Korea.",
+    "current_status_progress": "Active strategic/reseller relationship; data-center component remains development-stage.",
+    "sources": [
+      "https://news.samsung.com/global/samsung-and-openai-announce-strategic-partnership-to-accelerate-advancements-in-global-ai-infrastructure"
+    ]
+  },
+  {
+    "date": "2025-10-01 onward",
+    "amount": "unspecified",
+    "counterparties": [
+      "OpenAI",
+      "Samsung C&T",
+      "Samsung Heavy Industries"
+    ],
+    "relationship_type": "research collaboration",
+    "summary": "Parties agreed to explore global and floating AI data centers, floating power plants and control centers.",
+    "current_status_progress": "Exploratory; no committed deployed capacity or monetary consideration disclosed.",
+    "sources": [
+      "https://news.samsung.com/global/samsung-and-openai-announce-strategic-partnership-to-accelerate-advancements-in-global-ai-infrastructure"
+    ]
+  },
+  {
+    "date": "2025-10-01 onward",
+    "amount": "unspecified",
+    "counterparties": [
+      "OpenAI",
+      "SK Telecom"
+    ],
+    "relationship_type": "infrastructure deal",
+    "summary": "Partnership to explore an AI data center in Korea.",
+    "current_status_progress": "Exploratory/MoU-stage in the public announcement.",
+    "sources": [
+      "https://openai.com/index/samsung-and-sk-join-stargate/"
+    ]
+  },
+  {
+    "date": "2025-10-01 onward",
+    "amount": "unspecified",
+    "counterparties": [
+      "OpenAI",
+      "Korea Ministry of Science and ICT"
+    ],
+    "relationship_type": "partnership",
+    "summary": "MoU to evaluate AI-data-center development outside the Seoul metropolitan area.",
+    "current_status_progress": "Evaluation-stage government infrastructure partnership.",
+    "sources": [
+      "https://openai.com/index/samsung-and-sk-join-stargate/"
+    ]
+  },
+  {
+    "date": "2025-05-22 onward",
+    "amount": "approximately USD 30 billion reported for first 1 GW phase; original primary announcement did not specify this amount",
+    "counterparties": [
+      "OpenAI",
+      "G42",
+      "Oracle",
+      "NVIDIA",
+      "Cisco",
+      "SoftBank"
+    ],
+    "relationship_type": "infrastructure deal",
+    "summary": "Stargate UAE established a 1 GW Abu Dhabi compute cluster as the first phase of a larger UAE-US AI campus.",
+    "current_status_progress": "Active but broader 5 GW masterplan was reported in September 2026 as being redesigned for security and geographic distribution; first 1 GW phase expected to continue.",
+    "sources": [
+      "https://openai.com/index/introducing-stargate-uae/",
+      "https://aral.instap.net/reports?topic_id=22258815181252811"
+    ]
+  },
+  {
+    "date": "2025-07-31 to 2026-04",
+    "amount": "unspecified; original plan 230 MW with expansion ambition and target of 100,000 NVIDIA GPUs by end-2026",
+    "counterparties": [
+      "OpenAI",
+      "Nscale",
+      "Aker"
+    ],
+    "relationship_type": "infrastructure deal",
+    "summary": "Stargate Norway was announced with OpenAI as a prospective initial offtaker.",
+    "current_status_progress": "Cancelled by OpenAI in April 2026 according to Nscale S-1/Bloomberg reporting carried by Aral; Microsoft agreed to take over the Norway capacity.",
+    "sources": [
+      "https://openai.com/index/introducing-stargate-norway/",
+      "https://aral.instap.net/reports?topic_id=55521525825288524"
+    ]
+  },
+  {
+    "date": "2025-09-16 to 2026-04",
+    "amount": "unspecified; exploratory 8,000 GPUs with potential scaling to 31,000",
+    "counterparties": [
+      "OpenAI",
+      "Nscale",
+      "NVIDIA"
+    ],
+    "relationship_type": "infrastructure deal",
+    "summary": "Stargate UK announcement contemplated OpenAI GPU offtake from Nscale infrastructure.",
+    "current_status_progress": "OpenAI cancelled the Nscale UK plan in April 2026 according to Nscale S-1/Bloomberg reporting carried by Aral; Google was reportedly positioned as replacement.",
+    "sources": [
+      "https://openai.com/index/introducing-stargate-uk/",
+      "https://aral.instap.net/reports?topic_id=55521525825288524"
+    ]
+  },
+  {
+    "date": "2026-02-02 onward",
+    "amount": "USD 200 million multi-year",
+    "counterparties": [
+      "OpenAI",
+      "Snowflake"
+    ],
+    "relationship_type": "partnership",
+    "summary": "Multi-year enterprise AI partnership integrating OpenAI capabilities into Snowflake's data platform.",
+    "current_status_progress": "Active according to the existing Model Lab Network baseline.",
+    "sources": [
+      "https://reports.instap.net/data/model-lab-network.json"
+    ]
+  },
+  {
+    "date": "2023 to 2026-10-06",
+    "amount": "unspecified",
+    "counterparties": [
+      "OpenAI",
+      "Atlassian"
+    ],
+    "relationship_type": "partnership",
+    "summary": "Long-running enterprise partnership expanded in October 2026 across Atlassian products, Rovo, ChatGPT Enterprise and Codex.",
+    "current_status_progress": "Active and expanded; more than 3,000 Atlassian developers were reported using Codex.",
+    "sources": [
+      "https://openai.com/index/atlassian-partnership/"
+    ]
+  },
+  {
+    "date": "2024-06-10 onward",
+    "amount": "unspecified",
+    "counterparties": [
+      "OpenAI",
+      "Apple"
+    ],
+    "relationship_type": "partnership",
+    "summary": "Apple integrated ChatGPT into iOS, iPadOS and macOS, including Siri and Writing Tools.",
+    "current_status_progress": "Product-distribution/integration relationship; no disclosed capital consideration in the primary announcement.",
+    "sources": [
+      "https://openai.com/index/openai-and-apple-announce-partnership/"
+    ]
+  },
+  {
+    "date": "2026-08-18 onward",
+    "amount": "unspecified",
+    "counterparties": [
+      "OpenAI",
+      "CodeAI",
+      "Code.org"
+    ],
+    "relationship_type": "partnership",
+    "summary": "AI-literacy partnership supporting students and educators through advisory, Hour of AI and Builders Challenge initiatives.",
+    "current_status_progress": "Active program announced for the following year.",
+    "sources": [
+      "https://openai.com/index/partnering-with-codeai/"
+    ]
+  },
+  {
+    "date": "2023-07-13 onward",
+    "amount": "undisclosed",
+    "counterparties": [
+      "OpenAI",
+      "Associated Press"
+    ],
+    "relationship_type": "licensing",
+    "summary": "AP licensed portions of its text archive to OpenAI while gaining access to OpenAI technology.",
+    "current_status_progress": "No public termination identified in this review.",
+    "sources": [
+      "https://www.ap.org/media-center/press-releases/2023/ap-open-ai-agree-to-share-select-news-content-and-technology-in-new-collaboration/"
+    ]
+  },
+  {
+    "date": "2023-12-13 onward",
+    "amount": "undisclosed",
+    "counterparties": [
+      "OpenAI",
+      "Axel Springer"
+    ],
+    "relationship_type": "licensing",
+    "summary": "Global content and technology partnership covering brands including POLITICO, Business Insider, BILD and WELT.",
+    "current_status_progress": "Multi-year strategic content relationship; no public termination identified.",
+    "sources": [
+      "https://www.axelspringer.com/en/ax-press-release/axel-springer-and-openai-partner-to-deepen-beneficial-use-of-ai-in-journalism"
+    ]
+  },
+  {
+    "date": "2024-03-13 onward",
+    "amount": "undisclosed",
+    "counterparties": [
+      "OpenAI",
+      "Le Monde",
+      "Prisa Media"
+    ],
+    "relationship_type": "licensing",
+    "summary": "Content partnerships provide attributed publisher material in ChatGPT and support model training.",
+    "current_status_progress": "No public termination identified in this review.",
+    "sources": [
+      "https://openai.com/index/global-news-partnerships-le-monde-and-prisa-media/"
+    ]
+  },
+  {
+    "date": "2024-04-29 onward",
+    "amount": "undisclosed",
+    "counterparties": [
+      "OpenAI",
+      "Financial Times"
+    ],
+    "relationship_type": "licensing",
+    "summary": "Strategic licensing and product-development partnership with attribution and links to FT content.",
+    "current_status_progress": "Ongoing multi-dimensional publisher and enterprise relationship unless otherwise terminated.",
+    "sources": [
+      "https://aboutus.ft.com/press_release/financial-times-announces-strategic-partnership-with-openai"
+    ]
+  },
+  {
+    "date": "2024-05 onward",
+    "amount": "undisclosed",
+    "counterparties": [
+      "OpenAI",
+      "Reddit"
+    ],
+    "relationship_type": "licensing",
+    "summary": "OpenAI received access to Reddit's real-time structured content through its Data API; Reddit gained OpenAI-powered capabilities and OpenAI became an advertising partner.",
+    "current_status_progress": "Strategic data/product relationship; no termination identified in this review.",
+    "sources": [
+      "https://www.redditinc.com/blog/reddit-and-openai-build-partnership"
+    ]
+  },
+  {
+    "date": "2024-05-22 onward",
+    "amount": "undisclosed",
+    "counterparties": [
+      "OpenAI",
+      "News Corp"
+    ],
+    "relationship_type": "licensing",
+    "summary": "Multi-year agreement permits use of current and archival content from major News Corp publications in OpenAI products.",
+    "current_status_progress": "Multi-year relationship; no public termination identified.",
+    "sources": [
+      "https://openai.com/index/news-corp-and-openai-sign-landmark-multi-year-global-partnership/"
+    ]
+  },
+  {
+    "date": "2024-05-29 onward",
+    "amount": "undisclosed",
+    "counterparties": [
+      "OpenAI",
+      "The Atlantic"
+    ],
+    "relationship_type": "licensing",
+    "summary": "Content and product partnership involving discoverability, attribution and publisher experimentation with OpenAI technology.",
+    "current_status_progress": "No public termination identified.",
+    "sources": [
+      "https://www.theatlantic.com/press-releases/archive/2024/05/atlantic-and-openai-announce-strategic-content-product-partnership/678558/"
+    ]
+  },
+  {
+    "date": "2024-05-29 onward",
+    "amount": "undisclosed",
+    "counterparties": [
+      "OpenAI",
+      "Vox Media"
+    ],
+    "relationship_type": "licensing",
+    "summary": "Strategic partnership allows OpenAI to use Vox archives to enhance ChatGPT while Vox uses OpenAI technology in publishing products.",
+    "current_status_progress": "No public termination identified.",
+    "sources": [
+      "https://www.voxmedia.com/2024/5/29/24167472/vox-media-and-openai-form-strategic-content-and-product-partnership"
+    ]
+  },
+  {
+    "date": "2024-06-27 onward",
+    "amount": "undisclosed",
+    "counterparties": [
+      "OpenAI",
+      "TIME"
+    ],
+    "relationship_type": "licensing",
+    "summary": "Multi-year agreement provides OpenAI access to TIME's current content and historical archive for attributed responses.",
+    "current_status_progress": "Multi-year relationship; no public termination identified.",
+    "sources": [
+      "https://openai.com/index/time-and-openai-announce-strategic-content-partnership/"
+    ]
+  },
+  {
+    "date": "2024-08-20 onward",
+    "amount": "undisclosed",
+    "counterparties": [
+      "OpenAI",
+      "Condé Nast"
+    ],
+    "relationship_type": "licensing",
+    "summary": "OpenAI products may surface attributed content from Condé Nast brands.",
+    "current_status_progress": "No public termination identified.",
+    "sources": [
+      "https://openai.com/index/conde-nast/"
+    ]
+  },
+  {
+    "date": "2024-10-08 onward",
+    "amount": "undisclosed",
+    "counterparties": [
+      "OpenAI",
+      "Hearst"
+    ],
+    "relationship_type": "licensing",
+    "summary": "Content partnership covers more than 20 magazine brands and more than 40 newspapers.",
+    "current_status_progress": "No public termination identified.",
+    "sources": [
+      "https://www.hearst.com/-/hearst-and-openai-announce-strategic-content-partnership"
+    ]
+  },
+  {
+    "date": "2024-12-04 onward",
+    "amount": "undisclosed",
+    "counterparties": [
+      "OpenAI",
+      "Future plc"
+    ],
+    "relationship_type": "licensing",
+    "summary": "Strategic content partnership covers Future's portfolio of more than 200 media brands.",
+    "current_status_progress": "No public termination identified.",
+    "sources": [
+      "https://openai.com/index/future-partnership/"
+    ]
+  },
+  {
+    "date": "2025-02-10 onward",
+    "amount": "undisclosed",
+    "counterparties": [
+      "OpenAI",
+      "Schibsted Media"
+    ],
+    "relationship_type": "licensing",
+    "summary": "Content from major Scandinavian news brands is made available for attributed ChatGPT experiences.",
+    "current_status_progress": "No public termination identified.",
+    "sources": [
+      "https://openai.com/index/schibsted-media-partnership/"
+    ]
+  },
+  {
+    "date": "2023-07-18 onward",
+    "amount": "USD 5 million cash grant plus up to USD 5 million of API credits",
+    "counterparties": [
+      "OpenAI",
+      "American Journalism Project"
+    ],
+    "relationship_type": "grant",
+    "summary": "OpenAI funded experimentation and tooling for AI in local journalism.",
+    "current_status_progress": "Programmatic grant relationship.",
+    "sources": [
+      "https://www.theajp.org/news-insights/press-releases/openai-commits-5-million-to-the-american-journalism-project-to-support-ai-powered-local-news/"
+    ]
+  },
+  {
+    "date": "2026-09-28 onward",
+    "amount": "USD 5 million commitment plus up to USD 5 million in software credits and engineering support",
+    "counterparties": [
+      "OpenAI",
+      "Lenfest Institute",
+      "Lenfest AI Collaborative"
+    ],
+    "relationship_type": "grant",
+    "summary": "OpenAI expanded support for journalism-focused AI development and fellowships.",
+    "current_status_progress": "Active newly expanded program.",
+    "sources": [
+      "https://openai.com/index/lenfest-ai-collaborative-expansion/"
+    ]
+  },
+  {
+    "date": "2024-07-10 onward",
+    "amount": "unspecified",
+    "counterparties": [
+      "OpenAI",
+      "Los Alamos National Laboratory"
+    ],
+    "relationship_type": "research collaboration",
+    "summary": "Joint bioscience safety research evaluates multimodal frontier-model effects in physical laboratory tasks.",
+    "current_status_progress": "Research collaboration later broadened through the U.S. National Laboratories agreement.",
+    "sources": [
+      "https://openai.com/index/openai-and-los-alamos-national-laboratory-work-together/"
+    ]
+  },
+  {
+    "date": "2025-01-30 onward",
+    "amount": "unspecified",
+    "counterparties": [
+      "OpenAI",
+      "Los Alamos National Laboratory",
+      "Lawrence Livermore National Laboratory",
+      "Sandia National Laboratories",
+      "Microsoft"
+    ],
+    "relationship_type": "research collaboration",
+    "summary": "OpenAI agreed to make reasoning models available to approximately 15,000 national-lab scientists, including deployment on the Venado NVIDIA supercomputer.",
+    "current_status_progress": "Expanded public-sector scientific and national-security collaboration.",
+    "sources": [
+      "https://openai.com/index/strengthening-americas-ai-leadership-with-the-us-national-laboratories/"
+    ]
+  },
+  {
+    "date": "2023-08-16",
+    "amount": "unspecified",
+    "counterparties": [
+      "OpenAI",
+      "Global Illumination"
+    ],
+    "relationship_type": "acquisition",
+    "summary": "OpenAI acquired Global Illumination and its team joined OpenAI.",
+    "current_status_progress": "Completed and integrated.",
+    "sources": [
+      "https://openai.com/index/openai-acquires-global-illumination/"
+    ]
+  },
+  {
+    "date": "2024-06-21",
+    "amount": "unspecified",
+    "counterparties": [
+      "OpenAI",
+      "Rockset"
+    ],
+    "relationship_type": "acquisition",
+    "summary": "OpenAI acquired real-time analytics database company Rockset to strengthen retrieval infrastructure.",
+    "current_status_progress": "Completed; Rockset team joined OpenAI and technology was slated for product integration.",
+    "sources": [
+      "https://openai.com/index/openai-acquires-rockset/"
+    ]
+  },
+  {
+    "date": "2025-05-21 to 2025-07-09",
+    "amount": "unspecified in primary source",
+    "counterparties": [
+      "OpenAI",
+      "io Products",
+      "Jony Ive",
+      "LoveFrom"
+    ],
+    "relationship_type": "acquisition",
+    "summary": "io Products' team merged into OpenAI; Jony Ive and LoveFrom remained independent while taking a deep design role across OpenAI.",
+    "current_status_progress": "io team integrated; LoveFrom relationship remains collaborative rather than acquired.",
+    "sources": [
+      "https://openai.com/sam-and-jony/"
+    ]
+  },
+  {
+    "date": "2025-09-02",
+    "amount": "unspecified in primary announcement",
+    "counterparties": [
+      "OpenAI",
+      "Statsig"
+    ],
+    "relationship_type": "acquisition",
+    "summary": "OpenAI announced the acquisition of Statsig and planned for founder Vijaye Raji to become CTO of Applications.",
+    "current_status_progress": "Transaction was announced subject to approval; later closing was not separately re-verified in this research pass.",
+    "sources": [
+      "https://openai.com/index/vijaye-raji-to-become-cto-of-applications-with-acquisition-of-statsig/"
+    ]
+  },
+  {
+    "date": "2025-10-23",
+    "amount": "unspecified",
+    "counterparties": [
+      "OpenAI",
+      "Software Applications Incorporated",
+      "Sky"
+    ],
+    "relationship_type": "acquisition",
+    "summary": "OpenAI acquired Software Applications Incorporated, maker of the Sky natural-language Mac interface.",
+    "current_status_progress": "Completed; team joined OpenAI. OpenAI disclosed a passive investment by a fund associated with Sam Altman and independent board approval.",
+    "sources": [
+      "https://openai.com/index/openai-acquires-software-applications-incorporated/"
+    ]
+  },
+  {
+    "date": "2025-12-03",
+    "amount": "unspecified",
+    "counterparties": [
+      "OpenAI",
+      "Neptune.ai"
+    ],
+    "relationship_type": "acquisition",
+    "summary": "OpenAI entered a definitive agreement to acquire Neptune after collaborating on frontier-training experiment tooling.",
+    "current_status_progress": "Integration into OpenAI's training stack was planned; later closing status was not separately re-verified.",
+    "sources": [
+      "https://openai.com/index/openai-to-acquire-neptune/"
+    ]
+  },
+  {
+    "date": "2026-03-09",
+    "amount": "unspecified",
+    "counterparties": [
+      "OpenAI",
+      "Promptfoo"
+    ],
+    "relationship_type": "acquisition",
+    "summary": "OpenAI announced acquisition of Promptfoo to expand security and evaluation capabilities.",
+    "current_status_progress": "Announcement-stage transaction in the primary source reviewed.",
+    "sources": [
+      "https://openai.com/index/openai-to-acquire-promptfoo/"
+    ]
+  },
+  {
+    "date": "2026-03-19",
+    "amount": "unspecified",
+    "counterparties": [
+      "OpenAI",
+      "Astral"
+    ],
+    "relationship_type": "acquisition",
+    "summary": "OpenAI agreed to acquire Astral and integrate its Python developer tooling with Codex.",
+    "current_status_progress": "Primary announcement says closing remains subject to customary conditions and regulatory approval; no later closing confirmation was identified.",
+    "sources": [
+      "https://openai.com/index/openai-to-acquire-astral/"
+    ]
+  },
+  {
+    "date": "2026-06-11",
+    "amount": "unspecified",
+    "counterparties": [
+      "OpenAI",
+      "Ona"
+    ],
+    "relationship_type": "acquisition",
+    "summary": "OpenAI agreed to acquire Ona's secure cloud execution and orchestration technology for Codex.",
+    "current_status_progress": "At announcement, closing was subject to customary conditions and regulatory approvals and the companies remained independent until close.",
+    "sources": [
+      "https://openai.com/index/openai-to-acquire-ona/"
+    ]
+  },
+  {
+    "date": "current as of 2026-10-08",
+    "amount": "none",
+    "counterparties": [
+      "OpenAI",
+      "Bret Taylor",
+      "Sierra"
+    ],
+    "relationship_type": "board overlap",
+    "summary": "Bret Taylor is Chair of OpenAI's board and co-founder of Sierra.",
+    "current_status_progress": "Current governance/people overlap; no commercial OpenAI-Sierra relationship should be inferred solely from the shared individual.",
+    "sources": [
+      "https://openai.com/our-structure/",
+      "https://sierra.ai/author/bret-taylor"
+    ]
+  },
+  {
+    "date": "as of 2026-10-08",
+    "amount": "none",
+    "counterparties": [
+      "OpenAI",
+      "Anthropic"
+    ],
+    "relationship_type": "other",
+    "summary": "No verifiable current corporate relationship found. Historical people lineage exists because Anthropic was founded by former OpenAI personnel, but no current OpenAI-Anthropic investment, contract, partnership, licensing or infrastructure deal was verified.",
+    "current_status_progress": "Competitors with separate infrastructure/deployment strategies.",
+    "sources": [
+      "https://www.anthropic.com/news/anthropic-invests-50-billion-in-american-ai-infrastructure"
+    ]
+  },
+  {
+    "date": "as of 2026-10-08",
+    "amount": "none",
+    "counterparties": [
+      "OpenAI",
+      "TeraWulf"
+    ],
+    "relationship_type": "other",
+    "summary": "no verifiable relationship found",
+    "current_status_progress": "TeraWulf's verified frontier-model relationship is with Anthropic, including a 20-year Justified campus lease, not OpenAI.",
+    "sources": [
+      "https://investors.terawulf.com/news-events/press-releases/detail/142/terawulf-announces-anthropic-lease-at-justified-data-campus-and-sale-of-majority-interest-in-abernathy-joint-venture-to-fluidstack"
+    ]
+  },
+  {
+    "date": "as of 2026-10-08",
+    "amount": "none",
+    "counterparties": [
+      "OpenAI",
+      "Hut 8"
+    ],
+    "relationship_type": "other",
+    "summary": "no verifiable relationship found",
+    "current_status_progress": "Hut 8's River Bend AI infrastructure relationship is with Fluidstack/Anthropic; no OpenAI counterparty was identified.",
+    "sources": [
+      "https://www.hut8.com/news-insights/press-releases/hut-8-announces-ai-infrastructure-partnership-with-anthropic-and-fluidstack"
+    ]
+  }
+]
