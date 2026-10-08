@@ -695,3 +695,19 @@
     display: none;
   }
 }
+
+/* Model Lab research appendix and machine-readable content links. */
+.model-lab-access { display: flex; flex-wrap: wrap; gap: 12px 24px; padding: 16px; border: 1px solid var(--color-border); border-radius: 12px; margin-bottom: 16px; }
+.model-lab-access a { color: var(--color-accent, #60a5fa); font-size: 14px; }
+.model-lab-frame { width: 100%; border: 0; display: block; }
+.model-lab-research { margin-top: 40px; line-height: 1.85; overflow-wrap: anywhere; scroll-margin-top: 80px; }
+.model-lab-research h1 { font-size: clamp(24px, 4vw, 36px); }
+.model-lab-research h2 { margin-top: 40px; font-size: 25px; }
+.model-lab-research h3 { margin-top: 28px; font-size: 20px; }
+.model-lab-research p { margin: 16px 0; }
+.model-lab-research a { color: #60a5fa; }
+.model-lab-research table { display: block; overflow-x: auto; border-collapse: collapse; width: 100%; font-size: 14px; }
+.model-lab-research th, .model-lab-research td { border: 1px solid #334155; padding: 10px 14px; min-width: 110px; text-align: left; vertical-align: top; }
+.model-lab-research th { background: #1e293b; }
+.model-lab-research pre { padding: 20px; overflow-x: auto; background: #0b1220; border-radius: 10px; line-height: 1.6; }
+.model-lab-provenance { padding: 16px 20px; border-left: 3px solid #60a5fa; background: #1e293b; font-size: 14px; color: #cbd5e1; }

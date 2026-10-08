@@ -151,3 +151,11 @@ Planet textures are from [Solar System Scope](https://www.solarsystemscope.com/t
 ## License
 
 Private - Instap Research
+
+### AI access through MCP
+
+The project now exports report text on every build and includes a read-only MCP
+server with `list_reports`, `read_report`, and `get_report_data`. See
+[mcp/README.md](mcp/README.md) for client configuration and HTTP deployment.
+Model Lab Network exports its complete research and network; other reports reuse
+existing rendered content and data with explicit coverage labels.

@@ -25,7 +25,7 @@ echo -e "${YELLOW}=== Syncing to server ===${NC}"
 # history the cron accumulates server-side (it is created/owned by the cron, seeded
 # once via scp). The yearly metals-prices.json is intentionally NOT excluded — it
 # self-heals on the next hourly update.
-rsync -avz --delete --chmod=D755,F644 \
+rsync -avz --delete --chmod=u=rwX,go=rX \
   --exclude '.git' \
   --exclude '.DS_Store' \
   --exclude 'node_modules' \
@@ -34,7 +34,7 @@ rsync -avz --delete --chmod=D755,F644 \
   "$BUILD_DIR/" "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/"
 
 echo -e "${YELLOW}=== Syncing monitoring scripts ===${NC}"
-rsync -avz --chmod=D755,F644 \
+rsync -avz --chmod=u=rwX,go=rX \
   scripts/cosco_vlcc_orders.py \
   scripts/cosco_price_ratio.py \
   scripts/requirements.txt \
@@ -43,17 +43,28 @@ rsync -avz --chmod=D755,F644 \
 echo -e "${YELLOW}=== Syncing metals price scripts ===${NC}"
 # Keep the daily-price pipeline on the server in sync (the hourly cron runs
 # update-prices.js; backfill-daily.mjs is run manually to seed/enrich history).
-rsync -avz --chmod=D755,F644 \
+rsync -avz --chmod=u=rwX,go=rX \
   scripts/update-prices.js \
   scripts/backfill-daily.mjs \
   "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/scripts/"
-rsync -avz --chmod=D755,F644 \
+rsync -avz --chmod=u=rwX,go=rX \
   scripts/lib/ \
   "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/scripts/lib/"
 
 echo -e "${YELLOW}=== Updating Python deps ===${NC}"
 ssh "$REMOTE_USER@$REMOTE_HOST" \
   "cd $REMOTE_PATH/scripts && .venv/bin/pip install -q -r requirements.txt 2>&1 | tail -1"
+
+# The MCP catalog is read at startup, so restart an already configured service
+# after publishing new text exports. First installation remains explicit.
+if ssh "$REMOTE_USER@$REMOTE_HOST" "test -f /etc/systemd/system/instap-reports-mcp.service"; then
+  echo -e "${YELLOW}=== Updating research MCP service ===${NC}"
+  rsync -avz --chmod=u=rwX,go=rX \
+    mcp/server.mjs mcp/content.mjs mcp/package.json mcp/package-lock.json \
+    "$REMOTE_USER@$REMOTE_HOST:/var/www/instap-reports-mcp/"
+  ssh "$REMOTE_USER@$REMOTE_HOST" \
+    "cd /var/www/instap-reports-mcp && npm ci --omit=dev --ignore-scripts && sudo -n systemctl restart instap-reports-mcp"
+fi
 
 echo -e "${GREEN}=== Deployment complete ===${NC}"
 echo -e "Visit: https://reports.instap.net"

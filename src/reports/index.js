@@ -6,6 +6,16 @@
 
 export const reports = [
   {
+    slug: '2026-10-model-lab-network',
+    title: 'Model lab关系图',
+    description: '六家模型组织的资本、算力与全球基础设施网络；新增 Anthropic–TeraWulf、Hut 8、Lambda、Nscale、Akamai 关系及完整研究稿，区分合同金额、建设容量和已投运资产。',
+    date: '2026-10-08',
+    type: 'visualization',
+    category: 'viz',
+    tags: ['AI Infrastructure', 'Anthropic', 'OpenAI', 'Network', 'Map'],
+    component: () => import('./2026-10-model-lab-network/index.jsx'),
+  },
+  {
     slug: '2026-07-nvidia-memory-profit-pool',
     title: 'NVIDIA 与全球存储利润池：HBM 引爆、全品类 ASP 放大与 2027 情景框架',
     description:

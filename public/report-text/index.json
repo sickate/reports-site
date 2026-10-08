@@ -1,0 +1,480 @@
+{
+  "schemaVersion": 1,
+  "reports": [
+    {
+      "slug": "2026-10-model-lab-network",
+      "title": "Model lab关系图",
+      "description": "六家模型组织的资本、算力与全球基础设施网络；新增 Anthropic–TeraWulf、Hut 8、Lambda、Nscale、Akamai 关系及完整研究稿，区分合同金额、建设容量和已投运资产。",
+      "date": "2026-10-08",
+      "tags": [
+        "AI Infrastructure",
+        "Anthropic",
+        "OpenAI",
+        "Network",
+        "Map"
+      ],
+      "category": "viz",
+      "url": "https://reports.instap.net/reports/2026-10-model-lab-network",
+      "textPath": "/report-text/2026-10-model-lab-network.md",
+      "coverage": "complete-research-and-network-data",
+      "dataPaths": [
+        "/data/model-lab-network.json",
+        "/data/model-lab-world.geojson",
+        "/research-topics/model-lab-network/index.html",
+        "/research-topics/model-lab-network/research.md"
+      ],
+      "textLength": 100329
+    },
+    {
+      "slug": "2026-07-nvidia-memory-profit-pool",
+      "title": "NVIDIA 与全球存储利润池：HBM 引爆、全品类 ASP 放大与 2027 情景框架",
+      "description": "按实际值、初步业绩、公司指引、外部预测、模型与情景分层，统一比较 NVIDIA、Samsung、SK hynix 与 Micron 的 CY2026 营业利润区间；可视化 HBM 市场边界、存储周期传导、2027 三情景和 ASP 跟踪框架。",
+      "date": "2026-07-15",
+      "tags": [
+        "Research Topic",
+        "Semiconductor",
+        "NVIDIA",
+        "Memory",
+        "HBM",
+        "Profit Pool"
+      ],
+      "category": "industry",
+      "url": "https://reports.instap.net/reports/2026-07-nvidia-memory-profit-pool",
+      "textPath": "/report-text/2026-07-nvidia-memory-profit-pool.md",
+      "coverage": "rendered-initial-view-and-existing-data",
+      "dataPaths": [],
+      "textLength": 19339
+    },
+    {
+      "slug": "2026-06-metals-ytd",
+      "title": "Metals Momentum：13 种金属的 YTD 与滚动一年价格趋势",
+      "description": "复用 50 年金属数据架构、按日累积的短周期视图：YTD 与滚动 12 个月两种模式（共用整年横轴，未来留空），含归一化 %涨跌合图与每种金属的价格小卡片，并按数据频率（日/月/低频）如实标注。",
+      "date": "2026-06-12",
+      "tags": [
+        "Commodities",
+        "Metals",
+        "YTD",
+        "Momentum",
+        "Data Visualization"
+      ],
+      "category": "viz",
+      "url": "https://reports.instap.net/reports/2026-06-metals-ytd",
+      "textPath": "/report-text/2026-06-metals-ytd.md",
+      "coverage": "rendered-initial-view-and-existing-data",
+      "dataPaths": [
+        "/data/metals-daily.json",
+        "/data/metals-prices.json"
+      ],
+      "textLength": 422
+    },
+    {
+      "slug": "2026-05-faraday-rotator",
+      "title": "法拉第旋光片产业链深度解析",
+      "description": "AI 光模块时代的\"光学单向阀\"：BiRIG/YIG vs TGG/TSAG 四种磁光晶体路线、Coherent + Granopt 双寡头格局裂解、稀土反制下的国产替代窗口与 A 股横向比较表（福晶 / 东田微 / 长飞 / 隆华）。",
+      "date": "2026-05-11",
+      "tags": [
+        "Research Topic",
+        "Optical",
+        "Faraday Rotator",
+        "光通信",
+        "稀土",
+        "产业链"
+      ],
+      "category": "industry",
+      "url": "https://reports.instap.net/reports/2026-05-faraday-rotator",
+      "textPath": "/report-text/2026-05-faraday-rotator.md",
+      "coverage": "rendered-initial-view-and-existing-data",
+      "dataPaths": [],
+      "textLength": 6883
+    },
+    {
+      "slug": "2026-05-wafer-foundries",
+      "title": "全球前十大晶圆代工与 IDM 制造版图：地点、产能与时间线",
+      "description": "基于 Knometa/IC Insights 2024 月度产能口径，可视化前十厂商 ~55 个 fab/site 的全球分布、产能聚合与 2025–2030 关键项目时间线，覆盖 Samsung / TSMC / SK hynix / Micron / Kioxia-WD / UMC / Intel / TI / SMIC / Powerchip-Nexchip。",
+      "date": "2026-05-07",
+      "tags": [
+        "Research Topic",
+        "Semiconductor",
+        "Foundry",
+        "Manufacturing",
+        "Map"
+      ],
+      "category": "viz",
+      "url": "https://reports.instap.net/reports/2026-05-wafer-foundries",
+      "textPath": "/report-text/2026-05-wafer-foundries.md",
+      "coverage": "rendered-initial-view-and-existing-data",
+      "dataPaths": [
+        "/research-topics/wafer-foundries-2026.html"
+      ],
+      "textLength": 5215
+    },
+    {
+      "slug": "2026-05-google-alphabet",
+      "title": "Alphabet Q1 2026 财报跟踪：CapEx 周期顶部、Cloud Backlog 5x 跃迁与回购暂停",
+      "description": "按 11 模块跟踪模板落地的 Alphabet (GOOG) Q1 2026 投研页：8 张 KPI 卡 + 6 组季度趋势图，含 CapEx 指引演变、Cloud RPO $467.6B 跃迁、Q1 2026 回购首次归零、SOTP 拆分与分析师目标价对照。",
+      "date": "2026-05-03",
+      "tags": [
+        "投资分析",
+        "Tech",
+        "Alphabet",
+        "GOOG",
+        "AI Capex",
+        "Cloud"
+      ],
+      "category": "company",
+      "url": "https://reports.instap.net/reports/2026-05-google-alphabet",
+      "textPath": "/report-text/2026-05-google-alphabet.md",
+      "coverage": "rendered-initial-view-and-existing-data",
+      "dataPaths": [],
+      "textLength": 62241
+    },
+    {
+      "slug": "2026-05-xingye-yinxi",
+      "title": "兴业银锡：26 年看银，27 年看利润回归后的韧性",
+      "description": "整合两份兴业银锡研究稿，并将银价/锡价接到 metals 页面同一数据源，动态估算 2026E 营收、利润与当前价格对应 PE。",
+      "date": "2026-05-03",
+      "tags": [
+        "投资分析",
+        "Mining",
+        "Silver",
+        "Tin",
+        "兴业银锡"
+      ],
+      "category": "company",
+      "url": "https://reports.instap.net/reports/2026-05-xingye-yinxi",
+      "textPath": "/report-text/2026-05-xingye-yinxi.md",
+      "coverage": "rendered-initial-view-and-existing-data",
+      "dataPaths": [],
+      "textLength": 5427
+    },
+    {
+      "slug": "2026-04-neocloud-sector",
+      "title": "Neocloud 板块反推估值全景：7 家公司隐含预期与安全边际",
+      "description": "反推估值框架下的 NBIS / CRWV / WULF / APLD / IREN / CIFR / CLSK 横评，含 Backlog 风险调整、Implied CAGR 反推与 NBIS $146 红队专项检验。",
+      "date": "2026-04-25",
+      "tags": [
+        "投资分析",
+        "Neocloud",
+        "AI Infrastructure",
+        "NBIS",
+        "CoreWeave"
+      ],
+      "category": "industry",
+      "url": "https://reports.instap.net/reports/2026-04-neocloud-sector",
+      "textPath": "/report-text/2026-04-neocloud-sector.md",
+      "coverage": "rendered-initial-view-and-existing-data",
+      "dataPaths": [],
+      "textLength": 34918
+    },
+    {
+      "slug": "2026-04-high-voltage-platform",
+      "title": "800V 高压平台升级：从四种定价方式到产业链映射",
+      "description": "围绕 800V 电动车 / 高压平台升级，先解释四种市场定价方式，再按功率器件、模拟控制、系统架构三层重排海外与 A 股映射。",
+      "date": "2026-04-21",
+      "tags": [
+        "Research Topic",
+        "EV",
+        "800V",
+        "Power Electronics",
+        "高压平台"
+      ],
+      "category": "industry",
+      "url": "https://reports.instap.net/reports/2026-04-high-voltage-platform",
+      "textPath": "/report-text/2026-04-high-voltage-platform.md",
+      "coverage": "rendered-initial-view-and-existing-data",
+      "dataPaths": [],
+      "textLength": 4844
+    },
+    {
+      "slug": "2026-04-commercial-space",
+      "title": "商业航天：可复用火箭爆炸图与催化时间轴",
+      "description": "围绕长征十号乙、海上网捕、朱雀三号与 SpaceX/蓝箭资本化预期整理的商业航天专题页，含发射环节爆炸图和 2026 年催化时间轴。",
+      "date": "2026-04-21",
+      "tags": [
+        "Research Topic",
+        "Commercial Space",
+        "Rocket",
+        "SpaceX",
+        "商业航天"
+      ],
+      "category": "industry",
+      "url": "https://reports.instap.net/reports/2026-04-commercial-space",
+      "textPath": "/report-text/2026-04-commercial-space.md",
+      "coverage": "rendered-initial-view-and-existing-data",
+      "dataPaths": [],
+      "textLength": 5484
+    },
+    {
+      "slug": "2026-04-elon-musk-factories",
+      "title": "Elon Musk 全球制造基地分布图",
+      "description": "整合 Tesla 与 SpaceX 主要制造基地的全球地图，覆盖工厂位置、状态、类型、产能与备注口径。",
+      "date": "2026-04-21",
+      "tags": [
+        "Research Topic",
+        "Tesla",
+        "SpaceX",
+        "Manufacturing",
+        "Map"
+      ],
+      "category": "viz",
+      "url": "https://reports.instap.net/reports/2026-04-elon-musk-factories",
+      "textPath": "/report-text/2026-04-elon-musk-factories.md",
+      "coverage": "rendered-initial-view-and-existing-data",
+      "dataPaths": [
+        "/data/elon-musk-global-factories.csv",
+        "/research-topics/elon-musk-global-factories.html"
+      ],
+      "textLength": 829
+    },
+    {
+      "slug": "2026-04-optical-value-chain",
+      "title": "光通信产业链：价值捕获点与验证深度图谱",
+      "description": "按价值捕获点、供给卡点与验证深度重排的光通信产业链页面，覆盖光纤、器件、光源、模块、设备、光引擎与制造装备。",
+      "date": "2026-04-15",
+      "tags": [
+        "Research Topic",
+        "Optical",
+        "Supply Chain",
+        "AI Infrastructure",
+        "光通信"
+      ],
+      "category": "industry",
+      "url": "https://reports.instap.net/reports/2026-04-optical-value-chain",
+      "textPath": "/report-text/2026-04-optical-value-chain.md",
+      "coverage": "rendered-initial-view-and-existing-data",
+      "dataPaths": [
+        "/data/company-financials.jsonl"
+      ],
+      "textLength": 13754
+    },
+    {
+      "slug": "2026-04-global-lithium",
+      "title": "全球锂资源项目地图与数据库（2026）",
+      "description": "整合 44 个全球锂项目/集群的地图与数据库，覆盖产能、储量/资源、成本、运输路线与供给兑现风险；关键指标带出处信封。2026-08-11 刷新：锂价净变动约为零而锂股两周涨 6.5%–16%，本期拆解这次「预期重定价」，并修正津巴布韦出口政策与枧下窝复产两处口径。",
+      "date": "2026-08-11",
+      "tags": [
+        "Research Topic",
+        "Lithium",
+        "Mining",
+        "Supply Curve",
+        "锂"
+      ],
+      "category": "industry",
+      "url": "https://reports.instap.net/reports/2026-04-global-lithium",
+      "textPath": "/report-text/2026-04-global-lithium.md",
+      "coverage": "rendered-initial-view-and-existing-data",
+      "dataPaths": [
+        "/data/company-financials.jsonl",
+        "/data/global-lithium-database-2026.csv",
+        "/data/global-lithium-key-findings-2026.md",
+        "/data/global-lithium-market.json",
+        "/research-topics/global-lithium-projects-2026.html",
+        "/research-topics/global-lithium/README.md",
+        "/research-topics/global-lithium/data/columns.js",
+        "/research-topics/global-lithium/data/company-research.js",
+        "/research-topics/global-lithium/data/config.js",
+        "/research-topics/global-lithium/data/copy.js",
+        "/research-topics/global-lithium/data/csv.js",
+        "/research-topics/global-lithium/data/dictionaries.js",
+        "/research-topics/global-lithium/data/field-translations.js",
+        "/research-topics/global-lithium/data/gaps.js",
+        "/research-topics/global-lithium/data/listed-owners.js",
+        "/research-topics/global-lithium/data/market-schema.js",
+        "/research-topics/global-lithium/data/palette.js",
+        "/research-topics/global-lithium/data/regions.js",
+        "/research-topics/global-lithium/data/schema.js",
+        "/research-topics/global-lithium/index.html"
+      ],
+      "textLength": 1891
+    },
+    {
+      "slug": "2026-04-semiconductor-upstream",
+      "title": "半导体上游产业链关系图",
+      "description": "从材料、设备、零部件到晶圆厂的半导体上游图谱，含细分市场规模、代表公司与市场分布。",
+      "date": "2026-04-14",
+      "tags": [
+        "Research Topic",
+        "Semiconductor",
+        "Supply Chain",
+        "半导体"
+      ],
+      "category": "industry",
+      "url": "https://reports.instap.net/reports/2026-04-semiconductor-upstream",
+      "textPath": "/report-text/2026-04-semiconductor-upstream.md",
+      "coverage": "rendered-initial-view-and-existing-data",
+      "dataPaths": [
+        "/data/company-financials.jsonl",
+        "/data/semiconductor-upstream-company-exposures.jsonl",
+        "/data/semiconductor-upstream-subsegments.jsonl",
+        "/research-topics/semiconductor-upstream.html",
+        "/research-topics/semiconductor-upstream/README.md",
+        "/research-topics/semiconductor-upstream/data/company-finance.js",
+        "/research-topics/semiconductor-upstream/data/market-data.js",
+        "/research-topics/semiconductor-upstream/data/runtime-records.js",
+        "/research-topics/semiconductor-upstream/data/sections.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/equipment/advanced-packaging-equipment.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/equipment/ate.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/equipment/cleaning-equipment.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/equipment/cmp-equipment.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/equipment/deposition-equipment.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/equipment/etch-equipment.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/equipment/index.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/equipment/ion-implant.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/equipment/lithography-scanners.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/equipment/metrology-inspection.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/equipment/probers-handlers.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/equipment/track-systems.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/facilities/cleanroom-epc.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/facilities/exhaust-vacuum.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/facilities/gas-chemical-delivery.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/facilities/index.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/facilities/rf-power-matching.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/facilities/upw-systems.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/materials/abf-substrates.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/materials/advanced-packaging-polymers.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/materials/bonding-wires.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/materials/bt-substrates.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/materials/ceramic-fillers.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/materials/cmp-materials.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/materials/die-attach-materials.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/materials/electronic-gases.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/materials/index.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/materials/interconnect-solders.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/materials/leadframes.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/materials/lithography-ancillaries.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/materials/material-subsegment.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/materials/molding-compounds.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/materials/photomasks.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/materials/photoresist.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/materials/plating-chemicals.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/materials/rdl-dielectrics.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/materials/silicon-wafers.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/materials/solder-powders-alloys.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/materials/spherical-silica.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/materials/sputtering-targets.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/materials/temporary-bonding.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/materials/underfill-muf.js",
+        "/research-topics/semiconductor-upstream/data/subsegments/materials/wet-chemicals.js",
+        "/research-topics/semiconductor-upstream/index.html"
+      ],
+      "textLength": 138477
+    },
+    {
+      "slug": "2026-04-cosco-shipping-energy",
+      "title": "中远海能 H 股 (1138.HK) 深度投研 v4.0",
+      "description": "油运高盈利与供给拐点并存：结合集运纪要、VLCC/LNG 订单簿、最新 TCE 与公司业绩，重估空仓策略及再入场条件。",
+      "date": "2026-08-23",
+      "tags": [
+        "投资分析",
+        "航运",
+        "VLCC",
+        "LNG",
+        "地缘政治"
+      ],
+      "category": "company",
+      "url": "https://reports.instap.net/reports/2026-04-cosco-shipping-energy",
+      "textPath": "/report-text/2026-04-cosco-shipping-energy.md",
+      "coverage": "rendered-initial-view-and-existing-data",
+      "dataPaths": [
+        "/data/cosco-shipping-energy.json"
+      ],
+      "textLength": 16099
+    },
+    {
+      "slug": "2026-02-optical-communications",
+      "title": "光通信：AI数据中心的物理边界",
+      "description": "Morgan Stanley研报摘要：光通信从升级周期到架构迁移，五条增量赛道TAM估算，OCS/CPO技术解读，个股估值与关键争论。",
+      "date": "2026-02-24",
+      "tags": [
+        "投资分析",
+        "Optical",
+        "AI Infrastructure",
+        "光通信",
+        "CPO",
+        "OCS"
+      ],
+      "category": "industry",
+      "url": "https://reports.instap.net/reports/2026-02-optical-communications",
+      "textPath": "/report-text/2026-02-optical-communications.md",
+      "coverage": "rendered-initial-view-and-existing-data",
+      "dataPaths": [],
+      "textLength": 881
+    },
+    {
+      "slug": "2026-02-solar-system",
+      "title": "3D Solar System Simulator",
+      "description": "交互式3D太阳系模拟器，支持手势控制",
+      "date": "2026-02-04",
+      "tags": [
+        "3D",
+        "WebGL",
+        "Interactive",
+        "Space"
+      ],
+      "category": "viz",
+      "url": "https://reports.instap.net/reports/2026-02-solar-system",
+      "textPath": "/report-text/2026-02-solar-system.md",
+      "coverage": "rendered-initial-view-and-existing-data",
+      "dataPaths": [],
+      "textLength": 14448
+    },
+    {
+      "slug": "2026-02-zijin-mining",
+      "title": "紫金矿业深度分析",
+      "description": "紫金矿业 (2899.HK / 601899.SS) 投研分析：全球铜金龙头，AI时代的\"新石油\"供应商，央行购金浪潮的核心受益者。",
+      "date": "2026-02-03",
+      "tags": [
+        "投资分析",
+        "Mining",
+        "Commodities",
+        "铜",
+        "黄金"
+      ],
+      "category": "company",
+      "url": "https://reports.instap.net/reports/2026-02-zijin-mining",
+      "textPath": "/report-text/2026-02-zijin-mining.md",
+      "coverage": "rendered-initial-view-and-existing-data",
+      "dataPaths": [
+        "/data/company-financials.jsonl"
+      ],
+      "textLength": 21059
+    },
+    {
+      "slug": "2025-01-enigma-of-reason",
+      "title": "The Enigma of Reason",
+      "description": "Interactive book report on \"The Enigma of Reason\" by Hugo Mercier & Dan Sperber — exploring the argumentative theory of reasoning.",
+      "date": "2025-02-01",
+      "tags": [
+        "Cognitive Science",
+        "Psychology",
+        "Book Report"
+      ],
+      "category": "reading",
+      "url": "https://reports.instap.net/reports/2025-01-enigma-of-reason",
+      "textPath": "/report-text/2025-01-enigma-of-reason.md",
+      "coverage": "rendered-initial-view-and-existing-data",
+      "dataPaths": [],
+      "textLength": 15725
+    },
+    {
+      "slug": "2025-01-metals",
+      "title": "Metals Commodity Prices (1975-2025)",
+      "description": "50-year historical data analysis of 8 major metals including gold, silver, copper, and more.",
+      "date": "2025-01-22",
+      "tags": [
+        "Commodities",
+        "Metals",
+        "Data Visualization"
+      ],
+      "category": "viz",
+      "url": "https://reports.instap.net/reports/2025-01-metals",
+      "textPath": "/report-text/2025-01-metals.md",
+      "coverage": "rendered-initial-view-and-existing-data",
+      "dataPaths": [
+        "/data/metals-daily.json",
+        "/data/metals-prices.json"
+      ],
+      "textLength": 446
+    }
+  ]
+}
