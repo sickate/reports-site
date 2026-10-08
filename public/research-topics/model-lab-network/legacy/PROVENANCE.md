@@ -32,3 +32,7 @@ OpenAI research integration (2026-10-08): report configuration adds content
 licensing, grants, research and governance relationship types and a cancelled
 status. Cancelled edges use faint dotted lines. Canonical content is still
 maintained in JSON and the authored research Markdown, not in vendor code.
+
+Site status rendering now uses a neutral fallback for unrecognized states,
+so the map, tooltips and selected-company details continue rendering even
+if a future site record contains an unsupported status.

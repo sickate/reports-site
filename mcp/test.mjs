@@ -45,6 +45,11 @@ test('all reports export existing content; network references are valid', async 
   assert.equal(ids.size, data.entities.length);
   assert.equal(data.entities.filter(e => e.name === 'TeraWulf').length, 1);
   assert.equal(new Set(data.relations.map(r=>r.id)).size, data.relations.length);
+  for (const site of data.sites) {
+    assert.ok(['planned', 'construction', 'operational'].includes(site.status), site.id + ': ' + site.status);
+    for (const id of [...site.entities, ...site.labs]) assert.ok(ids.has(id), site.id + ':' + id);
+    for (const id of site.sources) assert.ok(sources.has(id), site.id + ':' + id);
+  }
   for (const r of data.relations) {
     assert.ok(ids.has(r.source), r.id); assert.ok(ids.has(r.target), r.id);
     for (const s of r.sources) assert.ok(sources.has(s), r.id + ':' + s);
