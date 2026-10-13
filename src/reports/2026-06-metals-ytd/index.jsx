@@ -102,8 +102,16 @@ function MetalsMomentum() {
       color: METAL_CONFIG[id]?.color || dailyMetals[id].color,
       unit: dailyMetals[id].unit,
       frequency: dailyMetals[id].frequency || 'daily',
+      frequencyLabel: dailyMetals[id].frequencyLabel,
+      benchmarkLabel: dailyMetals[id].benchmarkLabel,
+      baselineSource: dailyMetals[id].baselineSource,
+      sourceUrl: dailyMetals[id].sourceUrl,
+      quoteDateLabel: dailyMetals[id].quoteDateLabel,
+      sourceLinkLabel: dailyMetals[id].sourceLinkLabel,
+      chartType: dailyMetals[id].chartType || (dailyMetals[id].benchmarkLabel ? 'stepAfter' : 'monotone'),
       points: (dailyMetals[id].data || [])
-        .map((p) => ({ ts: tsOf(p.date), price: p.price }))
+        .map((p) => ({ ...p, ts: tsOf(p.date) }))
+        .filter((p) => Number.isFinite(p.ts) && Number.isFinite(p.price) && p.price > 0 && p.ts <= Date.now())
         .sort((a, b) => a.ts - b.ts),
     }));
   }, [dailyMetals]);
@@ -117,23 +125,26 @@ function MetalsMomentum() {
       // Baseline = latest point on/before window start (exact). For YTD this is
       // the prior year-end anchor (Dec 31 < Jan 1), giving a true YTD baseline.
       let base = null;
+      let baseTs = null;
       for (const p of m.points) {
-        if (p.ts <= winStartTs) base = p.price; else break;
+        if (p.ts <= winStartTs) { base = p.price; baseTs = p.ts; } else break;
       }
       const baseExact = base != null;
 
       // Fallbacks when no point precedes the window (cold start):
       if (base == null) {
         const y = new Date(winStartTs).getUTCFullYear();
-        const prevClose = yearlyMetals?.[m.id]?.data?.find((d) => d.year === y - 1)?.price ?? null;
+        const prevClose = m.baselineSource === 'observations-only' ? null
+          : yearlyMetals?.[m.id]?.data?.find((d) => d.year === y - 1)?.price ?? null;
         const firstIn = inWin.length ? inWin[0].price : null;
         // YTD wants the prior year-end close; rolling wants the earliest in-window point.
         base = mode === 'ytd' ? (prevClose ?? firstIn) : (firstIn ?? prevClose);
       }
 
-      const current = m.points.length ? m.points[m.points.length - 1].price : null;
+      const latest = m.points.at(-1) || null;
+      const current = latest?.price ?? null;
       const pct = base != null && current != null ? (current / base - 1) * 100 : null;
-      map[m.id] = { base, baseExact, inWin, current, pct };
+      map[m.id] = { base, baseTs, baseExact, inWin, current, pct, latest };
     });
     return map;
   }, [metals, mode, winStartTs, axisStartTs, axisEndTs, yearlyMetals]);
@@ -191,7 +202,7 @@ function MetalsMomentum() {
   if (error) return <div style={{ padding: 48, color: '#f87171', textAlign: 'center' }}>Error: {error}</div>;
 
   const modeLabel = mode === 'ytd' ? 'Year-to-Date' : 'Rolling 1-Year';
-  const baselineNote = mode === 'ytd' ? 'baseline = prior year-end close' : 'baseline = price ~12 months ago';
+  const baselineNote = mode === 'ytd' ? 'baseline = latest quote on or before Jan 1' : 'baseline = latest quote on or before the window start';
 
   const btn = (active) => ({
     padding: '8px 18px',
@@ -210,16 +221,18 @@ function MetalsMomentum() {
       <div style={{ marginBottom: 8 }}>
         <h1 style={{ margin: '0 0 8px', fontSize: 28, color: '#e2e8f0' }}>Metals Momentum — YTD & Rolling 1-Year</h1>
         <p style={{ margin: 0, color: '#94a3b8', fontSize: 15, lineHeight: 1.6 }}>
-          Daily price-change trends for 13 metals over a single year. Toggle between year-to-date and a trailing
+          Price-change trends for 13 metals over a single year. Toggle between year-to-date and a trailing
           rolling 12-month window — both use the same one-year horizontal scale.
         </p>
       </div>
 
       {/* Cold-start / data-cadence banner */}
       <div style={{ background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.25)', borderRadius: 10, padding: '12px 16px', margin: '16px 0 24px', color: '#93c5fd', fontSize: 13, lineHeight: 1.6 }}>
-        Daily history is backfilled and accrues over time, so trend lines fill in as snapshots are collected. Each metal
-        is tagged by data cadence — <b>Daily</b> (gold, silver, LME base metals), <b>Monthly</b> (iron ore, cobalt), or
-        <b> Low-freq</b> (tungsten, molybdenum, lithium, titanium — no free daily feed). Returns are computed vs the
+        Available history is backfilled and new observations accrue over time. Each metal
+        is tagged by data cadence — <b>Daily</b> (gold, silver, LME base metals), <b>Daily spot</b> (battery-grade lithium carbonate),
+        <b> Daily reports</b> (European APT tungsten), <b>Monthly</b> (iron ore), or
+        <b> Low-freq</b> (cobalt, molybdenum, titanium). Lithium uses China AM spot prices converted with historical ECB FX;
+        tungsten uses published indicative ranges. Missing copper, lithium, and tungsten observations are left unfilled. Returns are computed vs the
         period {baselineNote}.
         {lastUpdated && <> Updated {fmtDate(new Date(lastUpdated).getTime())}.</>}
       </div>
@@ -276,7 +289,7 @@ function MetalsMomentum() {
               <Legend />
               <ReferenceLine y={0} stroke="rgba(255,255,255,0.35)" strokeWidth={1.5} />
               {metals.filter((m) => selectedMetals.includes(m.id)).map((m) => (
-                <Line key={m.id} type="monotone" dataKey={m.id} name={m.name} stroke={m.color} strokeWidth={2} dot={false} connectNulls activeDot={{ r: 5 }} />
+                <Line key={m.id} type={m.chartType} dataKey={m.id} name={m.name} stroke={m.color} strokeWidth={2} dot={false} connectNulls activeDot={{ r: 5 }} />
               ))}
             </LineChart>
           </ResponsiveContainer>
@@ -302,12 +315,16 @@ function MetalsMomentum() {
                     <span style={{ width: 10, height: 10, borderRadius: '50%', background: m.color, display: 'inline-block' }} />
                     <span style={{ color: '#e2e8f0', fontWeight: 600, fontSize: 15 }}>{m.name}</span>
                     <span style={{ fontSize: 10, color: FREQ_COLOR[m.frequency], border: `1px solid ${FREQ_COLOR[m.frequency]}55`, borderRadius: 4, padding: '1px 6px' }}>
-                      {FREQ_LABEL[m.frequency] || m.frequency}
+                      {m.frequencyLabel || FREQ_LABEL[m.frequency] || m.frequency}
                     </span>
                   </div>
                   <div style={{ color: '#64748b', fontSize: 12, marginTop: 4 }}>
                     {fmtPrice(c.current)} {m.unit}
                   </div>
+                  {c.latest && <div style={{ color: '#94a3b8', fontSize: 11, marginTop: 4 }}>
+                    {m.quoteDateLabel || (m.benchmarkLabel ? 'Report' : 'As of')} {fmtDate(c.latest.ts)}
+                    {m.benchmarkLabel && Date.now() - c.latest.ts > 14 * DAY && <span style={{ color: '#fbbf24' }}> · Quote overdue</span>}
+                  </div>}
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ color: up ? '#34d399' : '#f87171', fontWeight: 700, fontSize: 18 }}>{fmtPct(c.pct)}</div>
@@ -327,11 +344,27 @@ function MetalsMomentum() {
                   <Tooltip
                     contentStyle={{ background: 'rgba(15,23,42,0.96)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, fontSize: 12 }}
                     labelFormatter={(ts) => fmtDate(ts)}
-                    formatter={(v) => [`${fmtPrice(v)} ${m.unit}`, m.name]}
+                    formatter={(v, name, item) => [
+                      `${fmtPrice(v)} ${m.unit}${item.payload.nativePrice != null ? ` · ${fmtPrice(item.payload.nativePrice)} ${item.payload.nativeUnit}` : ''}`,
+                      m.name,
+                    ]}
                   />
-                  <Area type="monotone" dataKey="price" stroke={m.color} strokeWidth={2} fill={`url(#g-${m.id})`} dot={false} connectNulls activeDot={{ r: 4, stroke: m.color, strokeWidth: 2, fill: '#0f172a' }} />
+                  <Area type={m.chartType} dataKey="price" stroke={m.color} strokeWidth={2} fill={`url(#g-${m.id})`} dot={false} connectNulls activeDot={{ r: 4, stroke: m.color, strokeWidth: 2, fill: '#0f172a' }} />
                 </AreaChart>
               </ResponsiveContainer>
+              {m.benchmarkLabel && <div style={{ color: '#94a3b8', fontSize: 11, lineHeight: 1.6, marginTop: 8 }}>
+                <div>{m.benchmarkLabel}</div>
+                {c.latest?.low != null && <div>Quoted range: {fmtPrice(c.latest.low)}–{fmtPrice(c.latest.high)} {m.unit}</div>}
+                {c.latest?.nativePrice != null && <>
+                  <div>Original quote: {fmtPrice(c.latest.nativePrice)} {c.latest.nativeUnit}</div>
+                  <div>1 USD = {c.latest.usdCny.toFixed(4)} CNY · FX {fmtDate(tsOf(c.latest.fxDate))}</div>
+                </>}
+                {c.baseTs != null && <div>Baseline quote: {fmtDate(c.baseTs)} · {fmtPrice(c.base)} {m.unit}</div>}
+                <a href={c.latest?.sourceUrl || m.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#93c5fd' }}>{m.sourceLinkLabel || 'Source report'}</a>
+                {c.latest?.fxSourceUrl && <>
+                  {' · '}<a href={c.latest.fxSourceUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#93c5fd' }}>FX source</a>
+                </>}
+              </div>}
             </div>
           );
         })}
@@ -339,8 +372,12 @@ function MetalsMomentum() {
 
       <p style={{ color: '#475569', fontSize: 11, marginTop: 24, lineHeight: 1.6 }}>
         * Return approximated from the earliest available data point (full period baseline not yet collected).
-        Sources: gold-api.com (gold/silver spot), westmetall.com (LME base metals), FRED (history). The 6 minor metals
-        without a free daily feed use periodic/manual quotes. Not investment advice.
+        Sources: gold-api.com (gold/silver spot), Westmetall (daily gold/silver/LME history), FRED (monthly iron history),
+        Chinatungsten (publication-dated European APT ranges). Tungsten is an indicative range midpoint,
+        with its own historical baseline, rather than a transaction close or the previous China FOB quote.
+        Lithium: Mysteel China battery-grade carbonate AM spot (Li₂CO₃≥99.5%), converted from CNY/ton
+        with same-day or preceding ECB reference FX; USD returns include currency movements.
+        Other low-frequency metals use periodic/manual quotes. Not investment advice.
       </p>
     </div>
   );

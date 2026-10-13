@@ -20,17 +20,47 @@ if [ ! -f "$BUILD_DIR/data/company-financials.jsonl" ]; then
   exit 1
 fi
 
+echo -e "${YELLOW}=== Backing up current release ===${NC}"
+BACKUP_NAME="metals-$(date -u +%Y%m%dT%H%M%SZ).tgz"
+ssh "$REMOTE_USER@$REMOTE_HOST" \
+  "mkdir -p /home/$REMOTE_USER/reports-backups && tar -C $REMOTE_PATH --exclude='./.backups' --exclude='./scripts/.venv' --exclude='./scripts/__pycache__' -czf /home/$REMOTE_USER/reports-backups/$BACKUP_NAME ."
+echo "Release backup: /home/$REMOTE_USER/reports-backups/$BACKUP_NAME"
+
+echo -e "${YELLOW}=== Syncing metals price scripts ===${NC}"
+rsync -avz --chmod=u=rwX,go=rX \
+  scripts/update-prices.js \
+  scripts/backfill-daily.mjs \
+  scripts/backfill-tungsten.mjs \
+  scripts/backfill-lithium.mjs \
+  scripts/backfill-copper.mjs \
+  "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/scripts/"
+rsync -avz --chmod=u=rwX,go=rX \
+  scripts/lib/ \
+  "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/scripts/lib/"
+
+# Prepare the three changed benchmarks before publishing their new UI.
+# The separate backfills preserve every other metal's collected history.
+echo -e "${YELLOW}=== Backfilling copper, tungsten and lithium ===${NC}"
+for METAL in copper tungsten lithium; do
+  ssh "$REMOTE_USER@$REMOTE_HOST" \
+    "DATA_FILE=$REMOTE_PATH/data/metals-prices.json DAILY_FILE=$REMOTE_PATH/data/metals-daily.json node $REMOTE_PATH/scripts/backfill-$METAL.mjs"
+done
+ssh "$REMOTE_USER@$REMOTE_HOST" \
+  "METALS=copper,tungsten,lithium DATA_FILE=$REMOTE_PATH/data/metals-prices.json node $REMOTE_PATH/scripts/update-prices.js"
+
 echo -e "${YELLOW}=== Syncing to server ===${NC}"
-# NOTE: data/metals-daily.json is excluded so deploys never wipe the daily price
-# history the cron accumulates server-side (it is created/owned by the cron, seeded
-# once via scp). The yearly metals-prices.json is intentionally NOT excluded — it
-# self-heals on the next hourly update.
+# Both metals files belong to the server's collectors. A local build must not
+# roll either one back; preserve previous on-server release backups too.
 rsync -avz --delete --chmod=u=rwX,go=rX \
   --exclude '.git' \
   --exclude '.DS_Store' \
+  --exclude '.backups' \
   --exclude 'node_modules' \
   --exclude 'scripts' \
+  --exclude 'research-analysis' \
+  --exclude 'data/cosco-shipping-energy.json' \
   --exclude 'data/metals-daily.json' \
+  --exclude 'data/metals-prices.json' \
   "$BUILD_DIR/" "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/"
 
 echo -e "${YELLOW}=== Syncing monitoring scripts ===${NC}"
@@ -39,17 +69,6 @@ rsync -avz --chmod=u=rwX,go=rX \
   scripts/cosco_price_ratio.py \
   scripts/requirements.txt \
   "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/scripts/"
-
-echo -e "${YELLOW}=== Syncing metals price scripts ===${NC}"
-# Keep the daily-price pipeline on the server in sync (the hourly cron runs
-# update-prices.js; backfill-daily.mjs is run manually to seed/enrich history).
-rsync -avz --chmod=u=rwX,go=rX \
-  scripts/update-prices.js \
-  scripts/backfill-daily.mjs \
-  "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/scripts/"
-rsync -avz --chmod=u=rwX,go=rX \
-  scripts/lib/ \
-  "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/scripts/lib/"
 
 echo -e "${YELLOW}=== Updating Python deps ===${NC}"
 ssh "$REMOTE_USER@$REMOTE_HOST" \

@@ -10,8 +10,10 @@
  * - gold-api.com (free, no API key): Gold, Silver, Copper, Platinum, Palladium
  * - freegoldapi.com (free, no API key): Gold backup
  *
- * Metals without free API sources require manual update:
- * - Aluminum, Nickel, Zinc, Tin, Tungsten, Molybdenum, Iron, Cobalt, Lithium, Titanium
+ * - westmetall.com: LME base metals
+ * - ctia.com.cn: publication-dated European APT ranges (daily store only)
+ * - Mysteel: China battery-grade carbonate AM spot + historical ECB FX (daily store)
+ * Manual quotes: Molybdenum, Iron, Cobalt, Titanium
  */
 
 import fs from 'fs';
@@ -21,7 +23,12 @@ import { fileURLToPath } from 'url';
 
 import { METAL_META } from './lib/sources/registry.mjs';
 import {
-  readDaily, ensureMetal, upsertPoint, prune, writeDaily, todayStr, DEFAULT_WINDOW_DAYS,
+  fetchCTIATungstenSeries, mergeCTIATungstenSeries,
+} from './lib/sources/ctia-tungsten.mjs';
+import { fetchMysteelLithiumSeries, mergeMysteelLithiumSeries, lithiumQuoteEnd } from './lib/sources/mysteel-lithium.mjs';
+import { fetchCopperSeries, mergeCopperSeries } from './lib/sources/copper.mjs';
+import {
+  readDaily, ensureMetal, upsertPoint, prune, writeDaily, todayStr, dateMinusDays, DEFAULT_WINDOW_DAYS,
 } from './lib/daily-store.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -34,7 +41,9 @@ const DATA_FILE = process.env.DATA_FILE || path.join(__dirname, '../public/data/
 // Daily store (one point per metal per day, rolling window). Updated alongside
 // the yearly file so the YTD / rolling-1Y page accrues real daily history.
 // On server: /var/www/reports/data/metals-daily.json
-const DAILY_FILE = process.env.DAILY_FILE || path.join(__dirname, '../public/data/metals-daily.json');
+// Derive the sibling daily file from DATA_FILE. This matters on production,
+// where DATA_FILE points at /var/www/reports/data rather than ../public/data.
+const DAILY_FILE = process.env.DAILY_FILE || path.join(path.dirname(DATA_FILE), 'metals-daily.json');
 
 // Metal configurations with data source info
 // gold-api.com uses USD/oz for gold/silver, USD/lb for copper
@@ -53,7 +62,7 @@ const METAL_SOURCES = {
     multiplier: 1,
   },
   copper: {
-    api: 'westmetall',
+    api: 'westmetall-copper',
     name: 'Copper',
     unit: 'USD/ton',
   },
@@ -81,10 +90,9 @@ const METAL_SOURCES = {
   // Prices from web search: Trading Economics, Fastmarkets, SMM, etc.
   // Updated: 2026-01-27
   tungsten: {
-    api: 'manual',
-    price: 1200,  // USD/mtu - APT FOB China ~$1,080-1,325/mtu
+    api: 'ctia-tungsten',
     unit: 'USD/mtu',
-    source: 'Fastmarkets APT',
+    source: 'Chinatungsten European APT reports',
   },
   molybdenum: {
     api: 'manual',
@@ -105,10 +113,9 @@ const METAL_SOURCES = {
     source: 'LME/Trading Economics',
   },
   lithium: {
-    api: 'manual',
-    price: 22000, // USD/ton - Battery-grade carbonate ~CNY 156,000/ton ≈ $22,000
+    api: 'mysteel-lithium',
     unit: 'USD/ton',
-    source: 'SMM China',
+    source: 'Mysteel China battery-grade carbonate AM spot + ECB FX',
   },
   titanium: {
     api: 'manual',
@@ -207,7 +214,8 @@ async function fetchWestmetallPrices() {
   // Pattern: "Copper </a> </td> <td> <a...> 13,195.00 </a>"
   const prices = {};
 
-  const metals = ['Copper', 'Tin', 'Zinc', 'Aluminium', 'Nickel', 'Lead'];
+  // Copper always uses its dedicated, source-dated LME_Cu_cash adapter.
+  const metals = ['Tin', 'Zinc', 'Aluminium', 'Nickel', 'Lead'];
 
   for (const metal of metals) {
     // Match pattern: metal name followed by </a></td><td><a...>price
@@ -252,7 +260,21 @@ async function fetchMetalPrice(metalId, config) {
 
   try {
     let price;
-    if (config.api === 'manual') {
+    if (config.api === 'ctia-tungsten' || config.api === 'mysteel-lithium' || config.api === 'westmetall-copper') {
+      const existing = readDaily(DAILY_FILE).metals[metalId];
+      const end = config.api === 'mysteel-lithium' ? lithiumQuoteEnd() : todayStr();
+      const windowStart = dateMinusDays(DEFAULT_WINDOW_DAYS);
+      const latest = existing?.benchmark === METAL_META[metalId].benchmark ? existing.data.at(-1)?.date : null;
+      // Re-read recent reports for corrections; cold starts fetch full history.
+      const lookback = latest && latest <= end ? dateMinusDays(14, new Date(`${latest}T00:00:00Z`)) : windowStart;
+      const fetchSeries = config.api === 'mysteel-lithium' ? fetchMysteelLithiumSeries
+        : config.api === 'westmetall-copper' ? fetchCopperSeries : fetchCTIATungstenSeries;
+      const sourceWindow = { start: lookback > windowStart ? lookback : windowStart, end };
+      const series = await fetchSeries(sourceWindow);
+      const point = series.at(-1);
+      console.log(`  ✓ ${metalId}: ${point.price} ${config.unit}; quote ${point.date} (${series.length} observations)`);
+      return { metalId, price: point.price, series, sourceWindow, updateYearly: metalId === 'copper', success: true };
+    } else if (config.api === 'manual') {
       // Use hardcoded price from config
       console.log(`  Using manual price for ${metalId} (${config.source})...`);
       price = config.price;
@@ -312,9 +334,17 @@ async function updatePrices() {
   let skipCount = 0;
   const updates = [];
   const dailyPrices = {}; // metalId -> latest price, for the daily store
+  const sourcedSeries = {};
+  const sourceWindows = {};
+  const sourceMergers = { tungsten: mergeCTIATungstenSeries, lithium: mergeMysteelLithiumSeries, copper: mergeCopperSeries };
+  let sourcedFailed = false;
+  let yearlyChanged = false;
+  const selectedIds = process.env.METALS?.split(',').map((id) => id.trim()).filter(Boolean);
+  if (selectedIds?.some((id) => !METAL_SOURCES[id])) throw new Error('Unknown metal in METALS');
 
   // Fetch prices
   for (const [metalId, config] of Object.entries(METAL_SOURCES)) {
+    if (selectedIds && !selectedIds.includes(metalId)) continue;
     if (!config.api) {
       console.log(`  ⊘ ${metalId}: Skipped (${config.note})`);
       skipCount++;
@@ -323,7 +353,13 @@ async function updatePrices() {
 
     const result = await fetchMetalPrice(metalId, config);
 
-    if (result.success && data.metals[metalId]) {
+    if (result.success && result.series && !result.updateYearly) {
+      // These series power YTD/rolling with their own sourced baselines.
+      // Do not replace legacy annual snapshots from a different publisher/basis.
+      sourcedSeries[metalId] = result.series;
+      updates.push({ metal: metalId, oldPrice: null, newPrice: result.price, unit: config.unit });
+      successCount++;
+    } else if (result.success && data.metals[metalId]) {
       const metalData = data.metals[metalId].data;
       const yearEntry = metalData.find(d => d.year === currentYear);
       const oldPrice = yearEntry ? yearEntry.price : null;
@@ -341,10 +377,18 @@ async function updatePrices() {
         newPrice: result.price,
         unit: data.metals[metalId].unit,
       });
-      dailyPrices[metalId] = result.price;
+      if (result.series) {
+        sourcedSeries[metalId] = result.series;
+        sourceWindows[metalId] = result.sourceWindow;
+        data.metals[metalId].lastQuoteDate = result.series.at(-1).date;
+      } else {
+        dailyPrices[metalId] = result.price;
+      }
+      yearlyChanged = true;
       successCount++;
     } else {
       failCount++;
+      if (sourceMergers[metalId]) sourcedFailed = true;
     }
 
     // Delay between requests (300ms)
@@ -352,12 +396,14 @@ async function updatePrices() {
   }
 
   // Update timestamp
-  data.lastUpdated = new Date().toISOString();
+  if (yearlyChanged) data.lastUpdated = new Date().toISOString();
 
   // Write updated data
   try {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
-    console.log(`\nData file updated: ${DATA_FILE}`);
+    if (yearlyChanged) {
+      fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+      console.log(`\nData file updated: ${DATA_FILE}`);
+    }
   } catch (error) {
     console.error(`Error writing data file: ${error.message}`);
     process.exit(1);
@@ -369,18 +415,42 @@ async function updatePrices() {
     const daily = readDaily(DAILY_FILE);
     const today = todayStr();
     let dailyCount = 0;
+    let unchangedLowFrequencyCount = 0;
+    for (const [metalId, series] of Object.entries(sourcedSeries)) {
+      sourceMergers[metalId](daily, series, sourceWindows[metalId]);
+      dailyCount += series.length;
+    }
     for (const [metalId, price] of Object.entries(dailyPrices)) {
       const meta = METAL_META[metalId];
       if (!meta) continue;
-      ensureMetal(daily, metalId, meta);
+      const node = ensureMetal(daily, metalId, meta);
+      const latest = node.data.at(-1);
+      if (meta.frequency !== 'daily' && latest?.price === price) {
+        unchangedLowFrequencyCount++;
+        continue;
+      }
       upsertPoint(daily, metalId, today, price);
       dailyCount++;
     }
-    prune(daily, DEFAULT_WINDOW_DAYS);
-    writeDaily(DAILY_FILE, daily);
-    console.log(`Daily store updated: ${DAILY_FILE} (${dailyCount} metals @ ${today})`);
+    if (dailyCount > 0 && selectedIds) {
+      const selectedNodes = Object.fromEntries(selectedIds.filter((id) => daily.metals[id])
+        .map((id) => [id, daily.metals[id]]));
+      prune({ metals: selectedNodes }, DEFAULT_WINDOW_DAYS);
+    } else if (dailyCount > 0) {
+      prune(daily, DEFAULT_WINDOW_DAYS);
+    }
+    if (dailyCount > 0) writeDaily(DAILY_FILE, daily);
+    if (dailyCount > 0) {
+      console.log(`Daily store updated: ${DAILY_FILE} (${dailyCount} observations; fetched ${today}; ${unchangedLowFrequencyCount} unchanged low-frequency quotes skipped)`);
+    } else {
+      console.log(`Daily store preserved: ${DAILY_FILE} (no new observations)`);
+    }
+    for (const [metalId, series] of Object.entries(sourcedSeries)) {
+      console.log(`${metalId} latest sourced quote: ${series.at(-1).date}`);
+    }
   } catch (error) {
     console.error(`Error updating daily store (non-fatal): ${error.message}`);
+    if (Object.keys(sourcedSeries).length) process.exitCode = 1;
   }
 
   // Summary
@@ -400,9 +470,10 @@ async function updatePrices() {
   }
 
   console.log('\n✅ Done!');
-  console.log('\n💡 Note: 6 metals use manual prices (no free API available):');
-  console.log('   Tungsten, Molybdenum, Iron, Cobalt, Lithium, Titanium');
+  console.log('\n💡 Note: 4 metals use manual prices (no free API available):');
+  console.log('   Molybdenum, Iron, Cobalt, Titanium');
   console.log('   To update them, edit METAL_SOURCES in scripts/update-prices.js');
+  if (sourcedFailed) process.exitCode = 1;
 }
 
 // Run the update

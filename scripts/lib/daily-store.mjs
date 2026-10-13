@@ -29,7 +29,10 @@ export function dateMinusDays(days, ref = new Date()) {
 export function readDaily(file) {
   try {
     return JSON.parse(fs.readFileSync(file, 'utf8'));
-  } catch {
+  } catch (error) {
+    // A missing file is a cold start. Malformed or unreadable existing history
+    // must fail rather than silently replacing every metal with an empty store.
+    if (error.code !== 'ENOENT') throw error;
     return { lastUpdated: null, windowDays: DEFAULT_WINDOW_DAYS, metals: {} };
   }
 }
@@ -86,5 +89,12 @@ export function prune(daily, windowDays = DEFAULT_WINDOW_DAYS, ref = new Date())
 
 export function writeDaily(file, daily) {
   daily.lastUpdated = new Date().toISOString();
-  fs.writeFileSync(file, JSON.stringify(daily, null, 2));
+  // Readers must see either the previous complete store or the new one.
+  const temporary = `${file}.${process.pid}.tmp`;
+  try {
+    fs.writeFileSync(temporary, JSON.stringify(daily, null, 2));
+    fs.renameSync(temporary, file);
+  } finally {
+    if (fs.existsSync(temporary)) fs.unlinkSync(temporary);
+  }
 }
