@@ -6,6 +6,16 @@
 
 export const reports = [
   {
+    slug: '2026-10-kelly-criterion',
+    title: 'Kelly Criterion：1000 条财富路径模拟器',
+    description: '调整下注比例、下注次数，观察 1000 条蒙特卡洛财富路径及中位数、P5、P95 和盈利概率，直观比较过度下注与凯利仓位。',
+    date: '2026-10-31',
+    type: 'visualization',
+    category: 'viz',
+    tags: ['Kelly', 'Probability', 'Risk Management', 'Monte Carlo', 'Interactive'],
+    component: () => import('./2026-10-kelly-criterion/index.jsx'),
+  },
+  {
     slug: '2026-10-model-lab-network',
     title: 'Model lab关系图',
     description: '六家模型组织的资本、算力与全球基础设施网络；整合 OpenAI 与 Anthropic 研究，新增存储、融资、媒体授权、科研及收购关联，区分合同金额、建设容量和已投运资产。',
