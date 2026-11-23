@@ -169,7 +169,7 @@ Price types:
 Server-side cron job runs every hour:
 ```bash
 # Cron: 0 * * * *
-DATA_FILE=/var/www/reports/data/metals-prices.json node /var/www/reports/scripts/update-prices.js
+DATA_FILE=/var/www/reports/data/metals-prices.json DAILY_FILE=/var/www/reports/data/metals-daily.json node /var/www/reports/scripts/update-prices.js
 ```
 
 Log file: `/var/log/metals-update.log`
@@ -187,14 +187,14 @@ Log file: `/var/log/metals-update.log`
 | Tin | USD/ton | westmetall.com (LME) | Yes |
 | Iron | USD/ton | Manual (CFR China 62% Fe) | No |
 | Cobalt | USD/lb | Manual (LME) | No |
-| Tungsten | USD/mtu | Manual (APT 88.5% WO3) | No |
+| Tungsten | USD/mtu | Legacy annual snapshot; Chinatungsten European APT in daily file | Daily series only |
 | Molybdenum | USD/lb | Manual (Oxide) | No |
-| Lithium | USD/ton | Manual (Battery-grade carbonate) | No |
+| Lithium | USD/ton | Legacy annual snapshot; Mysteel carbonate + ECB FX in daily file | Daily series only |
 | Titanium | USD/ton | Manual (Sponge) | No |
 
 **Manual Price Update Notes:**
 
-6 metals require manual price updates in `scripts/update-prices.js`:
+4 metals require manual price updates in `scripts/update-prices.js` (iron, cobalt, molybdenum, titanium). Tungsten and lithium's legacy annual snapshots are kept separate from their automatically collected YTD series; see `docs/tungsten-price-sources.md` and `docs/lithium-price-source.md`.
 
 1. **Unit Consistency**: Always use USD. If source is CNY, convert to USD.
 2. **Product Consistency**: Use the same product type as historical data:
@@ -210,15 +210,30 @@ Log file: `/var/log/metals-update.log`
 To update manual prices:
 ```javascript
 // In scripts/update-prices.js, edit METAL_SOURCES:
-lithium: {
+iron: {
   api: 'manual',
-  price: 22000,  // Update this value
+  price: 106,  // Update this value
   unit: 'USD/ton',
-  source: 'SMM China',
+  source: 'Trading Economics CFR China',
 },
 ```
 
 Then run: `node scripts/update-prices.js` and `npm run deploy`
+
+### Metals Momentum and Tungsten Reports
+
+Location: `src/reports/2026-06-metals-ytd/index.jsx`; data: `public/data/metals-daily.json`.
+
+- Tungsten uses Chinatungsten's publication-dated European APT USD/mtu ranges, labeled `Daily reports` and plotted as range midpoints.
+- Keep `date`, `low`, `high`, and `sourceUrl`; do not fill missing dates or mix Chinese domestic/FOB and European prices.
+- The new series has its own sourced baseline; do not seed it from the legacy annual tungsten file.
+- `node scripts/backfill-tungsten.mjs` backfills only tungsten. `METALS=tungsten node scripts/update-prices.js` runs a scoped incremental update.
+- Source and parser: `scripts/lib/sources/ctia-tungsten.mjs`. Fetch failures preserve the previous series; incorrect `/ton` quotes are rejected.
+- The existing hourly cron collects new reports once the scripts are deployed. Broader source comparison: `docs/tungsten-price-sources.md`.
+- Deployment backs up the previous release outside the web root, runs copper/tungsten/lithium scoped backfills before publishing the page, and preserves both server-owned metals JSON files. Daily writes use temporary-file rename; CLI details: `docs/CLI_COMMANDS.md`.
+- Copper must use the exact `LME_Cu_cash` field and actual quote dates, not a suffix match in the overview (which also matches EUR/100 kg `Wieland Copper`). Use `scripts/lib/sources/copper.mjs` and `node scripts/backfill-copper.mjs`; see `docs/copper-price-data-fix.md`. Do not mix monthly FRED values or fake calendar-day copies into its daily series.
+- Lithium uses Mysteel China battery-grade Li₂CO₃≥99.5% AM spot and historical ECB USD/CNY. Keep `nativePrice`, `nativeUnit`, `usdCny`, `fxDate`, and source links; do not mix industrial grade, hydroxide, PM spot, or GFEX futures into the series.
+- `node scripts/backfill-lithium.mjs` backfills only lithium; `METALS=lithium node scripts/update-prices.js` updates it. The source module is `scripts/lib/sources/mysteel-lithium.mjs`; details: `docs/lithium-price-source.md`.
 
 ### 3D Solar System Simulator (2026-02)
 

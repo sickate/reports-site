@@ -125,7 +125,10 @@ reports-instap/
 - `npm run build` now runs `prebuild`, which generates shared research datasets such as `public/data/company-financials.jsonl`
 - Report pages can reuse shared company finance cards and generated JSONL instead of hardcoding tables into each page
 - Deployment now validates that `dist/data/company-financials.jsonl` exists before syncing to the server
-- Daily metals price store (`public/data/metals-daily.json`) accumulates one point per metal per day over a rolling ~420-day window: seeded by `scripts/backfill-daily.mjs` (FRED history) and appended hourly by `scripts/update-prices.js`. It is excluded from the deploy `--delete` so accumulated history survives deploys
+- Daily metals price store (`public/data/metals-daily.json`) keeps a rolling ~420-day window: Westmetall backfills daily gold/silver/LME history (silver is converted from EUR/kg with the same-day EUR/USD fixing), FRED backfills monthly iron history, and `scripts/update-prices.js` appends new observations. Deploys backfill copper, tungsten and lithium before publishing the page, and preserve both server-owned metals files, COSCO monitoring data, server-only research archives, and previous release backups.
+- Tungsten on the YTD page uses publication-dated European APT ranges from Chinatungsten, with its own historical baseline and source links. Run `node scripts/backfill-tungsten.mjs` to backfill only tungsten, or `METALS=tungsten node scripts/update-prices.js` for an incremental update. See [source comparison and maintenance notes](docs/tungsten-price-sources.md); the legacy annual tungsten series is kept separate.
+- Lithium on the YTD page uses Mysteel China battery-grade carbonate AM spot (Li₂CO₃≥99.5%), converted from CNY/ton with historical ECB reference FX. Run `node scripts/backfill-lithium.mjs` or `METALS=lithium node scripts/update-prices.js`. Original prices and actual FX dates are retained; see [lithium source and conversion notes](docs/lithium-price-source.md).
+- Copper uses the exact Westmetall `LME_Cu_cash` table and actual source dates. `node scripts/backfill-copper.mjs` repairs only copper, including wrong benchmark values and date shifts. See [September 1 anomaly diagnosis](docs/copper-price-data-fix.md); never match `Wieland Copper` by the `Copper` suffix or inject monthly averages into this daily series.
 
 ## Recent Research Topics
 

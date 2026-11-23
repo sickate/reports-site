@@ -47,9 +47,9 @@ GET /data/metals-prices.json
 | `tin` | Tin | USD/ton | Auto (hourly) |
 | `iron` | Iron | USD/ton | Manual |
 | `cobalt` | Cobalt | USD/lb | Manual |
-| `tungsten` | Tungsten | USD/mtu | Manual |
+| `tungsten` | Tungsten | USD/mtu | Legacy annual snapshot (daily series below) |
 | `molybdenum` | Molybdenum | USD/lb | Manual |
-| `lithium` | Lithium | USD/ton | Manual |
+| `lithium` | Lithium | USD/ton | Legacy annual snapshot (daily series below) |
 | `titanium` | Titanium | USD/ton | Manual |
 
 ### Data Sources
@@ -63,6 +63,78 @@ GET /data/metals-prices.json
 - Current year: latest available price
 - Each metal has exactly 52 data points (1975–2026)
 - `color` field provides a suggested chart color per metal
+
+### Daily and Publication-Dated Metals History
+
+```
+GET /data/metals-daily.json
+```
+
+Rolling ~420-day history used by the YTD / rolling-year page. Each metal has
+`name`, `unit`, `color`, `frequency`, `source` and `data: [{ date, price }]`.
+Data-file `lastUpdated` is the collection timestamp; each point's `date` is
+the observation date. The latest point may be older than `lastUpdated`.
+
+Copper uses the exact Westmetall `LME_Cu_cash` daily cash-settlement table,
+with `benchmark: "westmetall-lme-copper-cash-usd-ton"` and
+`baselineSource: "observations-only"`. Dated points include their `sourceUrl`.
+Missing trading days remain absent. `node scripts/backfill-copper.mjs` replaces
+the fetched copper window from that source, repairing incorrect values and
+calendar-date copies while preserving other metals. See [the September 1 data fix](../../docs/copper-price-data-fix.md).
+
+Tungsten is a separate **European APT indicative range** quoted in Chinatungsten
+market reports, rather than the legacy annual China FOB manual snapshot:
+
+```json
+{
+  "name": "Tungsten",
+  "unit": "USD/mtu",
+  "frequency": "daily",
+  "frequencyLabel": "Daily reports",
+  "benchmark": "ctia-european-apt-usd-mtu",
+  "baselineSource": "observations-only",
+  "data": [{
+    "date": "2026-10-12",
+    "price": 2700,
+    "low": 2500,
+    "high": 2900,
+    "sourceUrl": "https://www.ctia.com.cn/en/news/53543.html"
+  }]
+}
+```
+
+- Tungsten dates are report publication dates, not independently verified transaction dates.
+- `price` is the range midpoint rounded to two decimals; original bounds are preserved.
+- Missing days are absent. Repeated published ranges retain their actual report dates.
+- YTD uses the latest same-benchmark quote on/before Jan 1; it does not use the annual legacy anchor.
+- `node scripts/backfill-tungsten.mjs` backfills only tungsten. The existing hourly updater re-reads recent reports and preserves quotes on source failure.
+- The annual tungsten history is not overwritten with the new European benchmark.
+
+See [source investigation and operational notes](../../docs/tungsten-price-sources.md).
+
+Lithium in the daily dataset uses **Mysteel China battery-grade carbonate AM
+spot (Li₂CO₃≥99.5%)**. Its `benchmark` is
+`mysteel-china-battery-carbonate-am-usd`, `frequencyLabel` is `Daily spot`, and
+its baseline is sourced from that same daily series. Each point also stores:
+
+```json
+{
+  "date": "2026-10-13",
+  "price": 16024.68,
+  "nativePrice": 107250,
+  "nativeUnit": "CNY/ton",
+  "usdCny": 6.6928,
+  "fxDate": "2026-10-12",
+  "sourceUrl": "https://www.mysteel.com/mmlc/",
+  "fxSourceUrl": "https://frankfurter.dev/providers/ecb/"
+}
+```
+
+USD price is native price divided by same-day or preceding ECB USD/CNY, rounded
+to two decimals. FX older than seven days is rejected; future FX is not used.
+USD returns therefore include exchange-rate movements. Missing price days stay
+absent. `node scripts/backfill-lithium.mjs` affects only lithium; source/FX
+failures retain the existing series. See [source and conversion details](../../docs/lithium-price-source.md).
 
 ---
 
@@ -209,6 +281,7 @@ Static asset caching (`Cache-Control: public, immutable, max-age=1y`) applies to
 | Endpoint | Update Frequency | Mechanism |
 |----------|-----------------|-----------|
 | `metals-prices.json` | Hourly (7 auto metals) | Node.js cron on server |
+| `metals-daily.json` | Hourly collection; market/report-dated observations | Node.js cron; Chinatungsten tungsten + Mysteel lithium/ECB FX |
 | `cosco-shipping-energy.json` | Weekly (2 auto indicators) | Python cron on server |
 | `cosco-shipping-energy.json` | Ad-hoc (6 manual indicators) | Edit JSON directly |
 

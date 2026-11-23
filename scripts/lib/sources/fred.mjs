@@ -9,42 +9,46 @@
  * callers can degrade per-metal.
  */
 
-import https from 'https';
+import { execFile } from 'node:child_process';
 
 const USER_AGENT =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36';
 
-function get(url, timeoutMs = 15000) {
+function validateCsv(body, contentType = '') {
+  if (contentType.includes('text/html') || body.trimStart().startsWith('<')) {
+    throw new Error('non-CSV response (bot challenge?)');
+  }
+  return body;
+}
+
+async function get(url, timeoutMs = 8000) {
+  const response = await fetch(url, {
+    headers: { 'User-Agent': USER_AGENT, Accept: 'text/csv,text/plain,*/*' },
+    signal: AbortSignal.timeout(timeoutMs),
+  });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const contentType = response.headers.get('content-type') || '';
+  const body = await response.text();
+  return validateCsv(body, contentType);
+}
+
+function getWithCurl(url, timeoutMs = 20000) {
   return new Promise((resolve, reject) => {
-    const req = https.get(
-      url,
-      { headers: { 'User-Agent': USER_AGENT, Accept: 'text/csv,text/plain,*/*' } },
-      (res) => {
-        if (res.statusCode !== 200) {
-          res.resume();
-          reject(new Error(`HTTP ${res.statusCode}`));
-          return;
+    execFile(
+      'curl',
+      ['-4', '-sS', '--fail', '--max-time', String(Math.ceil(timeoutMs / 1000)), url],
+      { maxBuffer: 5 * 1024 * 1024 },
+      (error, stdout) => {
+        if (error) reject(error);
+        else {
+          try { resolve(validateCsv(stdout)); } catch (validationError) { reject(validationError); }
         }
-        const ct = res.headers['content-type'] || '';
-        let body = '';
-        res.on('data', (c) => (body += c));
-        res.on('end', () => {
-          // FRED occasionally serves an HTML bot-challenge instead of CSV.
-          if (ct.includes('text/html') || body.trimStart().startsWith('<')) {
-            reject(new Error('non-CSV response (bot challenge?)'));
-          } else {
-            resolve(body);
-          }
-        });
-        res.on('error', reject);
       },
     );
-    req.setTimeout(timeoutMs, () => req.destroy(new Error(`timeout after ${timeoutMs}ms`)));
-    req.on('error', reject);
   });
 }
 
-async function getWithRetry(url, attempts = 3) {
+async function getWithRetry(url, attempts = 2) {
   let lastErr;
   for (let i = 0; i < attempts; i++) {
     try {
@@ -53,7 +57,11 @@ async function getWithRetry(url, attempts = 3) {
       lastErr = e;
     }
   }
-  throw lastErr;
+  try {
+    return await getWithCurl(url);
+  } catch (curlError) {
+    throw new Error(`${lastErr?.message || 'fetch failed'}; curl fallback failed: ${curlError.message}`);
+  }
 }
 
 /**
