@@ -6,6 +6,16 @@
 
 export const reports = [
   {
+    slug: '2026-11-china-semiconductor',
+    title: '中国半导体制造产业链全景图：设备、材料、核心零部件与 HBM',
+    description: '整合 Paul Triolo 研究事实、日期与争议，按制造工艺拆解中国半导体上下游，提供交互关系图、企业检索、先进封装流程、国产化成熟度及 2027–2028 跟踪框架。',
+    date: '2026-11-24',
+    type: 'visualization',
+    category: 'industry',
+    tags: ['Research Topic', 'Semiconductor', 'China', 'Supply Chain', 'HBM', '半导体'],
+    component: () => import('./2026-11-china-semiconductor/index.jsx'),
+  },
+  {
     slug: '2026-11-data-center-ballots',
     title: '当地方选票遇上算力扩张：数据中心限制与中选权力地图',
     description: '18 个地方的数据中心限制、20 条项目 / 政策记录、州长换党与州议会控制权；地图按规划 MW 或预算显示规模，区分禁令、临时暂停、咨询票与罢免。',

@@ -1,0 +1,47 @@
+.cs-report{--cs-panel:var(--color-bg-secondary,#182437);--cs-border:var(--color-border,#334155);--cs-muted:var(--color-text-secondary,#94a3b8);max-width:1320px;margin:auto;line-height:1.7;color:var(--color-text-primary,#e2e8f0)}
+.cs-report *{box-sizing:border-box}
+.cs-hero{padding:clamp(20px,4vw,48px);border:1px solid var(--cs-border);border-radius:16px;background:var(--cs-panel)}
+.cs-kicker{font-size:.78rem;letter-spacing:.13em;color:#7dd3fc;font-weight:600}
+.cs-hero h1{font-size:clamp(1.8rem,4vw,3rem);line-height:1.2;margin:14px 0}
+.cs-hero p,.cs-note{color:var(--cs-muted)}
+.cs-metrics,.cs-cards,.cs-market-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:14px;margin:22px 0}
+.cs-metrics>div,.cs-cards>div,.cs-market-grid>div{padding:18px;background:var(--cs-panel);border:1px solid var(--cs-border);border-radius:10px;min-width:0}
+.cs-metrics strong{display:block;font-size:2rem;color:#7dd3fc;line-height:1.4;font-variant-numeric:tabular-nums}
+.cs-metrics small,.cs-metrics span{display:block;color:var(--cs-muted);font-size:.83rem}
+.cs-nav{display:flex;flex-wrap:wrap;gap:12px;padding:18px 0;border-bottom:1px solid var(--cs-border)}
+.cs-report a{color:#7dd3fc;text-decoration:underline;text-underline-offset:3px}
+.cs-section{margin:30px 0 44px;scroll-margin-top:90px}
+.cs-section h2{font-size:1.55rem;line-height:1.4;margin-bottom:16px}
+.cs-section h3{font-size:1.12rem;margin:22px 0 12px}
+.cs-section h4{margin:0 0 10px;color:#7dd3fc}
+.cs-section p{margin:8px 0 16px}
+.cs-cards p{margin:6px 0}
+.cs-graph{overflow:auto;border:1px solid var(--cs-border);border-radius:12px;background:var(--cs-panel)}
+.cs-graph svg{display:block;width:100%;min-width:900px}
+.cs-node{cursor:pointer;outline:none}
+.cs-node rect{fill:#1e293b;stroke:#526a87;stroke-width:1.5}
+.cs-node text{fill:#e2e8f0;font-weight:600;font-size:16px;pointer-events:none}
+.cs-node text.cs-node-sub{fill:#a5b6cc;font-size:12px;font-weight:400}
+.cs-node:hover rect,.cs-node:focus rect,.cs-node.selected rect{fill:#16405a;stroke:#7dd3fc;stroke-width:2.5}
+.cs-table-wrap{overflow-x:auto;border:1px solid var(--cs-border);border-radius:10px;margin:14px 0}
+.cs-table-wrap table{width:100%;border-collapse:collapse;min-width:660px;font-size:.92rem}
+.cs-table-wrap th,.cs-table-wrap td{padding:12px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--cs-border);overflow-wrap:anywhere}
+.cs-table-wrap th{background:var(--cs-panel);font-weight:600;color:#7dd3fc}
+.cs-table-wrap tr:last-child td{border-bottom:none}
+.cs-table-wrap tbody tr:nth-child(even){background:rgba(148,163,184,.045)}
+.cs-filters label{display:block;font-size:.85rem;color:var(--cs-muted)}
+.cs-filters input{display:block;width:min(100%,500px);padding:12px 14px;border:1px solid var(--cs-border);background:var(--cs-panel);color:inherit;font:inherit;border-radius:8px;margin:6px 0 14px}
+.cs-chips{display:flex;flex-wrap:wrap;gap:8px}
+.cs-chips button{cursor:pointer;color:inherit;background:var(--cs-panel);border:1px solid var(--cs-border);border-radius:8px;padding:7px 12px;font:inherit;font-size:.85rem}
+.cs-chips button[aria-pressed=true]{background:#16405a;border-color:#7dd3fc;color:#bae6fd}
+.cs-chips button:focus-visible,.cs-filters input:focus-visible{outline:2px solid #7dd3fc;outline-offset:2px}
+.cs-flow{display:flex;flex-wrap:wrap;gap:9px}
+.cs-flow>div{display:flex;gap:8px;align-items:center;border:1px solid var(--cs-border);border-radius:8px;background:var(--cs-panel);padding:10px 12px;font-size:.88rem}
+.cs-flow span{color:#7dd3fc;font-variant-numeric:tabular-nums}
+.cs-bar-row{display:grid;grid-template-columns:80px minmax(0,1fr) 64px;gap:10px;align-items:center;margin:12px 0;font-size:.85rem}
+.cs-bar-row b{text-align:right;font-variant-numeric:tabular-nums}
+.cs-bar{height:12px;border-radius:4px;background:rgba(148,163,184,.15);overflow:hidden}
+.cs-bar i{display:block;height:100%;border-radius:4px;background:#38bdf8}
+.cs-note{font-size:.85rem}
+.cs-section li{margin:6px 0}
+@media(max-width:650px){.cs-table-wrap table{font-size:.82rem}.cs-table-wrap th,.cs-table-wrap td{padding:9px}.cs-section h2{font-size:1.3rem}.cs-metrics,.cs-cards,.cs-market-grid{gap:10px}.cs-hero{padding:20px}}
