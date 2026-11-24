@@ -57,10 +57,12 @@ Actions variable `REPORTS_AUTO_DEPLOY` is set to `true`, a successful build of
 You can also run the workflow manually from the Actions tab on `main`.
 
 To enable production deployment, configure a `production` environment restricted
-to the `main` branch. Set the environment variable `DEPLOY_SSH_HOST` to the
-public SSH hostname for `maru` and add these environment secrets:
+to the `main` branch. In that environment, set `DEPLOY_SSH_HOST` to the
+public SSH hostname for `maru` and `DEPLOY_SSH_USER` to a dedicated deployment
+account. The account needs write access to the deployment paths and permission
+to restart `instap-reports-mcp` if that service is installed. Add these secrets:
 
-- `DEPLOY_SSH_KEY` holds a dedicated private key authorized for `tzhu` on `maru`.
+- `DEPLOY_SSH_KEY` holds a dedicated private key authorized for the deployment account.
 - `DEPLOY_SSH_KNOWN_HOSTS` holds the verified SSH host key as a known-hosts
   line beginning with `maru`, the alias used by the deployment script.
 

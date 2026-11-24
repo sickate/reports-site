@@ -2,7 +2,7 @@
 set -e
 
 # Configuration
-REMOTE_USER="tzhu"
+REMOTE_USER="${DEPLOY_SSH_USER:-tzhu}"
 REMOTE_HOST="maru"
 REMOTE_PATH="/var/www/reports"
 BUILD_DIR="dist"
@@ -32,6 +32,7 @@ rsync -avz --delete --chmod=u=rwX,go=rX \
   --exclude '.DS_Store' \
   --exclude 'node_modules' \
   --exclude 'scripts' \
+  --exclude '/.backups/' \
   --exclude 'data/metals-daily.json' \
   "$BUILD_DIR/" "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH/"
 

@@ -55,6 +55,7 @@ jobs:
       - name: Deploy current main to maru
         env:
           DEPLOY_SSH_HOST: ${{ vars.DEPLOY_SSH_HOST }}
+          DEPLOY_SSH_USER: ${{ vars.DEPLOY_SSH_USER }}
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
           DEPLOY_SSH_KNOWN_HOSTS: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
         run: |
@@ -68,8 +69,9 @@ jobs:
             exit 0
           fi
 
-          if [[ ! "$DEPLOY_SSH_HOST" =~ ^[A-Za-z0-9.-]+$ || -z "$DEPLOY_SSH_KEY" || -z "$DEPLOY_SSH_KNOWN_HOSTS" ]]; then
-            echo "::error::Configure DEPLOY_SSH_HOST, DEPLOY_SSH_KEY and DEPLOY_SSH_KNOWN_HOSTS in the production environment."
+          if [[ ! "$DEPLOY_SSH_HOST" =~ ^[A-Za-z0-9.-]+$ || ! "$DEPLOY_SSH_USER" =~ ^[a-z_][a-z0-9_-]*$ ||
+                -z "$DEPLOY_SSH_KEY" || -z "$DEPLOY_SSH_KNOWN_HOSTS" ]]; then
+            echo "::error::Configure the deployment SSH variables and secrets in the production environment."
             exit 1
           fi
 
