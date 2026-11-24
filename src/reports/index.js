@@ -6,6 +6,16 @@
 
 export const reports = [
   {
+    slug: '2026-11-china-semiconductor',
+    title: '中国半导体制造产业链全景图：设备、材料、核心零部件与 HBM',
+    description: '整合 Paul Triolo 研究事实、日期与争议，按制造工艺拆解中国半导体上下游，提供交互关系图、企业检索、先进封装流程、国产化成熟度及 2027–2028 跟踪框架。',
+    date: '2026-11-24',
+    type: 'visualization',
+    category: 'industry',
+    tags: ['Research Topic', 'Semiconductor', 'China', 'Supply Chain', 'HBM', '半导体'],
+    component: () => import('./2026-11-china-semiconductor/index.jsx'),
+  },
+  {
     slug: '2026-10-kelly-criterion',
     title: 'Kelly Criterion：1000 条财富路径模拟器',
     description: '调整下注比例、下注次数，观察 1000 条蒙特卡洛财富路径及中位数、P5、P95 和盈利概率，直观比较过度下注与凯利仓位。',
