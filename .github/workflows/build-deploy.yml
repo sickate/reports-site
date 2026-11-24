@@ -26,7 +26,7 @@ jobs:
           PUPPETEER_SKIP_DOWNLOAD: 'true'
       - run: npm run build
       - uses: actions/upload-artifact@v6
-        if: github.ref == 'refs/heads/main' && vars.REPORTS_AUTO_DEPLOY == 'true'
+        if: github.ref == 'refs/heads/main'
         with:
           name: reports-dist
           path: dist/
@@ -93,6 +93,12 @@ jobs:
           SSH_CONFIG
           unset DEPLOY_SSH_KEY DEPLOY_SSH_KNOWN_HOSTS
 
-          bash scripts/deploy.sh --skip-build
+          remote="$DEPLOY_SSH_USER@maru"
+          rsync -rtz --delete --chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r dist/ "$remote:./"
+          ssh "$remote" publish
           curl --fail --silent --show-error --retry 3 --max-time 15 \
-            -o /dev/null https://reports.instap.net/
+            -o "$RUNNER_TEMP/reports-live-index.html" "https://reports.instap.net/?deploy=$GITHUB_SHA"
+          if ! cmp -s dist/index.html "$RUNNER_TEMP/reports-live-index.html"; then
+            echo "::error::The production home page does not match the built release."
+            exit 1
+          fi

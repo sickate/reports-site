@@ -395,6 +395,10 @@ export const sources = [
     "https://americanaffairsjournal.org/2026/02/innovation-under-pressure-chinas-semiconductor-industry-at-a-crossroads/"
   ],
   [
+    "SEMI 2025 equipment sales",
+    "https://www.semi.org/en/SEMI-Reports-Global-Semiconductor-Equipment-Billings-Reached-135-Billion-in-2025"
+  ],
+  [
     "SEMI 2024 equipment sales",
     "https://www.semi.org/en/semi-press-release/global-semiconductor-equipment-billings-surged-to-117-billion-dollars-in-2024-semi-reports"
   ],
@@ -415,7 +419,7 @@ export const sources = [
     "https://dsia.com.cn/ydetail/641.html"
   ]
 ];
-export const spending = [[2021,296.2],[2022,282.7],[2023,366],[2024,495.5],[2025,493.1]];
+export const spending = [[2021,296.2],[2022,282.7],[2023,366],[2024,495.5],[2025,493]];
 export const maturity = [["刻蚀",55,65],["清洗",50,60],["CMP",30,40],["热处理",30,40],["沉积",25,25],["离子注入",0,20],["量测检测",0,10],["Track",0,10],["光刻",0,1]];
 export const watch = [
   "长鑫 DRAM 实际月投片及合格 HBM 产量",
