@@ -1609,3 +1609,24 @@ export const ecosystemEdges = [
     ]
   }
 ];
+
+// Additional named subsystem relationships; dates denote evidence, not incorporation.
+sourceRegistry.rs = ["2021-06-06 · 联合早报：哈勃入股科益虹源（工商报道）","https://www.zaobao.com.sg/realtime/china/story20210606-1152565"];
+ecosystemNodes.push(
+ {id:"rs",lane:"共享上游",period:"2019–22",name:"科益虹源 RSLaser",role:"KrF / ArF 光源",description:"2021-06 报道哈勃入股约4.76%，为历史持股而非当前比例或控股；也服务传统光刻生态。高功率光源仍需先进整机验证。",sourceIds:["rs","ft"]},
+ {id:"guowang",lane:"共享上游",period:"2026",name:"国望光学 / 国科精密",role:"投影 / 照明光学",description:"国产光学子系统相关企业；先进浸没式整机供货与性能尚未独立核实。",sourceIds:["baseline","ft"]},
+ {id:"stage",lane:"共享上游",period:"2026",name:"华卓精科",role:"双工件台 / 运动",description:"超精密运动和工件台相关企业，整机动态套刻和量产认证须单独确认。",sourceIds:["baseline"]},
+ {id:"qier",lane:"共享上游",period:"2026",name:"启尔机电",role:"浸没控制",description:"浸没式光刻子系统候选，实际机型供货未独立核实。",sourceIds:["baseline"]},
+ {id:"zhiqi",lane:"华为关联",period:"2026",name:"至期光子",role:"精密光学 / 投资报道",description:"FT 2026-09 报道华为关联基金投资光学企业；具体持股及先进整机供货待核实。",sourceIds:["ft"]},
+ {id:"oem",lane:"共享制造",period:"2026",name:"北方华创 / 中微 / 拓荆",role:"独立设备平台",description:"传统设备企业独立提供刻蚀、沉积、热处理等工艺能力，不能因服务同一晶圆厂认定为华为或上海微电子下属。",sourceIds:["triolo","baseline"]}
+);
+ecosystemEdges.push(
+ {from:"huawei",to:"rs",type:"reportedOwnership",note:"2021-06 报道哈勃少数股权投资约4.76%；不是控股，现持股未核实",sourceIds:["rs"]},
+ {from:"rs",to:"smee",type:"reported",note:"媒体称国产光刻光源配套；具体先进机型未核实",sourceIds:["rs","baseline"]},
+ {from:"huawei",to:"zhiqi",type:"reportedOwnership",note:"FT 报道关联投资；比例与控制权未核实",sourceIds:["ft"]},
+ {from:"guowang",to:"yul",type:"candidate",note:"精密光学候选能力；不代表已确认供货",sourceIds:["baseline"]},
+ {from:"stage",to:"smee",type:"candidate",note:"精密工件台相关能力；先进机型 BOM 未核实",sourceIds:["baseline"]},
+ {from:"qier",to:"yul",type:"candidate",note:"浸没子系统候选；未确认实际供货",sourceIds:["baseline"]},
+ {from:"oem",to:"smic",type:"candidate",note:"独立设备平台与制造工艺的产业协作；此边不是具体订单确认",sourceIds:["triolo","baseline"]},
+ {from:"oem",to:"memory",type:"candidate",note:"存储工艺学习与设备市场；具体采购需核实",sourceIds:["triolo","baseline"]}
+);
