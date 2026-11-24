@@ -47,7 +47,7 @@ export default function ChinaSemiconductor(){
  const directoryRef=useRef(null);
  const filtered=useMemo(()=>segments.filter(r=>(group==='All'||r[0]===group)&&r.join(' ').toLowerCase().includes(query.trim().toLowerCase())),[group,query]);
  function choose(g){setGroup(g);setQuery('');}
- function openDirectory(g,segment){setGroup(g);setQuery(segment);if(directoryRef.current)directoryRef.current.open=true;document.getElementById('cs-companies')?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}
+ function openDirectory(g,segment){setGroup(g);setQuery(segment);if(directoryRef.current)directoryRef.current.open=true;window.requestAnimationFrame(()=>{directoryRef.current?.querySelector('summary')?.focus({preventScroll:true});document.getElementById('cs-companies')?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});});}
  return <article className="cs-report">
  <header className="cs-hero"><div className="cs-kicker">RESEARCH / SEMICONDUCTORS / 2026.11.24</div><h1>中国半导体制造产业链全景图</h1><p>从原材料、设备核心零部件与工艺材料，到晶圆制造、HBM、先进封装及测试。以实际工艺能力而非概念股标签建立研究底图。</p><div className="cs-metrics"><div><small>2025 中国大陆设备销售额（SEMI）</small><strong>$49.3B</strong><span>含进口设备，非国产设备收入</span></div><div><small>细分环节</small><strong>{segments.length}</strong><span>覆盖上市与非上市主体 · 图谱进一步细分</span></div><div><small>核心跟踪窗口</small><strong>2027–28</strong><span>目标与预测不计入已实现事实</span></div></div></header>
  <nav aria-label="Report contents" className="cs-nav">
