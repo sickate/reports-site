@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
+import ResearchAtlas from './ResearchAtlas.jsx';
 import { Link } from 'react-router-dom';
 import { segments, facts, sources, spending, maturity, watch, regions } from './data.js';
 import './styles.css';
@@ -15,11 +16,9 @@ const graph = [
   {id:'package',label:'Advanced Packaging',sub:'TSV · 键合 · FC-BGA',x:860,y:115,group:'先进封装'},
   {id:'test',label:'Testing',sub:'ATE · Probe Card · KGD',x:860,y:265,group:'测试'},
 ];
-const edges=[['raw','parts'],['raw','materials'],['parts','equipment'],['optics','equipment'],['equipment','fab'],['materials','fab'],['eda','fab'],['fab','package'],['fab','test'],['package','test'],['equipment','package']];
-const nodeMap=Object.fromEntries(graph.map(n=>[n.id,n]));
 const groupLabels = Object.fromEntries(graph.map(({ group, label }) => [group, label]));
 const sections = [
-  ['cs-map', 'Supply Chain Map'],
+  ['cs-map', 'Ecosystem & Global Gap Atlas'],
   ['cs-facts', 'Evidence Timeline'],
   ['cs-companies', 'Company Directory'],
   ['cs-hbm', 'HBM Process'],
@@ -45,22 +44,21 @@ function Section({id,title,children}){return <section id={id} className="cs-sect
 export default function ChinaSemiconductor(){
  const [group,setGroup]=useState('All');
  const [query,setQuery]=useState('');
+ const directoryRef=useRef(null);
  const filtered=useMemo(()=>segments.filter(r=>(group==='All'||r[0]===group)&&r.join(' ').toLowerCase().includes(query.trim().toLowerCase())),[group,query]);
  function choose(g){setGroup(g);setQuery('');}
- function selectNode(g){choose(g);document.getElementById('cs-companies')?.scrollIntoView({behavior:'smooth'});}
+ function openDirectory(g,segment){setGroup(g);setQuery(segment);if(directoryRef.current)directoryRef.current.open=true;window.requestAnimationFrame(()=>{directoryRef.current?.querySelector('summary')?.focus({preventScroll:true});document.getElementById('cs-companies')?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});});}
  return <article className="cs-report">
- <header className="cs-hero"><div className="cs-kicker">RESEARCH / SEMICONDUCTORS / 2026.11.24</div><h1>中国半导体制造产业链全景图</h1><p>从原材料、设备核心零部件与工艺材料，到晶圆制造、HBM、先进封装及测试。以实际工艺能力而非概念股标签建立研究底图。</p><div className="cs-metrics"><div><small>2025 中国大陆设备销售额（SEMI）</small><strong>$49.3B</strong><span>含进口设备，非国产设备收入</span></div><div><small>细分环节</small><strong>{segments.length}</strong><span>覆盖上市与非上市主体</span></div><div><small>核心跟踪窗口</small><strong>2027–28</strong><span>目标与预测不计入已实现事实</span></div></div></header>
+ <header className="cs-hero"><div className="cs-kicker">RESEARCH / SEMICONDUCTORS / 2026.11.24</div><h1>中国半导体制造产业链全景图</h1><p>从原材料、设备核心零部件与工艺材料，到晶圆制造、HBM、先进封装及测试。以实际工艺能力而非概念股标签建立研究底图。</p><div className="cs-metrics"><div><small>2025 中国大陆设备销售额（SEMI）</small><strong>$49.3B</strong><span>含进口设备，非国产设备收入</span></div><div><small>细分环节</small><strong>{segments.length}</strong><span>覆盖上市与非上市主体 · 图谱进一步细分</span></div><div><small>核心跟踪窗口</small><strong>2027–28</strong><span>目标与预测不计入已实现事实</span></div></div></header>
  <nav aria-label="Report contents" className="cs-nav">
   {sections.map(([id, label]) => <a key={id} href={'#' + id}>{label}</a>)}
  </nav>
- <Section id="cs-map" title="01 / 产业链关系图">
- <p>芯片国产化、制造设备国产化、设备内部零部件国产化，是三个不同的层次。点击节点可筛选对应环节；箭头表示工艺或产业依赖，不代表已确认的企业间供货合同。</p>
- <div className="cs-graph"><svg viewBox="0 0 1120 490" role="group" aria-label="China semiconductor supply chain. Select a node to filter the directory."><defs><marker id="cs-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0 0 L7 3 L0 6 Z" fill="#64748b"/></marker></defs>{edges.map(([a,b])=>{const s=nodeMap[a],t=nodeMap[b],x=s.x+240,y=s.y+36,tx=t.x,ty=t.y+36;return <path key={a+b} d={x<tx?'M'+x+' '+y+' C'+(x+25)+' '+y+' '+(tx-25)+' '+ty+' '+tx+' '+ty:'M'+(s.x+120)+' '+(s.y+72)+' L'+(t.x+120)+' '+t.y} fill="none" stroke="#64748b" strokeWidth="1.6" markerEnd="url(#cs-arrow)"/>})}{graph.map(n=><g key={n.id} role="button" tabIndex={0} aria-label={n.label} aria-pressed={group===n.group} onClick={()=>selectNode(n.group)} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selectNode(n.group);}}} className={'cs-node '+(group===n.group?'selected':'')}><rect x={n.x} y={n.y} width="240" height="72" rx="10"/><text x={n.x+14} y={n.y+28}>{n.label}</text><text x={n.x+14} y={n.y+51} className="cs-node-sub">{n.sub}</text></g>)}</svg></div>
- <h3>制造生态及工艺学习平台</h3><div className="cs-cards">{ecosystems.map(([a,b,c])=><div key={a}><h4>{a}</h4><p>{b}</p><p>{c}</p></div>)}</div><p className="cs-note">华为关联生态来自 Paul Triolo 的研究框架，不是正式股权结构；长鑫和长江存储与各设备商的具体采购关系需逐厂核实。</p>
+ <Section id="cs-map" title="01 / 交互产业图谱：生态版图与全球差距">
+ <ResearchAtlas onDirectory={openDirectory}/>
  <h3>四条独立研究主线</h3><div className="cs-cards">{chains.map(([a,...b])=><div key={a}><h4>{a}</h4>{b.map((v,i)=><p key={v}>{i>0?'↓ ':''}{v}</p>)}</div>)}</div>
  </Section>
- <Section id="cs-facts" title="02 / 重要事实、数据与日期"><p>原文发布于 2026-02-20。以下将原文引述、媒体报道、公司公告和预测分开；并保留后续研究的补充信息。尚未独立逐项核查原文脚注。</p><DataTable headers={['日期','事实 / 主张','证据状态']} rows={facts}/><p>关键争议：文章中的 Ascend 每片约 60 个理论裸片与个位数良品说法缺乏独立核实；不能将月投片直接乘以理论裸片数视为合格芯片产出。70% 国产化的 2028 年目标也是未验证说法。EUV 光源产生、可曝光晶圆和稳定量产分别是不同里程碑。</p></Section>
- <Section id="cs-companies" title="03 / 企业与细分工艺目录"><p>按产品类别列出候选参与者及国际对标；股票代码为研究标识，不构成上市状态或投资建议。跨环节企业可重复出现。</p><div className="cs-filters"><label>Search companies / tickers / processes<input value={query} onChange={e=>setQuery(e.target.value)} placeholder="中微 / 688012 / HBM" /></label><div className="cs-chips">{['All',...groups].map(g=><button type="button" key={g} onClick={()=>choose(g)} aria-pressed={group===g}>{groupLabels[g] ?? g}</button>)}</div></div><p className="cs-note">{filtered.length} / {segments.length} segments</p><DataTable headers={['层级','细分工艺','国内参与者','技术/证据状态','国际对标']} rows={filtered}/>{!filtered.length&&<p>No matching segments.</p>}</Section>
+ <Section id="cs-facts" title="02 / 重要事实、数据与日期"><p>原文发布于 2026-02-20。以下将原文引述、媒体报道、公司公告和预测分开；最新补充事实的具体来源见图谱节点详情。尚未独立逐项核查原文脚注。</p><DataTable headers={['日期','事实 / 主张','证据状态']} rows={[...facts.filter(r=>!r[0].includes('2027–2030')), ['2026-07-28','Reuters：爱晟纳整合团队并开始小批生产浸没 DUV 的报道','媒体报道，验收和量产良率未知'],['2026-08-27','TechInsights：N+3 属 7nm 级演进，尚未达到商业 5nm 整体缩放','第三方拆解'],['2026-09-07 / 09-20','长鑫披露 LPDDR6 商用、G5 平台量产，AA 半间距 11.95nm','公司披露，独立成本与良率对标不足'],['2026-10-28','SK hynix 披露 HBM4 销售扩张，预计 Q4 成为主流','公司业绩与指引'],...facts.filter(r=>r[0].includes('2027–2030'))]}/><p>关键争议：文章中的 Ascend 每片约 60 个理论裸片与个位数良品说法缺乏独立核实；不能将月投片直接乘以理论裸片数视为合格芯片产出。70% 国产化的 2028 年目标也是未验证说法。EUV 光源产生、可曝光晶圆和稳定量产分别是不同里程碑。</p></Section>
+ <Section id="cs-companies" title="03 / 企业与细分工艺目录"><details ref={directoryRef} className="cs-directory-details"><summary>展开详细企业目录（可由图谱节点定位）</summary><p>按产品类别列出候选参与者及国际对标；股票代码为研究标识，不构成上市状态或投资建议。跨环节企业可重复出现。</p><div className="cs-filters"><label>Search companies / tickers / processes<input value={query} onChange={e=>setQuery(e.target.value)} placeholder="中微 / 688012 / HBM" /></label><div className="cs-chips">{['All',...groups].map(g=><button type="button" key={g} onClick={()=>choose(g)} aria-pressed={group===g}>{groupLabels[g] ?? g}</button>)}</div></div><p className="cs-note">{filtered.length} / {segments.length} segments</p><DataTable headers={['层级','细分工艺','国内参与者','技术/证据状态','国际对标']} rows={filtered}/>{!filtered.length&&<p>No matching segments.</p>}</details></Section>
  <Section id="cs-hbm" title="04 / HBM 与先进封装流程"><div className="cs-flow">{hbm.map((v,i)=><div key={v}><span>{String(i+1).padStart(2,'0')}</span>{v}</div>)}</div><DataTable headers={['工艺','候选参与者','核查重点']} rows={[
  ['DRAM Die','长鑫存储；其他潜在主体待核实','先进 DRAM 实际良品及 HBM 认证'],
  ['TSV / 沉积','中微、北方华创、拓荆','高深宽比、均匀性'],
