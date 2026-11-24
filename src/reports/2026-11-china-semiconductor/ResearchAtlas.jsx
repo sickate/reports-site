@@ -21,7 +21,11 @@ const relationStyles={
  context:{label:'政策背景',color:'#64748b',dash:'4 5',width:1.5}
 };
 const gapOf=n=>gapLevels[n.gap===null?'U':n.gap];
-function stageOf(n){const s=n.stage;return /研发|原型/.test(s)&&! /商用|量产/.test(s)?['研发 / 验证','#fb923c']:/验证|导入|小批/.test(s)?['导入 / 验证','#eab308']:['商用 / 量产','#2dd4bf'];}
+// Explicit process-level assessments: a commercial base is not proof of advanced-node qualification.
+const stageLabels={commercial:['已有商用基础','#2dd4bf'],adoption:['导入 / 验证','#eab308'],research:['研发 / 原型','#fb923c'],unknown:['证据不足','#94a3b8']};
+const stageGroups={commercial:[0,1,2,4,5,9,10,12,13,14,16,19,20,23,24,25,30,31,32,34,36,37,38,39,40,42,43,44,45,46,47,49,50,52,53,56],adoption:[3,6,8,11,15,17,18,21,22,48,54,55],research:[7,26,27,28,29,33,35,51],unknown:[41]};
+const stageById=Object.fromEntries(Object.entries(stageGroups).flatMap(([stage,ids])=>ids.map(i=>['p'+i,stage])));
+function stageOf(n){return stageLabels[stageById[n.id]??'unknown'];}
 function evidenceOf(n){return /拆解|公司披露|公司公告/.test(n.evidence)?['拆解 / 公司披露','#2dd4bf']:/媒体|报道/.test(n.evidence)?['报道 / 外部资料','#c084fc']:['定性研究 / 待核验','#94a3b8'];}
 const nodeColor=(n,mode)=>mode==='gap'?gapOf(n)[2]:mode==='stage'?stageOf(n)[1]:mode==='evidence'?evidenceOf(n)[1]:groupColors[n.group];
 function Sources({ids=[]}){return <ul className="cs-atlas-sources">{[...new Set(ids)].map(id=>{const s=sourceRegistry[id];return s?<li key={id}>{id==='baseline'?s[0]:<a href={s[1]} target="_blank" rel="noreferrer">{s[0]}</a>}</li>:null;})}</ul>}
@@ -29,11 +33,11 @@ function Tag({color,children}){return <span className="cs-atlas-tag" style={{'--
 function Legend({items}){return <div className="cs-atlas-legend">{items.map(([name,color])=><span key={name}><i style={{background:color}}/>{name}</span>)}</div>}
 function Drawer({selected,onClose,onDirectory,onSelect}){
  const dialog=useRef(null);const closeRef=useRef(null);
- useEffect(()=>{const el=dialog.current;if(selected&&!el.open){el.showModal();closeRef.current?.focus();}else if(!selected&&el.open)el.close();},[selected]);
+ useEffect(()=>{const el=dialog.current;if(selected){if(!el.open)el.showModal();el.scrollTop=0;closeRef.current?.focus({preventScroll:true});}else if(el.open)el.close();},[selected]);
  const n=selected?.node;
  const isProcess=selected?.kind==='process';
  const connected=n&&!isProcess?ecosystemEdges.filter(e=>e.from===n.id||e.to===n.id):[];
- return <dialog ref={dialog} className="cs-atlas-dialog" aria-labelledby="cs-drawer-title" onCancel={e=>{e.preventDefault();onClose();}} onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
+ return <dialog ref={dialog} className="cs-atlas-dialog" aria-labelledby={n?'cs-drawer-title':undefined} onCancel={e=>{e.preventDefault();onClose();}} onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
  {n&&<div className="cs-atlas-drawer"><div className="cs-drawer-top"><span className="cs-atlas-kicker">{isProcess?'PROCESS INTELLIGENCE':'ECOSYSTEM INTELLIGENCE'}</span><button ref={closeRef} type="button" aria-label="关闭详情" className="cs-atlas-close" onClick={onClose}>×</button></div>
  <h2 id="cs-drawer-title">{isProcess?n.label:n.name}</h2>
  {isProcess?<><div className="cs-atlas-tags"><Tag color={groupColors[n.group]}>{n.group}</Tag><Tag color={gapOf(n)[2]}>{gapOf(n)[0]} · {gapOf(n)[1]}</Tag><Tag color={stageOf(n)[1]}>{stageOf(n)[0]}</Tag></div>
@@ -41,7 +45,7 @@ function Drawer({selected,onClose,onDirectory,onSelect}){
  <h3>中国参与者</h3><div className="cs-player-list">{n.players.split('；').map((v,i)=><span key={i}>{v}</span>)}</div>
  <h3>国际对标</h3><p>{n.leaders}</p><h3>差距与验证指标</h3><p>{n.why}</p><h3>技术与证据状态</h3><p>{n.stage}</p><Tag color={evidenceOf(n)[1]}>{n.evidence}</Tag><p className="cs-note">G 等级为研究者按先进产品能力、商业化与验证程度作出的定性判断，不是精确市占率、年份或性能比例；未披露的同口径数据不补估。</p>
  <h3>相关产业环节</h3><div className="cs-atlas-tags">{processNodes.filter(p=>p.id!==n.id&&(p.group===n.group||groupLinks[n.group].includes(p.group))).slice(0,12).map(p=><button type="button" className="cs-atlas-link" key={p.id} onClick={()=>onSelect({kind:'process',node:p})}>{p.label}</button>)}</div>
- <h3>来源与证据</h3><Sources ids={n.sourceIds}/><button className="cs-atlas-primary" type="button" onClick={()=>{onClose();onDirectory(n.group,n.segment);}}>打开对应详细表格 ↗</button>
+ <h3>来源与证据</h3><Sources ids={n.sourceIds}/><button className="cs-atlas-primary" type="button" onClick={()=>{dialog.current?.close();onClose();onDirectory(n.group,n.segment);}}>打开对应详细表格 ↗</button>
  </>:<><div className="cs-atlas-tags"><Tag color={ecoColors[n.lane]}>{n.lane}</Tag><Tag color="#94a3b8">{n.period} · {n.role}</Tag></div><h3>分工与已知进展</h3><p>{n.description}</p><h3>关系与证据</h3>{connected.length?connected.map((e,i)=>{const target=ecosystemNodes.find(v=>v.id===(e.from===n.id?e.to:e.from));const style=relationStyles[e.type];return <div className="cs-relation-detail" key={i}><Tag color={style.color}>{style.label}</Tag><button type="button" className="cs-atlas-link" onClick={()=>onSelect({kind:'eco',node:target})}>{e.from===n.id?'→ ':'← '}{target.name}</button><p>{e.note}</p><Sources ids={e.sourceIds}/></div>}):<p>暂无可核实的直接关系边。</p>}<h3>节点来源</h3><Sources ids={n.sourceIds}/><p className="cs-note">归入生态表示研究上的分工/协作，不自动表示控股、排他供应或集团子公司。</p></>}
  </div>}
  </dialog>
@@ -80,7 +84,7 @@ function ProcessMap({onSelect}){
  const [gapFilter,setGapFilter]=useState('all');
  const filtered=processNodes.filter(n=>(gapFilter==='all'||(n.gap===null?'U':String(n.gap))===gapFilter)&&[n.label,n.segment,n.players,n.leaders,n.cn,n.world].join(' ').toLowerCase().includes(query.trim().toLowerCase()));
  const modes=[['category','产业类别'],['gap','全球差距'],['stage','成熟度'],['evidence','证据状态']];
- const colors=mode==='gap'?Object.values(gapLevels).map(v=>[v[0]+' '+v[1],v[2]]):mode==='stage'?[['商用 / 量产','#2dd4bf'],['导入 / 验证','#eab308'],['研发 / 验证','#fb923c']]:mode==='evidence'?[['拆解 / 公司披露','#2dd4bf'],['报道 / 外部资料','#c084fc'],['定性研究 / 待核验','#94a3b8']]:Object.entries(groupColors);
+ const colors=mode==='gap'?Object.values(gapLevels).map(v=>[v[0]+' '+v[1],v[2]]):mode==='stage'?Object.values(stageLabels):mode==='evidence'?[['拆解 / 公司披露','#2dd4bf'],['报道 / 外部资料','#c084fc'],['定性研究 / 待核验','#94a3b8']]:Object.entries(groupColors);
  return <div className="cs-atlas-panel"><div className="cs-atlas-header"><div><span className="cs-atlas-kicker">GLOBAL GAP ATLAS / PROCESS LEVEL</span><h3>中国 vs 全球领先：逐工艺节点</h3><p>每个节点展示国内现状和海外基准。点击打开详情，无需离开图谱。节点底色按所选视角变化，右侧 G 标签始终保留差距等级。</p></div><Tag color="#60a5fa">{filtered.length} / {processNodes.length} 节点</Tag></div>
  <div className="cs-atlas-controls"><div className="cs-chips">{modes.map(([id,label])=><button key={id} type="button" aria-pressed={mode===id} onClick={()=>setMode(id)}>{label}</button>)}</div><label>搜索节点或公司 <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="EUV / 华海清科 / HBM"/></label><label>差距筛选 <select value={gapFilter} onChange={e=>setGapFilter(e.target.value)}><option value="all">全部</option>{Object.entries(gapLevels).map(([key,v])=><option key={key} value={key}>{v[0]} · {v[1]}</option>)}</select></label></div>
  <Legend items={colors}/><div className="cs-gap-key">{Object.values(gapLevels).map(v=><Tag key={v[0]} color={v[2]}>{v[0]} {v[1]}</Tag>)}</div>
