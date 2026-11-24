@@ -49,7 +49,26 @@ This will:
 4. Request SSL certificate via certbot
 5. Reload nginx
 
-### Deploy Updates
+### GitHub Actions deployment
+
+Pushes to any branch run the production build on GitHub. When the repository
+Actions variable `REPORTS_AUTO_DEPLOY` is set to `true`, a successful build of
+`main` is deployed to [reports.instap.net](https://reports.instap.net).
+You can also run the workflow manually from the Actions tab on `main`.
+
+To enable production deployment, configure a `production` environment restricted
+to the `main` branch. Set the environment variable `DEPLOY_SSH_HOST` to the
+public SSH hostname for `maru` and add these environment secrets:
+
+- `DEPLOY_SSH_KEY` holds a dedicated private key authorized for `tzhu` on `maru`.
+- `DEPLOY_SSH_KNOWN_HOSTS` holds the verified SSH host key as a known-hosts
+  line beginning with `maru`, the alias used by the deployment script.
+
+Before enabling `REPORTS_AUTO_DEPLOY`, reconcile any manually published
+reports with `main`. The deployment sync removes site files absent from the
+build and preserves the cron-managed daily metals data.
+
+### Deploy Updates Manually
 
 ```bash
 npm run deploy

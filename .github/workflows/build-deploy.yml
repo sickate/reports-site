@@ -1,0 +1,96 @@
+name: Build and deploy reports
+
+on:
+  push:
+    branches:
+      - '**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: 'true'
+      - run: npm run build
+      - uses: actions/upload-artifact@v6
+        if: github.ref == 'refs/heads/main' && vars.REPORTS_AUTO_DEPLOY == 'true'
+        with:
+          name: reports-dist
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  deploy:
+    if: github.ref == 'refs/heads/main' && vars.REPORTS_AUTO_DEPLOY == 'true'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: reports-production
+      cancel-in-progress: false
+    environment:
+      name: production
+      url: https://reports.instap.net
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v7
+        with:
+          name: reports-dist
+          path: dist/
+      - name: Deploy current main to maru
+        env:
+          DEPLOY_SSH_HOST: ${{ vars.DEPLOY_SSH_HOST }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_SSH_KNOWN_HOSTS: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
+        run: |
+          main_sha="$(git ls-remote origin refs/heads/main | cut -f1)"
+          if [[ -z "$main_sha" ]]; then
+            echo "::error::Could not resolve the current main commit."
+            exit 1
+          fi
+          if [[ "$main_sha" != "$GITHUB_SHA" ]]; then
+            echo "::notice::Skipping deployment because main has advanced."
+            exit 0
+          fi
+
+          if [[ ! "$DEPLOY_SSH_HOST" =~ ^[A-Za-z0-9.-]+$ || -z "$DEPLOY_SSH_KEY" || -z "$DEPLOY_SSH_KNOWN_HOSTS" ]]; then
+            echo "::error::Configure DEPLOY_SSH_HOST, DEPLOY_SSH_KEY and DEPLOY_SSH_KNOWN_HOSTS in the production environment."
+            exit 1
+          fi
+
+          umask 077
+          mkdir -p ~/.ssh
+          trap 'rm -f ~/.ssh/reports-deploy-key' EXIT
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/reports-deploy-key
+          printf '%s\n' "$DEPLOY_SSH_KNOWN_HOSTS" > ~/.ssh/reports-known-hosts
+          printf 'Host maru\n  HostName %s\n' "$DEPLOY_SSH_HOST" >> ~/.ssh/config
+          cat >> ~/.ssh/config <<'SSH_CONFIG'
+            HostKeyAlias maru
+            IdentityFile ~/.ssh/reports-deploy-key
+            UserKnownHostsFile ~/.ssh/reports-known-hosts
+            GlobalKnownHostsFile /dev/null
+            IdentitiesOnly yes
+            BatchMode yes
+            StrictHostKeyChecking yes
+            ConnectTimeout 15
+          SSH_CONFIG
+          unset DEPLOY_SSH_KEY DEPLOY_SSH_KNOWN_HOSTS
+
+          bash scripts/deploy.sh --skip-build
+          curl --fail --silent --show-error --retry 3 --max-time 15 \
+            -o /dev/null https://reports.instap.net/
