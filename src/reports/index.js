@@ -1,10 +1,30 @@
-// category 字段用于主页分组：'company' | 'industry' | 'viz' | 'reading'
+// category 字段用于主页分组：'art' | 'company' | 'industry' | 'viz' | 'reading'
 // company:  单标的深度（季度跟踪、公司深度投研）
 // industry: 行业 / 板块 / 产业链分析
 // viz:      可视化 / 交互工具（地图、数据仪表盘、3D）
 // reading:  读书笔记（默认在主页底部收起，权重低于前三类）
 
 export const reports = [
+  {
+    slug: '2026-11-data-center-ballots',
+    title: '当地方选票遇上算力扩张：数据中心限制与中选权力地图',
+    description: '18 个地方的数据中心限制、20 条项目 / 政策记录、州长换党与州议会控制权；地图按规划 MW 或预算显示规模，区分禁令、临时暂停、咨询票与罢免。',
+    date: '2026-11-04',
+    type: 'visualization',
+    category: 'viz',
+    tags: ['Data Centers', 'Midterms 2026', 'Map', 'AWS', 'Meta', 'State Power'],
+    component: () => import('./2026-11-data-center-ballots/index.jsx'),
+  },
+  {
+    slug: '2026-10-art-of-light',
+    title: '当光改写世界：梵高、透纳与我的审美地图',
+    description: '梵高与莫奈、透纳、蒙蒂切利和日本浮世绘的并排赏析；17 幅馆藏画作、个人偏好地图、氛围筛选与可放大的本地画廊。',
+    date: '2026-10-14',
+    type: 'visualization',
+    category: 'art',
+    tags: ['艺术赏析', '梵高', '透纳', '莫奈', '光与氛围'],
+    component: () => import('./2026-10-art-of-light/index.jsx'),
+  },
   {
     slug: '2026-10-kelly-criterion',
     title: 'Kelly Criterion：1000 条财富路径模拟器',
@@ -227,6 +247,12 @@ export const reports = [
 ];
 
 export const REPORT_CATEGORIES = [
+  {
+    key: 'art',
+    label: '艺术赏析',
+    description: '画作比较、个人审美与可进入的光色世界',
+    icon: '🎨',
+  },
   {
     key: 'company',
     label: '公司报告',

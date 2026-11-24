@@ -56,19 +56,21 @@ Actions variable `REPORTS_AUTO_DEPLOY` is set to `true`, a successful build of
 `main` is deployed to [reports.instap.net](https://reports.instap.net).
 You can also run the workflow manually from the Actions tab on `main`.
 
-To enable production deployment, configure a `production` environment restricted
-to the `main` branch. In that environment, set `DEPLOY_SSH_HOST` to the
-public SSH hostname for `maru` and `DEPLOY_SSH_USER` to a dedicated deployment
-account. The account needs write access to the deployment paths and permission
-to restart `instap-reports-mcp` if that service is installed. Add these secrets:
+The GitHub `production` environment accepts deployments from `main`. Its
+`DEPLOY_SSH_HOST` and `DEPLOY_SSH_USER` variables identify the public SSH
+endpoint and the dedicated deployment account on `maru`. The
+`DEPLOY_SSH_KEY` secret stores that account's dedicated private key, and
+`DEPLOY_SSH_KNOWN_HOSTS` stores the verified host key with the alias `maru`.
 
-- `DEPLOY_SSH_KEY` holds a dedicated private key authorized for the deployment account.
-- `DEPLOY_SSH_KNOWN_HOSTS` holds the verified SSH host key as a known-hosts
-  line beginning with `maru`, the alias used by the deployment script.
+The server runs `scripts/deploy-ci-server.sh` from the root-owned path
+`/usr/local/libexec/instap-reports-ci`. The restricted SSH key can stage the
+build via rsync and request a publish. The server preserves deployment backups,
+administrative scripts, and cron-managed data. Use the manual deployment below
+for changes to the monitoring or MCP service code.
 
-Before enabling `REPORTS_AUTO_DEPLOY`, reconcile any manually published
-reports with `main`. The deployment sync removes site files absent from the
-build and preserves the cron-managed daily metals data.
+Before enabling automation, stage the GitHub build on the server and run
+`/usr/local/libexec/instap-reports-ci preview` as the site's owner to check
+for differences from the live site.
 
 ### Deploy Updates Manually
 

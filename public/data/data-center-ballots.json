@@ -1,0 +1,1022 @@
+{
+  "meta": {
+    "title": "当地方选票遇上算力扩张",
+    "asOf": "2026-11-04",
+    "timezone": "Asia/Shanghai",
+    "thread": "https://x.com/jdcapelouto/status/2117786709173645427",
+    "threadContinuations": 17,
+    "scope": "18 个地方记录；其中 Madison County 汇总四镇咨询票。不是全美禁令普查。",
+    "voteStatus": "选举夜报道 / 非正式计票；尚未取得最终认证结果",
+    "capacityRule": "圆面积正比于已披露规划 MW 或预算；同城多个项目取最大单项，不合计。精确值未知用菱形。",
+    "coordinateRule": "Census 城镇代表内点，近似城市位置；不代表数据中心地块。"
+  },
+  "sites": [
+    {
+      "id": "piqua",
+      "city": "Piqua",
+      "state": "OH",
+      "lat": 40.147112,
+      "lng": -84.243465,
+      "policy": "ban",
+      "result": "作者报：超过 25MW 禁令通过；市长及两名委员被罢免",
+      "policyText": "城市宪章限制超过 25MW 的数据中心；既有开发协议的适用尚可能争议。",
+      "projects": [
+        {
+          "id": "meta-piqua",
+          "company": "Meta",
+          "name": "Piqua Data Center",
+          "mw": 1400,
+          "capexB": 1,
+          "stage": "planned",
+          "companyKeys": [
+            "meta"
+          ],
+          "tickers": [
+            "META"
+          ],
+          "area": "约 608 英亩（次级公共记录索引）",
+          "capacityBasis": "申请运营负荷；1,400MW 来自作者及听证记录索引，非已通电 IT 容量",
+          "impact": "未来算力建设、许可及交付时间面临不确定性；可能增加诉讼、改址和重新落实电力条件的成本。",
+          "caveat": "开发协议于 2026-01-23 执行；规则冻结条款仅取得次级引述，尚无裁决证明豁免或取消。",
+          "sources": [
+            "https://piquaoh.gov/1673/Data-Center-Project",
+            "https://piquaoh.gov/DocumentCenter/View/3973"
+          ],
+          "capexQualifier": ">",
+          "capacityText": null
+        }
+      ],
+      "sources": [
+        "https://x.com/jdcapelouto/status/2117821128991494330"
+      ],
+      "caveat": "",
+      "nameZh": "",
+      "coordinateBasis": "Census representative internal point; approximate city location, not data-center parcel",
+      "geoid": "3962848",
+      "coordinateYear": 2024
+    },
+    {
+      "id": "trenton",
+      "city": "Trenton",
+      "state": "OH",
+      "lat": 39.478808,
+      "lng": -84.466373,
+      "policy": "ban",
+      "result": "约 80% 初步赞成票；超过 25MW 禁令通过",
+      "policyText": "在建项目与第二拟建园区必须分开判断；既有许可适用存在争议。",
+      "projects": [
+        {
+          "id": "aws-trenton-new",
+          "company": "Amazon / AWS",
+          "name": "第二拟建园区",
+          "mw": 1000,
+          "capexB": 5,
+          "stage": "planned",
+          "companyKeys": [
+            "amazon"
+          ],
+          "tickers": [
+            "AMZN"
+          ],
+          "area": "601 英亩 / 18 栋",
+          "capacityBasis": "规划负荷；非在运 IT 容量",
+          "impact": "通过并入 Trenton 推进的路线受阻；可否在原乡镇辖区另行申请，取决于后续审批与供电条件。",
+          "caveat": "9 月撤回并市申请不等于取消园区。1,000MW 为拟建规模。",
+          "sources": [
+            "https://www.wvxu.org/environment/2026-11-03/trenton-votes-to-ban-data-centers",
+            "https://www.wvxu.org/local-news/2026-09-15/trenton-withdraws-annex-land-data-center-township"
+          ],
+          "capexQualifier": "",
+          "capacityText": null
+        },
+        {
+          "id": "aws-pld-trenton",
+          "company": "Prologis 开发 / AWS 使用",
+          "name": "在建 Project Mila",
+          "mw": 250,
+          "capexB": null,
+          "stage": "construction",
+          "companyKeys": [
+            "amazon",
+            "prologis"
+          ],
+          "tickers": [
+            "PLD",
+            "AMZN"
+          ],
+          "area": "约 140 英亩 / 接近 100 万平方英尺",
+          "capacityBasis": "在建项目设计负荷，尚非在运容量",
+          "impact": "涉及 Prologis 实际交付与 AWS 未来容量。若既有许可不受保护，施工和合同履约可能受到影响。",
+          "caveat": "市府认为已有许可可继续；倡议方律师认为应限制在 25MW。10/9、11/3 报道均保留争议。",
+          "sources": [
+            "https://www.statenews.org/section/the-ohio-newsroom/2026-08-19/backdoor-deal-or-business-as-usual-an-ohio-data-center-raises-transparency-concerns",
+            "https://www.wvxu.org/local-news/2026-10-09/data-centers-are-on-the-ballot-in-trenton-heres-what-to-know-about-issue-17"
+          ],
+          "capexQualifier": "",
+          "capacityText": null
+        }
+      ],
+      "sources": [
+        "https://x.com/jdcapelouto/status/2117820236418207770"
+      ],
+      "caveat": "",
+      "nameZh": "",
+      "coordinateBasis": "Census representative internal point; approximate city location, not data-center parcel",
+      "geoid": "3977322",
+      "coordinateYear": 2024
+    },
+    {
+      "id": "sunbury",
+      "city": "Sunbury",
+      "state": "OH",
+      "lat": 40.249405,
+      "lng": -82.880199,
+      "policy": "ban",
+      "result": "作者报：超过 25MW 禁令以约 79% 通过",
+      "policyText": "此前已有许可暂停；新宪章限制进一步提高恢复审批的不确定性。",
+      "projects": [
+        {
+          "id": "aws-sunbury",
+          "company": "Amazon Data Services / AWS",
+          "name": "Sunbury 拟建园区",
+          "mw": null,
+          "capexB": 2,
+          "stage": "paused",
+          "companyKeys": [
+            "amazon"
+          ],
+          "tickers": [
+            "AMZN"
+          ],
+          "area": "未披露",
+          "capacityBasis": "规划负荷；非在运 IT 容量",
+          "impact": "主要影响未来扩容及用地开发；项目此前已暂停，不能把预算全部认作此次投票新增损失。",
+          "caveat": "早期用地权利不证明对新禁令享有豁免；未核实 MW。1,300 英亩是整个工业园，并非已核实 AWS 项目占地。",
+          "sources": [
+            "https://sunburyohio.org/DocumentCenter/View/1694/Amazon-Data-Services---Press-Release-final?bidId=",
+            "https://sunburyohio.org/DocumentCenter/View/1692/Data-Center-FAQ?bidId=",
+            "https://sunburyvillage.com/AgendaCenter/ViewFile/Agenda/_04292026-825?packet=true"
+          ],
+          "capexQualifier": "",
+          "capacityText": null
+        }
+      ],
+      "sources": [
+        "https://x.com/jdcapelouto/status/2117831675510140961"
+      ],
+      "caveat": "",
+      "nameZh": "",
+      "coordinateBasis": "Census representative internal point; approximate city location, not data-center parcel",
+      "geoid": "3975602",
+      "coordinateYear": 2024
+    },
+    {
+      "id": "pataskala",
+      "city": "Pataskala",
+      "state": "OH",
+      "lat": 40.019795,
+      "lng": -82.71988,
+      "policy": "ban",
+      "result": "截图：超过 25MW 禁令约 73.62% 通过",
+      "policyText": "未来新开发受限；已被拒项目与微软储地分别记录。",
+      "projects": [
+        {
+          "id": "aligned-pataskala",
+          "company": "Aligned Data Centers",
+          "name": "Broad / Mink 方案",
+          "mw": 200,
+          "capexB": null,
+          "stage": "rejected",
+          "companyKeys": [
+            "aligned"
+          ],
+          "tickers": [],
+          "area": "约 89 英亩",
+          "capacityBasis": "规划负荷；非在运 IT 容量",
+          "impact": "减少方案重启和开发选择权；不是新增 200MW 运营容量损失。",
+          "caveat": "市议会已于 8/25 拒绝方案；管理员称当时本市无现有数据中心。",
+          "sources": [
+            "https://newalbanygahannabeacon.com/articles/pataskala-unanimously-rejects-aligned-data-centers-proposal-mt9thi5t"
+          ],
+          "capexQualifier": "",
+          "capacityText": null
+        },
+        {
+          "id": "microsoft-pataskala",
+          "company": "Microsoft",
+          "name": "储备土地",
+          "mw": null,
+          "capexB": null,
+          "stage": "land",
+          "companyKeys": [
+            "microsoft"
+          ],
+          "tickers": [
+            "MSFT"
+          ],
+          "area": "报道历次购地 289 + 40 + 37 英亩",
+          "capacityBasis": "规划负荷；非在运 IT 容量",
+          "impact": "未来土地开发选择权受限；没有已披露的本市 Azure 容量或收入可供量化。",
+          "caveat": "10 月新购 37 英亩花费约 665 万美元是土地交易额，不是数据中心总投资；相邻城市项目不在此禁令辖区。",
+          "sources": [
+            "https://www.datacenterdynamics.com/en/news/microsoft-acquires-37-acres-in-licking-county-ohio/"
+          ],
+          "capexQualifier": "",
+          "capacityText": null
+        }
+      ],
+      "sources": [
+        "https://x.com/jdcapelouto/status/2117816198066843772"
+      ],
+      "caveat": "",
+      "nameZh": "",
+      "coordinateBasis": "Census representative internal point; approximate city location, not data-center parcel",
+      "geoid": "3961112",
+      "coordinateYear": 2024
+    },
+    {
+      "id": "urbana",
+      "city": "Urbana",
+      "state": "OH",
+      "lat": 40.109095,
+      "lng": -83.754987,
+      "policy": "ban",
+      "result": "作者报：建设禁令约 73% 领先",
+      "policyText": "此前 3 月已有 12 个月暂停令；Thor 已起诉；小型企业自用设施例外有附加条件。",
+      "projects": [
+        {
+          "id": "thor-urbana",
+          "company": "Thor Equities（私人开发商）",
+          "name": "Urbana Technology Hub",
+          "mw": null,
+          "capexB": 1,
+          "stage": "planned",
+          "companyKeys": [
+            "thor"
+          ],
+          "tickers": [],
+          "area": "约 230 英亩 / 46 万平方英尺",
+          "capacityBasis": "规划负荷；非在运 IT 容量",
+          "impact": "前期投入回收、融资及未来开发收益面临风险；Thor 自称前期已投入 1,960 万美元。",
+          "caveat": "10 亿美元为全项目预算，非损失额。MW、终端云客户未披露；诉讼结果未定。",
+          "sources": [
+            "https://www.datacenterdynamics.com/en/news/thor-equities-files-lawsuit-against-ohios-urbana-after-data-center-moratorium-disrupts-project/",
+            "https://www.wyso.org/environment-news/2026-06-23/urbana-backed-down-from-rules-paving-way-for-big-data-centers-now-a-developer-is-suing"
+          ],
+          "capexQualifier": "",
+          "capacityText": null
+        }
+      ],
+      "sources": [
+        "https://x.com/jdcapelouto/status/2117796541494931790"
+      ],
+      "caveat": "",
+      "nameZh": "",
+      "coordinateBasis": "Census representative internal point; approximate city location, not data-center parcel",
+      "geoid": "3979072",
+      "coordinateYear": 2024
+    },
+    {
+      "id": "hubbard",
+      "city": "Hubbard",
+      "state": "OH",
+      "lat": 41.158121,
+      "lng": -80.564651,
+      "policy": "ban",
+      "result": "作者报：全市禁令约 76% 领先",
+      "policyText": "已有一年暂停；作者称市长此前已表示该项目终止。",
+      "projects": [
+        {
+          "id": "crane-hubbard",
+          "company": "Crane Data Centers（作者归因）",
+          "name": "拟议 300MW 方案",
+          "mw": 300,
+          "capexB": null,
+          "stage": "terminated",
+          "companyKeys": [
+            "crane"
+          ],
+          "tickers": [],
+          "area": "未披露",
+          "capacityBasis": "300MW 仅保留原作者归因；未独立确认承诺容量",
+          "impact": "降低项目重启可能；不能再计为选举新增取消或已有服务器收入损失。",
+          "caveat": "未确认当前建设合同、云租户或投入资金；不能因名称关联上市公司 Crane，也不能套用其俄勒冈州另一合作项目。",
+          "sources": [
+            "https://cityofhubbard-oh.gov/data-center-petitions/",
+            "https://x.com/jdcapelouto/status/2117798375772889223"
+          ],
+          "capexQualifier": "",
+          "capacityText": null
+        }
+      ],
+      "sources": [
+        "https://x.com/jdcapelouto/status/2117798375772889223"
+      ],
+      "caveat": "",
+      "nameZh": "",
+      "coordinateBasis": "Census representative internal point; approximate city location, not data-center parcel",
+      "geoid": "3936582",
+      "coordinateYear": 2024
+    },
+    {
+      "id": "emporia",
+      "city": "Emporia",
+      "state": "KS",
+      "lat": 38.40186,
+      "lng": -96.191654,
+      "policy": "ban",
+      "result": "作者报：高影响数据中心禁令约 60% 通过",
+      "policyText": "是否属于州法允许公投的事项仍有法律争议。",
+      "projects": [
+        {
+          "id": "kanza-emporia",
+          "company": "Kanza Park Place LLC",
+          "name": "Flint Hills Digital Campus",
+          "mw": null,
+          "capexB": null,
+          "stage": "planned",
+          "companyKeys": [
+            "kanza"
+          ],
+          "tickers": [],
+          "area": "约 1,000 英亩",
+          "capacityBasis": "早期 GW 级构想；无精确且获批的 MW",
+          "impact": "私人开发商的招商、融资和土地变现受阻；未来租户身份尚不公开。",
+          "caveat": "9 月开发协议仍未完成；没有确定并网容量、最终用户或可量化总投资。",
+          "sources": [
+            "https://www.emporiarda.org/news-and-media/news-archive/p/item/67803/flint-hills-digital-campus-initiative-signals-major-economic-development-opportunity-for-emporia-and-lyon-county",
+            "https://kvoe.com/2026/09/17/data-center-flint-hills-digital-campus-spokesman-says-officials-taking-steps-to-address-project-concerns-as-project-gains-nationwide-interest/",
+            "https://kvoe.com/2026/08/20/300493/"
+          ],
+          "capexQualifier": "",
+          "capacityText": "GW 级构想；精确 MW 未确认"
+        }
+      ],
+      "sources": [
+        "https://x.com/jdcapelouto/status/2117813374612381819"
+      ],
+      "caveat": "",
+      "nameZh": "",
+      "coordinateBasis": "Census representative internal point; approximate city location, not data-center parcel",
+      "geoid": "2021275",
+      "coordinateYear": 2024
+    },
+    {
+      "id": "perry",
+      "city": "Perry Village",
+      "state": "OH",
+      "lat": 41.763674,
+      "lng": -81.143013,
+      "policy": "conditions",
+      "result": "作者报：税惠保证金 / 噪声要求约 87% 通过",
+      "policyText": "针对税惠的条件不是全面禁建；另行暂停明确排除 Champion Farm。",
+      "projects": [
+        {
+          "id": "province-perry",
+          "company": "Province Group",
+          "name": "Perry Technology Park / Champion Farm",
+          "mw": null,
+          "capexB": null,
+          "stage": "planned",
+          "companyKeys": [
+            "province"
+          ],
+          "tickers": [],
+          "area": "早期约 230 英亩；官网 217 + 潜扩 84 英亩",
+          "capacityBasis": "规划负荷；非在运 IT 容量",
+          "impact": "保证金、税惠和噪声条件改变开发经济性及资金占用。7 月地方已拒税收减免。",
+          "caveat": "MW、总资本投入及租户未披露。不要套用同名 Perry Township 的另一个项目。",
+          "sources": [
+            "https://perrytechnologypark.com/project-overview/",
+            "https://perryvillageohio.com/announcements/?mo=11&yr=2026",
+            "https://www.lakeshoreviews.com/perry-village-moves-toward-data-center-moratorium-after-rejecting-tax-abatement/"
+          ],
+          "capexQualifier": "",
+          "capacityText": null
+        }
+      ],
+      "sources": [
+        "https://x.com/jdcapelouto/status/2117815576148201700"
+      ],
+      "caveat": "",
+      "nameZh": "",
+      "coordinateBasis": "Census representative internal point; approximate city location, not data-center parcel",
+      "geoid": "3961882",
+      "coordinateYear": 2024
+    },
+    {
+      "id": "granite-city",
+      "city": "Granite City / Madison County",
+      "state": "IL",
+      "lat": 38.729283,
+      "lng": -90.125472,
+      "policy": "advisory",
+      "result": "作者报：四个 township 的咨询票大幅反对",
+      "policyText": "Chouteau、Granite City、Nameoki、Venice 的咨询投票本身无约束力。",
+      "projects": [
+        {
+          "id": "cloverleaf-granite",
+          "company": "Cloverleaf Infrastructure",
+          "name": "Granite City 早期方案",
+          "mw": 500,
+          "capexB": null,
+          "stage": "planned",
+          "companyKeys": [
+            "cloverleaf",
+            "nvidia"
+          ],
+          "tickers": [
+            "NVDA（间接少数股权）"
+          ],
+          "area": "约 250–300 英亩 / 120 万平方英尺",
+          "capacityBasis": "规划负荷；非在运 IT 容量",
+          "impact": "增加政治和许可阻力；NVIDIA 有已确认的少数股权投资，但当地客户、GPU 订单及投资占比未知。",
+          "caveat": "两处备选位置不能相加成两个 500MW 项目。4 月尚无正式申请，10 月报道提案搁置；咨询票不自动关闭项目。",
+          "sources": [
+            "https://granitecitydatacenter.com/",
+            "https://www.bnd.com/news/local/article314595136.html",
+            "https://www.cloverleafinfra.com/newsroom/cloverleaf-infrastructure-forms-strategic-partnership-with-nvidia-to-accelerate-data-center-infrastructure-development"
+          ],
+          "capexQualifier": "",
+          "capacityText": null
+        }
+      ],
+      "sources": [
+        "https://x.com/jdcapelouto/status/2117817264196165783"
+      ],
+      "caveat": "",
+      "nameZh": "",
+      "coordinateBasis": "Census representative internal point; approximate city location, not data-center parcel",
+      "geoid": "1730926",
+      "coordinateYear": 2024
+    },
+    {
+      "id": "yukon",
+      "city": "Yukon",
+      "state": "OK",
+      "lat": 35.518409,
+      "lng": -97.766172,
+      "policy": "recall",
+      "result": "作者报：市长被罢免；并非项目禁令",
+      "policyText": "跨 Yukon 与 Oklahoma City；OKC 一侧 10 月已通过改划，仍有后续许可。",
+      "projects": [
+        {
+          "id": "beltline-yukon",
+          "company": "Beltline Energy / BLE Landholdings",
+          "name": "Yukon 早期一侧方案",
+          "mw": 500,
+          "capexB": 1,
+          "stage": "planned",
+          "companyKeys": [
+            "beltline"
+          ],
+          "tickers": [],
+          "area": "早期 Yukon 一侧 184.5 英亩",
+          "capacityBasis": "早期 Yukon 一侧规划；非跨界园区总容量",
+          "impact": "政治支持、土地交易与后续许可不确定性增加，但市长罢免不撤销跨辖区批文。",
+          "caveat": "后期跨 Yukon + OKC 构想为约 480 英亩、15 栋、150 亿美元；不同时间和范围，不可与早期数相加；终端客户未确认。",
+          "sources": [
+            "https://okenergytoday.com/2025/08/data-center-proposed-in-yukon/",
+            "https://www.hppr.org/hppr-news/2026-07-27/a-loophole-leaves-oklahoma-data-center-water-consumption-largely-untracked",
+            "https://freepressokc.com/city-council-approves-zoning-for-massive-data-center-in-west-okc/"
+          ],
+          "capexQualifier": "",
+          "capacityText": null
+        }
+      ],
+      "sources": [
+        "https://x.com/jdcapelouto/status/2117822699678371944"
+      ],
+      "caveat": "",
+      "nameZh": "",
+      "coordinateBasis": "Census representative internal point; approximate city location, not data-center parcel",
+      "geoid": "4082950",
+      "coordinateYear": 2024
+    },
+    {
+      "id": "edgewater",
+      "city": "Edgewater",
+      "state": "FL",
+      "lat": 28.954439,
+      "lng": -80.940857,
+      "policy": "ban",
+      "result": "作者报：新建禁令写入宪章有望通过；检索即时票约 77% 赞成",
+      "policyText": "限制新数据中心的批准、建设、扩建及运营。",
+      "projects": [
+        {
+          "id": "edgewater-unknown",
+          "company": "未确认",
+          "name": "地方开发限制",
+          "mw": null,
+          "capexB": null,
+          "stage": "unknown",
+          "companyKeys": [],
+          "tickers": [],
+          "area": "未披露",
+          "capacityBasis": "规划负荷；非在运 IT 容量",
+          "impact": "主要约束未来新开发，尚无证据表明现有中心必须关闭。",
+          "caveat": "未核实到具体开发商、租户、MW 或总投资。",
+          "sources": [],
+          "capexQualifier": "",
+          "capacityText": null
+        }
+      ],
+      "sources": [
+        "https://x.com/jdcapelouto/status/2117786711350472888",
+        "https://ballotpedia.org/Edgewater,_Florida,_Prohibit_New_Data_Centers_Amendment_(November_2026)"
+      ],
+      "caveat": "",
+      "nameZh": "",
+      "coordinateBasis": "Census representative internal point; approximate city location, not data-center parcel",
+      "geoid": "1219825",
+      "coordinateYear": 2024
+    },
+    {
+      "id": "defiance",
+      "city": "Defiance",
+      "state": "OH",
+      "lat": 41.28099,
+      "lng": -84.365835,
+      "policy": "ban",
+      "result": "作者报：超过 25MW 的禁令通过",
+      "policyText": "相邻 / 聚合地块和不同能源来源合并计算，不能据条文推断现有设施关停。",
+      "projects": [
+        {
+          "id": "defiance-unknown",
+          "company": "未确认",
+          "name": "地方开发限制",
+          "mw": null,
+          "capexB": null,
+          "stage": "unknown",
+          "companyKeys": [],
+          "tickers": [],
+          "area": "未披露",
+          "capacityBasis": "规划负荷；非在运 IT 容量",
+          "impact": "限制大型新开发；未能可靠映射具体公司。",
+          "caveat": "未核实到具体开发商、租户、MW 或总投资。",
+          "sources": [],
+          "capexQualifier": "",
+          "capacityText": null
+        }
+      ],
+      "sources": [
+        "https://x.com/jdcapelouto/status/2117807057000632462",
+        "https://ballotpedia.org/Defiance,_Ohio,_Prohibit_Data_Center_Construction_Initiative_(November_2026)"
+      ],
+      "caveat": "",
+      "nameZh": "",
+      "coordinateBasis": "Census representative internal point; approximate city location, not data-center parcel",
+      "geoid": "3921308",
+      "coordinateYear": 2024
+    },
+    {
+      "id": "granville",
+      "city": "Granville",
+      "state": "OH",
+      "lat": 40.0568,
+      "lng": -82.50414,
+      "policy": "ban",
+      "result": "作者截图：超过 25MW 禁令约 82.45% 通过",
+      "policyText": "城市宪章开发限制。",
+      "projects": [
+        {
+          "id": "granville-unknown",
+          "company": "未确认",
+          "name": "地方开发限制",
+          "mw": null,
+          "capexB": null,
+          "stage": "unknown",
+          "companyKeys": [],
+          "tickers": [],
+          "area": "未披露",
+          "capacityBasis": "规划负荷；非在运 IT 容量",
+          "impact": "未来大型项目开发选择权受限。",
+          "caveat": "未核实到具体开发商、租户、MW 或总投资。",
+          "sources": [],
+          "capexQualifier": "",
+          "capacityText": null
+        }
+      ],
+      "sources": [
+        "https://x.com/jdcapelouto/status/2117816198066843772"
+      ],
+      "caveat": "",
+      "nameZh": "",
+      "coordinateBasis": "Census representative internal point; approximate village location, not data-center parcel",
+      "geoid": "3931402",
+      "coordinateYear": 2024
+    },
+    {
+      "id": "wilmington",
+      "city": "Wilmington",
+      "state": "OH",
+      "lat": 39.429125,
+      "lng": -83.816172,
+      "policy": "zoning",
+      "result": "作者报：四项允许数据中心的改划遭否决",
+      "policyText": "约 545 英亩地块；开发商与结果方向仍需县级文件进一步核实。",
+      "projects": [
+        {
+          "id": "wilmington-unknown",
+          "company": "未确认",
+          "name": "地方开发限制",
+          "mw": null,
+          "capexB": null,
+          "stage": "unknown",
+          "companyKeys": [],
+          "tickers": [],
+          "area": "未披露",
+          "capacityBasis": "规划负荷；非在运 IT 容量",
+          "impact": "土地改划路径受阻；不能直接归入 AWS 受损敞口。",
+          "caveat": "土地代表称与 AWS 无关，Ardent 夏季已退出；不得把反对组织提及的 60 亿美元当作核实预算。",
+          "sources": [],
+          "capexQualifier": "",
+          "capacityText": null
+        }
+      ],
+      "sources": [
+        "https://x.com/jdcapelouto/status/2117824364133621942",
+        "https://www.realchangewilmington.com/post/4-rezoning-referendums-on-november-3rd-ballot"
+      ],
+      "caveat": "",
+      "nameZh": "",
+      "coordinateBasis": "Census representative internal point; approximate city location, not data-center parcel",
+      "geoid": "3985792",
+      "coordinateYear": 2024
+    },
+    {
+      "id": "grove-city",
+      "city": "Grove City",
+      "state": "OH",
+      "lat": 39.885822,
+      "lng": -83.096959,
+      "policy": "conditions",
+      "result": "作者报：重大开发须公投约 55% 通过",
+      "policyText": "增加选民审批关口，尚非全面禁建。",
+      "projects": [
+        {
+          "id": "grove-city-unknown",
+          "company": "未确认",
+          "name": "地方开发限制",
+          "mw": null,
+          "capexB": null,
+          "stage": "unknown",
+          "companyKeys": [],
+          "tickers": [],
+          "area": "未披露",
+          "capacityBasis": "规划负荷；非在运 IT 容量",
+          "impact": "审批周期及项目能否获得公众同意增加不确定性。",
+          "caveat": "未核实到具体开发商、租户、MW 或总投资。",
+          "sources": [],
+          "capexQualifier": "",
+          "capacityText": null
+        }
+      ],
+      "sources": [
+        "https://x.com/jdcapelouto/status/2117825265430831470"
+      ],
+      "caveat": "",
+      "nameZh": "",
+      "coordinateBasis": "Census representative internal point; approximate city location, not data-center parcel",
+      "geoid": "3932592",
+      "coordinateYear": 2024
+    },
+    {
+      "id": "bloomington",
+      "city": "Bloomington",
+      "state": "IL",
+      "lat": 40.475777,
+      "lng": -88.969912,
+      "policy": "advisory",
+      "result": "作者报：支持大型数据中心暂停的咨询票通过",
+      "policyText": "无约束力；仍需后续立法 / 行政行动。",
+      "projects": [
+        {
+          "id": "bloomington-unknown",
+          "company": "未确认",
+          "name": "地方开发限制",
+          "mw": null,
+          "capexB": null,
+          "stage": "unknown",
+          "companyKeys": [],
+          "tickers": [],
+          "area": "未披露",
+          "capacityBasis": "规划负荷；非在运 IT 容量",
+          "impact": "反映政治阻力，本次咨询票不自行暂停或关闭设施。",
+          "caveat": "未核实到具体开发商、租户、MW 或总投资。",
+          "sources": [],
+          "capexQualifier": "",
+          "capacityText": null
+        }
+      ],
+      "sources": [
+        "https://x.com/jdcapelouto/status/2117826396936376473"
+      ],
+      "caveat": "",
+      "nameZh": "",
+      "coordinateBasis": "Census representative internal point; approximate city location, not data-center parcel",
+      "geoid": "1706613",
+      "coordinateYear": 2024
+    },
+    {
+      "id": "belvidere",
+      "city": "Belvidere",
+      "state": "NJ",
+      "lat": 40.829802,
+      "lng": -75.073337,
+      "policy": "advisory",
+      "result": "作者报：推动全镇禁令的咨询票约 75% 通过",
+      "policyText": "咨询投票本身不形成禁令。",
+      "projects": [
+        {
+          "id": "belvidere-unknown",
+          "company": "未确认",
+          "name": "地方开发限制",
+          "mw": null,
+          "capexB": null,
+          "stage": "unknown",
+          "companyKeys": [],
+          "tickers": [],
+          "area": "未披露",
+          "capacityBasis": "规划负荷；非在运 IT 容量",
+          "impact": "后续是否立法仍待观察；尚无可确认公司敞口。",
+          "caveat": "未核实到具体开发商、租户、MW 或总投资。",
+          "sources": [],
+          "capexQualifier": "",
+          "capacityText": null
+        }
+      ],
+      "sources": [
+        "https://x.com/jdcapelouto/status/2117826715678601595"
+      ],
+      "caveat": "",
+      "nameZh": "",
+      "coordinateBasis": "Census representative internal point; approximate city location, not data-center parcel",
+      "geoid": "3404990",
+      "coordinateYear": 2024
+    },
+    {
+      "id": "peru",
+      "city": "Peru",
+      "state": "ME",
+      "lat": 44.460915,
+      "lng": -70.451923,
+      "policy": "moratorium",
+      "result": "作者报：180 天开发与许可暂停通过",
+      "policyText": "临时冻结；不等同永久禁止。",
+      "projects": [
+        {
+          "id": "peru-unknown",
+          "company": "未确认",
+          "name": "地方开发限制",
+          "mw": null,
+          "capexB": null,
+          "stage": "unknown",
+          "companyKeys": [],
+          "tickers": [],
+          "area": "未披露",
+          "capacityBasis": "规划负荷；非在运 IT 容量",
+          "impact": "拟建项目审批时间延后；未确认具体运营商。",
+          "caveat": "未核实到具体开发商、租户、MW 或总投资。",
+          "sources": [],
+          "capexQualifier": "",
+          "capacityText": null
+        }
+      ],
+      "sources": [
+        "https://x.com/jdcapelouto/status/2117840174549729732"
+      ],
+      "caveat": "",
+      "nameZh": "",
+      "coordinateBasis": "Census county-subdivision representative internal point; approximate town location, not data-center parcel",
+      "geoid": "2301758270",
+      "coordinateYear": 2024
+    }
+  ],
+  "elections": {
+    "GA": {
+      "stateCode": "GA",
+      "name": "Georgia",
+      "priorGovernor": "Brian Kemp",
+      "priorParty": "R",
+      "winner": "Keisha Lance Bottoms",
+      "newParty": "D",
+      "status": "called",
+      "calledAt": "2026-11-04T02:24:31Z",
+      "governorFlip": true,
+      "certified": false,
+      "assumedOffice": false,
+      "legislativeStatus": "未完成本次核查；不等于控制权未变化",
+      "house": null,
+      "senate": null,
+      "sources": [
+        "https://apnews.com/article/521a4669d5404d30ac82d3e9597669b4"
+      ],
+      "note": "已核实州长选举换党；州议会结果未完整核实，不推定民主党三权控制。"
+    },
+    "OH": {
+      "stateCode": "OH",
+      "name": "Ohio",
+      "priorGovernor": "Mike DeWine",
+      "priorParty": "R",
+      "winner": "Amy Acton",
+      "newParty": "D",
+      "status": "called",
+      "calledAt": "2026-11-04T03:49:29Z",
+      "governorFlip": true,
+      "certified": false,
+      "assumedOffice": false,
+      "legislativeStatus": "共和党保住州众议院及参议院；媒体结果口径",
+      "house": "R retained",
+      "senate": "R retained",
+      "sources": [
+        "https://apnews.com/article/72209f23c091478f87db1abde4ff6e60",
+        "https://ballotpedia.org/Election_results,_2026:_State_legislatures"
+      ],
+      "note": "当选后预期形成民主党州长＋共和党两院的分治；交接尚未生效。"
+    },
+    "IA": {
+      "stateCode": "IA",
+      "name": "Iowa",
+      "priorGovernor": "Kim Reynolds",
+      "priorParty": "R",
+      "winner": "Rob Sand",
+      "newParty": "D",
+      "status": "called",
+      "calledAt": "2026-11-04T04:12:44Z",
+      "governorFlip": true,
+      "certified": false,
+      "assumedOffice": false,
+      "legislativeStatus": "未完成本次核查；不等于控制权未变化",
+      "house": null,
+      "senate": null,
+      "sources": [
+        "https://apnews.com/article/d281bb94a2284714b47d04808fa43ca1"
+      ],
+      "note": "已核实州长选举换党；州议会结果未完整核实，不推定民主党三权控制。"
+    },
+    "TX": {
+      "stateCode": "TX",
+      "name": "Texas",
+      "priorGovernor": "Greg Abbott",
+      "priorParty": "R",
+      "winner": "Gina Hinojosa",
+      "newParty": "D",
+      "status": "called",
+      "calledAt": "2026-11-04T04:17:54Z",
+      "governorFlip": true,
+      "certified": false,
+      "assumedOffice": false,
+      "legislativeStatus": "未完成本次核查；不等于控制权未变化",
+      "house": null,
+      "senate": null,
+      "sources": [
+        "https://apnews.com/article/4cbe7e21109148709cb9d4a5a599bb5d"
+      ],
+      "note": "已核实州长选举换党；州议会结果未完整核实，不推定民主党三权控制。"
+    },
+    "ME": {
+      "stateCode": "ME",
+      "name": "Maine",
+      "priorGovernor": "Janet Mills",
+      "priorParty": "D",
+      "winner": "Hannah Pingree",
+      "newParty": "D",
+      "status": "called",
+      "calledAt": "2026-11-04T04:29:45Z",
+      "governorFlip": false,
+      "certified": false,
+      "assumedOffice": false,
+      "legislativeStatus": "未完成本次核查；不等于控制权未变化",
+      "house": null,
+      "senate": null,
+      "sources": [
+        "https://apnews.com/article/c40e049375b64433b522d023e1ff23ef"
+      ],
+      "note": "州长所属党维持；更换个人或连任不等于换党。"
+    },
+    "FL": {
+      "stateCode": "FL",
+      "name": "Florida",
+      "priorGovernor": "Ron DeSantis",
+      "priorParty": "R",
+      "winner": "Byron Donalds",
+      "newParty": "R",
+      "status": "called",
+      "calledAt": "2026-11-04T02:09:37Z",
+      "governorFlip": false,
+      "certified": false,
+      "assumedOffice": false,
+      "legislativeStatus": "共和党保住州众议院及参议院；媒体结果口径",
+      "house": "R retained",
+      "senate": "R retained",
+      "sources": [
+        "https://apnews.com/article/b9362976a9a9402494548f9cdd4c51fd",
+        "https://ballotpedia.org/Election_results,_2026:_State_legislatures"
+      ],
+      "note": "州长所属党维持；更换个人或连任不等于换党。"
+    },
+    "OK": {
+      "stateCode": "OK",
+      "name": "Oklahoma",
+      "priorGovernor": "Kevin Stitt",
+      "priorParty": "R",
+      "winner": "Mike Mazzei",
+      "newParty": "R",
+      "status": "called",
+      "calledAt": "2026-11-04T04:47:14Z",
+      "governorFlip": false,
+      "certified": false,
+      "assumedOffice": false,
+      "legislativeStatus": "共和党保住州众议院及参议院；媒体结果口径",
+      "house": "R retained",
+      "senate": "R retained",
+      "sources": [
+        "https://apnews.com/article/97095aae4a924371b113e64bc7d868e6",
+        "https://ballotpedia.org/Election_results,_2026:_State_legislatures"
+      ],
+      "note": "州长所属党维持；更换个人或连任不等于换党。"
+    },
+    "IL": {
+      "stateCode": "IL",
+      "name": "Illinois",
+      "priorGovernor": "JB Pritzker",
+      "priorParty": "D",
+      "winner": "JB Pritzker",
+      "newParty": "D",
+      "status": "called",
+      "calledAt": "2026-11-04T01:01:06Z",
+      "governorFlip": false,
+      "certified": false,
+      "assumedOffice": false,
+      "legislativeStatus": "州参议院民主党保住；州众议院在所取快照中尚待定",
+      "house": null,
+      "senate": "D retained",
+      "sources": [
+        "https://apnews.com/article/0699147af2c14b93b0c3b822c8b91028",
+        "https://ballotpedia.org/Election_results,_2026:_State_legislatures"
+      ],
+      "note": "州长所属党维持；更换个人或连任不等于换党。"
+    },
+    "KS": {
+      "stateCode": "KS",
+      "name": "Kansas",
+      "priorGovernor": "Laura Kelly",
+      "priorParty": "D",
+      "winner": null,
+      "newParty": null,
+      "status": "pending",
+      "calledAt": null,
+      "governorFlip": false,
+      "certified": false,
+      "assumedOffice": false,
+      "legislativeStatus": "未完成本次核查；不等于控制权未变化",
+      "house": null,
+      "senate": null,
+      "sources": [
+        "https://apnews.com/article/eef95708ad9460def594935ac301c4f5",
+        "https://www.kmbc.com/article/kansas-state-executive-races-november-2026-governor-ag/74287686"
+      ],
+      "note": "州长选举待核实：Cindy Holscher（D）vs Ty Masterson（R）；不按领先票判断换党。"
+    },
+    "NJ": {
+      "stateCode": "NJ",
+      "name": "New Jersey",
+      "priorGovernor": "Mikie Sherrill",
+      "priorParty": "D",
+      "winner": null,
+      "newParty": "D",
+      "status": "no-election",
+      "calledAt": null,
+      "governorFlip": false,
+      "certified": false,
+      "assumedOffice": false,
+      "legislativeStatus": "未完成本次核查；不等于控制权未变化",
+      "house": null,
+      "senate": null,
+      "sources": [
+        "https://www.nj.gov/state/elections/election-information-2026.shtml",
+        "https://nj.gov/governor/news/remarks/approved/20260120b_gov.shtml"
+      ],
+      "note": "本次无常规州长选举；Sherrill 的胜选属于 2025 年，不能算作本次换党。"
+    }
+  },
+  "electionMeta": {
+    "asOf": "2026-11-04T13:20:00+08:00",
+    "legislatureAsOf": "2026-11-04T12:57:00+08:00",
+    "scope": "核实到的州长换党州＋数据中心讨论涉及州；不是全美最终清点",
+    "status": "AP race calls / 未认证",
+    "nationalFlipCount": 4,
+    "legislatureNote": "州议会来源快照仅 29/88 议院已叫票，59 待定；当时尚未报告议院控制翻转，不代表最后不会变化。",
+    "sources": [
+      "https://apnews.com/article/ef6199e25927a9ac9f4c18eae0e497cd",
+      "https://ballotpedia.org/Election_results,_2026:_State_legislatures",
+      "https://www.ncsl.org/about-state-legislatures/state-partisan-composition"
+    ]
+  },
+  "geography": {
+    "source": "Natural Earth Admin-1, simplified",
+    "url": "https://www.naturalearthdata.com/about/terms-of-use/",
+    "note": "CONUS州界；城市近似点，不是地块。"
+  }
+}
